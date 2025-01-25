@@ -24,9 +24,13 @@ namespace TradingServer.Core {
         public Task Run(CancellationToken token) => ExecuteAsync(token);
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken) {
+            _logger.LogInformation($"Starting process {nameof(TradingServer)}");
             while (!stoppingToken.IsCancellationRequested) {
-
+                // CancellationTokenSource cts = new CancellationTokenSource();
+                //cts.Cancel();
+                //cts.Dispose();
             }
+            // _logger.LogInformation($"Ending process {nameof(TradingServer)}");
         return Task.CompletedTask;
         }
     }

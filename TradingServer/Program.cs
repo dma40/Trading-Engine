@@ -1,9 +1,16 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System;
+﻿
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using System.Runtime.InteropServices;
 
 using TradingServer.Core;
+
+using var engine = TradingHostBuilder.BuildTradingServer();
+TradingServerServiceProvider.serviceProvider = engine.Services;
+{
+    using var scope = TradingServerServiceProvider.serviceProvider.CreateScope();
+    await engine.RunAsync().ConfigureAwait(false);
+}
+
+Console.WriteLine("console");
 
 
