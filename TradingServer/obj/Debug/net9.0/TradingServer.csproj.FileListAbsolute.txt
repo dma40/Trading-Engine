@@ -1,0 +1,15 @@
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/bin/Debug/net9.0/TradingServer
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/bin/Debug/net9.0/TradingServer.deps.json
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/bin/Debug/net9.0/TradingServer.runtimeconfig.json
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/bin/Debug/net9.0/TradingServer.dll
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/bin/Debug/net9.0/TradingServer.pdb
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.GeneratedMSBuildEditorConfig.editorconfig
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfo.cs
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.csproj.CoreCompileInputs.cache
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.sourcelink.json
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.dll
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/refint/TradingServer.dll
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.pdb
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.genruntimeconfig.cache
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/ref/TradingServer.dll
