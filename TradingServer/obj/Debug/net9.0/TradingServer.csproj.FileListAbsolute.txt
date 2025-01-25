@@ -13,3 +13,4 @@
 /Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.pdb
 /Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.genruntimeconfig.cache
 /Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/ref/TradingServer.dll
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.csproj.AssemblyReference.cache

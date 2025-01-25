@@ -1,4 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+using System;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.InteropServices;
 
-Console.WriteLine("This is a preliminary test that things work ok");
+using TradingServer.Core;
+
+
