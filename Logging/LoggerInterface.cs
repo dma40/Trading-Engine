@@ -14,6 +14,9 @@ namespace TradingServer.Logging {
 
         void Warning(string module, Exception e);
 
+        void Error(string module, string msg);
+
+        void Error(string module, Exception e);
 
     }
 }

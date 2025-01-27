@@ -1,10 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TradingServer.Core.Configuration;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
+using TradingServer.Logging;
 
 namespace TradingServer.Core;
 
@@ -15,6 +12,7 @@ public class TradingHostBuilder {
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
 
         services.AddSingleton<ITradingServer, TradingServer>();
+        services.AddSingleton<ITextLogger, TextLogger>();
 
         services.AddHostedService<TradingServer>();
     })

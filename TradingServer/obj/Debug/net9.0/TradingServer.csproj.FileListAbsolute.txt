@@ -46,3 +46,5 @@
 /Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/refint/TradingServer.Core.dll
 /Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/TradingServer.Core.pdb
 /Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/obj/Debug/net9.0/ref/TradingServer.Core.dll
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/bin/Debug/net9.0/Logging.dll
+/Users/dylan.ma/Documents/GitHub/Trading-Engine/TradingServer/bin/Debug/net9.0/Logging.pdb

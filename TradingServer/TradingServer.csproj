@@ -12,12 +12,17 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
+    <ProjectReference Include="/Logging" />
   </ItemGroup>
 
   <ItemGroup>
       <None Update="appsettings.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Logging\Logging.csproj" />
   </ItemGroup>
 
 </Project>

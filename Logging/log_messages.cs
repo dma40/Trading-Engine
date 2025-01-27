@@ -11,4 +11,9 @@ namespace TradingServer.Logging {
         Warning,
         Error
     }
+
+    public enum LoggerTypes {
+        Text,
+        Database
+    }
 }
