@@ -12,7 +12,7 @@ namespace TradingServer.Logging {
         Error
     }
 
-    public enum LoggerTypes {
+    public enum LoggerType {
         Text,
         Database
     }

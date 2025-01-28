@@ -604,17 +604,17 @@
           }
         }
       },
-      "Logging/1.0.0": {
+      "TradingServer.Logging/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "Microsoft.Extensions.Logging": "9.0.1"
         },
         "compile": {
-          "bin/placeholder/Logging.dll": {}
+          "bin/placeholder/TradingServer.Logging.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Logging.dll": {}
+          "bin/placeholder/TradingServer.Logging.dll": {}
         }
       }
     }
@@ -1492,7 +1492,7 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Logging/1.0.0": {
+    "TradingServer.Logging/1.0.0": {
       "type": "project",
       "path": "../Logging/Logging.csproj",
       "msbuildProject": "../Logging/Logging.csproj"
@@ -1500,9 +1500,9 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "Logging >= 1.0.0",
       "Microsoft.Extensions.DependencyInjection >= 9.0.1",
-      "Microsoft.Extensions.Hosting >= 9.0.1"
+      "Microsoft.Extensions.Hosting >= 9.0.1",
+      "TradingServer.Logging >= 1.0.0"
     ]
   },
   "packageFolders": {

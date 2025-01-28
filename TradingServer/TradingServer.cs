@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TradingServer.Core.Configuration;
+using TradingServer.Logging.LoggingConfiguration;
 
 using TradingServer.Logging;
 
@@ -15,7 +10,6 @@ namespace TradingServer.Core {
 
     class TradingServer: BackgroundService, ITradingServer {
 
-        //private readonly ILogger<TradingServer> _logger;
         private readonly ITextLogger _logger;
         private readonly TradingServerConfiguration _tradingConfig;
 

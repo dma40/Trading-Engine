@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 using TradingServer.Core;
-// using TradingServer.Logging;
 
 using var engine = TradingHostBuilder.BuildTradingServer();
 TradingServerServiceProvider.serviceProvider = engine.Services;

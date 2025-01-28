@@ -2,12 +2,12 @@ using System;
 
 namespace TradingServer.Logging.LoggingConfiguration {
     public class LoggerConfiguration {
-        public LoggerTypes LoggerType { get; set; }
-        public TextLoggerConfiguration TextLoggerConfiguration {get; set; }
+        public LoggerType LoggerType { get; set; }
+        public TextLoggerConfiguration TextLoggerConfiguration { get; set; }
     }
 
     public class TextLoggerConfiguration {
-        public string Directory {get; set; }
+        public string Directory { get; set; }
 
         public string Filename { get; set; }
 

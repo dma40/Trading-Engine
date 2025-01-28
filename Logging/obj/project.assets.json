@@ -363,7 +363,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "/Users/dylan.ma/Documents/GitHub/Trading-Engine/Logging/Logging.csproj",
-      "projectName": "Logging",
+      "projectName": "TradingServer.Logging",
       "projectPath": "/Users/dylan.ma/Documents/GitHub/Trading-Engine/Logging/Logging.csproj",
       "packagesPath": "/Users/dylan.ma/.nuget/packages/",
       "outputPath": "/Users/dylan.ma/Documents/GitHub/Trading-Engine/Logging/obj/",

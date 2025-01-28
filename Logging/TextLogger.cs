@@ -1,6 +1,7 @@
 
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using TradingServer.Logging.LoggingConfiguration;
 
 namespace TradingServer.Logging {
@@ -9,8 +10,18 @@ namespace TradingServer.Logging {
         private readonly LoggerConfiguration _logConfig;
 
         public TextLogger(IOptions<LoggerConfiguration> logConfig): base() {
-            _logConfig = logConfig.Value ?? throw new ArgumentNullException();
-            if (_logConfig.LoggerType != LoggerTypes.Text) {
+            // do this to temporarily address bug with the .json file, which is not working for some reason
+            var log = new LoggerConfiguration {
+                LoggerType = LoggerType.Text,
+                TextLoggerConfiguration = new TextLoggerConfiguration {
+                    Directory = "/Users/dylan.ma/Documents/Trading-Engine",
+                    Filename = "TradingLogFile",
+                    FileExtension = ".log"
+                }
+            };
+
+            _logConfig = log ?? throw new ArgumentNullException();
+            if (_logConfig.LoggerType != LoggerType.Text) {
                 throw new InvalidOperationException("You can't initialize a TextLogger in this way. That is the wrong type");
             }
             
@@ -18,7 +29,8 @@ namespace TradingServer.Logging {
             string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory, $"{now:yyyy-MM-dd}");
             string baseName = Path.Combine($"{_logConfig.TextLoggerConfiguration.Filename}-{now:HH-mm-ss}",
                                             _logConfig.TextLoggerConfiguration.FileExtension);
-            string filepath = Path.Combine(logdir, baseName);
+            // string filepath = Path.Combine(logdir, baseName);
+            string filepath = Path.ChangeExtension(logdir, baseName);
 
             Directory.CreateDirectory(logdir);
 
