@@ -14,6 +14,7 @@ namespace TradingServer.Logging {
 
     public enum LoggerType {
         Text,
-        Database
+        // Database
+        // Trace
     }
 }

@@ -1,7 +1,6 @@
 
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 using TradingServer.Logging.LoggingConfiguration;
 
 namespace TradingServer.Logging {
@@ -27,18 +26,18 @@ namespace TradingServer.Logging {
             
             var now = DateTime.Now;
             string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory, $"{now:yyyy-MM-dd}");
-            string baseName = Path.Combine($"{_logConfig.TextLoggerConfiguration.Filename}-{now:HH-mm-ss}",
-                                            _logConfig.TextLoggerConfiguration.FileExtension);
-            // string filepath = Path.Combine(logdir, baseName);
-            string filepath = Path.ChangeExtension(logdir, baseName);
+            string filename = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:HH-mm-ss}";
+            string logbase = Path.ChangeExtension(filename, _logConfig.TextLoggerConfiguration.FileExtension);
+
+            string filepath = Path.Combine(logdir, logbase);
 
             Directory.CreateDirectory(logdir);
 
             _ = Task.Run(() => LogAsync(filepath, _logQueue, _ts.Token));
         }
 
-        private static async Task LogAsync(string file_path, BufferBlock<LogInformation> logs, CancellationToken token) {
-            using var filestream = new FileStream(file_path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+        private static async Task LogAsync(string filepath, BufferBlock<LogInformation> logs, CancellationToken token) {
+            using var filestream = new FileStream(filepath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
             using var streamwriter = new StreamWriter(filestream) {AutoFlush = true};
             try {
                 while (true) {

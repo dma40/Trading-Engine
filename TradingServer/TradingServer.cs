@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TradingServer.Core.Configuration;
-using TradingServer.Logging.LoggingConfiguration;
 
 using TradingServer.Logging;
 
