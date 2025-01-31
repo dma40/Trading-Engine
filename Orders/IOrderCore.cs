@@ -1,4 +1,6 @@
-﻿namespace TradingServer.Orders {
+﻿using System;
+
+namespace TradingServer.Orders {
 
     public interface IOrderCore
     {

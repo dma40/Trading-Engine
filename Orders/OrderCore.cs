@@ -1,3 +1,5 @@
+using System;
+
 namespace TradingServer.Orders {
     public class OrderCore: IOrderCore {
         public OrderCore(long orderID, string username, int securityID) {

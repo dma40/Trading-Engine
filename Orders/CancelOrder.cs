@@ -1,3 +1,5 @@
+using System;
+
 namespace TradingServer.Orders {
     public class CancelOrder: IOrderCore {
         public CancelOrder(IOrderCore core) {
