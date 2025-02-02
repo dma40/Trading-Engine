@@ -1,5 +1,7 @@
-namespace TradingServer.Core {
-    interface ITradingServer {
+namespace TradingServer.Core 
+{
+    interface ITradingServer 
+    {
         Task Run(CancellationToken token);
     }
 }

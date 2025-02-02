@@ -3,8 +3,10 @@ using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Options;
 using TradingServer.Logging.LoggingConfiguration;
 
-namespace TradingServer.Logging {
-    public class TextLogger: AbstractLogger, ITextLogger {
+namespace TradingServer.Logging 
+{
+    public class TextLogger: AbstractLogger, ITextLogger 
+    {
 
         private readonly LoggerConfiguration _logConfig;
 

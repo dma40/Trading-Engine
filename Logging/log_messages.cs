@@ -2,7 +2,8 @@
 
 // Extra: DBLogger, ConsoleLogger
 
-namespace TradingServer.Logging {
+namespace TradingServer.Logging 
+{
 
     public enum message_types
     {
@@ -12,7 +13,8 @@ namespace TradingServer.Logging {
         Error
     }
 
-    public enum LoggerType {
+    public enum LoggerType 
+    {
         Text,
         // Database
         // Trace

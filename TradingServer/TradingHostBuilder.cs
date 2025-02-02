@@ -5,7 +5,8 @@ using TradingServer.Logging;
 
 namespace TradingServer.Core;
 
-public class TradingHostBuilder {
+public class TradingHostBuilder 
+{
     public static IHost BuildTradingServer() => Host.CreateDefaultBuilder().ConfigureServices((context, services) =>
     {
         services.AddOptions();

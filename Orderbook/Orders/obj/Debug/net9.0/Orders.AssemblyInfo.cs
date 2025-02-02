@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("TradingServer.Core")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("TradingServer.Orders")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e96755f3b1225ff958848008e0a43bf6236cb79f")]
-[assembly: System.Reflection.AssemblyProductAttribute("TradingServer.Core")]
-[assembly: System.Reflection.AssemblyTitleAttribute("TradingServer.Core")]
+[assembly: System.Reflection.AssemblyProductAttribute("TradingServer.Orders")]
+[assembly: System.Reflection.AssemblyTitleAttribute("TradingServer.Orders")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Généré par la classe MSBuild WriteCodeFragment.
