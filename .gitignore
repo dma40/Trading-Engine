@@ -35,3 +35,4 @@ Logging/bin/Debug/net9.0/TradingServer.Logging.dll
 Orderbook/Orders/obj/Debug/net9.0/Orders.AssemblyInfoInputs.cache
 Orderbook/Orders/obj/Debug/net9.0/.NETCoreApp,Version=v9.0.AssemblyAttributes.cs
 TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
+Logging/bin/Debug/net9.0/TradingServer.Logging.dll
