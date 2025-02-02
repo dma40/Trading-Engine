@@ -62,22 +62,11 @@ namespace TradingServer.Orderbook
         public void removeOrder(CancelOrder cancel)
         {
             // we need to find the appropriate ID, and then cancel it
-            if (!containsOrder(cancel.OrderID))
+            if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
             {
-                throw new InvalidOperationException("This order does not exist in the orderbook");
-            }
-            // traverse the individual limits and then try to search for the appropriate order
-            else 
-            {
-                OrderbookEntry corresponding = _orders[cancel.OrderID];
+                removeOrder(cancel, orderbookentry, _orders);
             }
             // testcase for removing from head, removing from tail, removing from middle
-        }
-
-        public void cancelOrder(CancelOrder cancel)
-        // remove from head, remove from tail, remove from empty, remove from middle
-        {
-
         }
 
         public void modifyOrder(ModifyOrder modify)
@@ -85,20 +74,67 @@ namespace TradingServer.Orderbook
         {
             if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
             {
-                // removeOrder(modify.ToCancelOrder());
+                removeOrder(modify.cancelOrder());
+                addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
                 // find the corresponding entry
                 // then remove it 
                 // test if it is null
             }
         }
 
+        public void removeOrder(CancelOrder cancel, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
+        {
+
+        }
+
         public int count => _orders.Count;
-        public List<OrderbookEntry> getAskOrders() => throw new NotImplementedException();
-        public List<OrderbookEntry> getBidOrders() => throw new NotImplementedException();
+
+        public List<OrderbookEntry> getAskOrders()
+        {
+            List<OrderbookEntry> entries = new List<OrderbookEntry>();
+            foreach (var limit in _askLimits)
+            {
+                var headPointer = limit.head;
+                while (headPointer != null)
+                {
+                    entries.Add(headPointer);
+                    headPointer = headPointer.next;
+                }
+            }
+            return entries;
+        }
+
+        public List<OrderbookEntry> getBidOrders()
+        {
+            List<OrderbookEntry> entries = new List<OrderbookEntry>();
+            foreach (var limit in _bidLimits)
+            {
+                var headPointer = limit.head;
+                while (headPointer != null)
+                {
+                    entries.Add(headPointer);
+                    headPointer = headPointer.next;
+                }
+            }
+            return entries;
+        }
         public bool containsOrder(long orderID)
         {
             return _orders.ContainsKey(orderID);
         }
-        public OrderbookSpread spread() => throw new NotImplementedException();
+        public OrderbookSpread spread()
+        {
+            long? bestAsk = null, bestBid = null;
+            if (_askLimits.Any() && !_askLimits.Min.isEmpty)
+            {
+                bestAsk = _askLimits.Min.Price;
+            }
+
+            if (_bidLimits.Any() && !_askLimits.Min.isEmpty)
+            {
+                bestBid = _askLimits.Max.Price;
+            }
+            return new OrderbookSpread(bestBid, bestAsk);
+        }
     }
 }
