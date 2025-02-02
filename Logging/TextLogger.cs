@@ -11,7 +11,6 @@ namespace TradingServer.Logging
         private readonly LoggerConfiguration _logConfig;
 
         public TextLogger(IOptions<LoggerConfiguration> logConfig): base() {
-            // do this to temporarily address bug with the .json file, which is not working for some reason
             var log = new LoggerConfiguration {
                 LoggerType = LoggerType.Text,
                 TextLoggerConfiguration = new TextLoggerConfiguration {
