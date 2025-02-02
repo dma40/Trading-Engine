@@ -8,6 +8,5 @@ namespace TradingServer.Orderbook
         void cancelOrder(CancelOrder cancel);
         void modifyOrder(ModifyOrder modify);
         void removeOrder(CancelOrder cancel);
-
     }
 }
