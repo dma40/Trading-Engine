@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -88,7 +89,10 @@ namespace TradingServer.Orderbook
 
         public void removeOrder(CancelOrder cancel, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
-
+            // check each of the limits, find which limit it is in
+            // limitPointer = orderentry.isBuySide ? _askLimits[0] : _bidLimits[0]
+            // check lengths of lists
+            // then go through the limit to remove the value
         }
 
         public int count => _orders.Count;
