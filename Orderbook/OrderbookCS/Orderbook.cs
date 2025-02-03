@@ -6,6 +6,10 @@ using TradingServer.Orders;
 // Matching orderbook interface
 // if possible, order types + market type
 
+// Also, FIFO Orderbooks consider orders based on the time at which they come in
+// the usefulness of why we instantiate the UTC time to find a way of determining the earliest
+// orders
+
 namespace TradingServer.Orderbook
 {
     public class Orderbook: IRetrievalOrderbook
