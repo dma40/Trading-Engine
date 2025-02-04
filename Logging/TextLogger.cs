@@ -10,10 +10,13 @@ namespace TradingServer.Logging
 
         private readonly LoggerConfiguration _logConfig;
 
-        public TextLogger(IOptions<LoggerConfiguration> logConfig): base() {
-            var log = new LoggerConfiguration {
+        public TextLogger(IOptions<LoggerConfiguration> logConfig): base() 
+        {
+            var log = new LoggerConfiguration 
+            {
                 LoggerType = LoggerType.Text,
-                TextLoggerConfiguration = new TextLoggerConfiguration {
+                TextLoggerConfiguration = new TextLoggerConfiguration 
+                {
                     Directory = "/Users/dylan.ma/Documents/Trading-Engine",
                     Filename = "TradingLogFile",
                     FileExtension = ".log"
@@ -21,7 +24,8 @@ namespace TradingServer.Logging
             };
 
             _logConfig = log ?? throw new ArgumentNullException();
-            if (_logConfig.LoggerType != LoggerType.Text) {
+            if (_logConfig.LoggerType != LoggerType.Text) 
+            {
                 throw new InvalidOperationException("You can't initialize a TextLogger in this way. That is the wrong type");
             }
             
@@ -37,17 +41,21 @@ namespace TradingServer.Logging
             _ = Task.Run(() => LogAsync(filepath, _logQueue, _ts.Token));
         }
 
-        private static async Task LogAsync(string filepath, BufferBlock<LogInformation> logs, CancellationToken token) {
+        private static async Task LogAsync(string filepath, BufferBlock<LogInformation> logs, CancellationToken token) 
+        {
             using var filestream = new FileStream(filepath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
             using var streamwriter = new StreamWriter(filestream) {AutoFlush = true};
-            try {
-                while (true) {
+            try 
+            {
+                while (true) 
+                {
                     var logItem = await logs.ReceiveAsync(token).ConfigureAwait(false);
                     string formatted = FormatLogItem(logItem);
                     await streamwriter.WriteAsync(formatted).ConfigureAwait(false);
                 }
             }
-            catch (OperationCanceledException) {
+            catch (OperationCanceledException) 
+            {
                 Console.WriteLine("Something went wrong!");
             }
         }
@@ -58,26 +66,32 @@ namespace TradingServer.Logging
             Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name));
         }
 
-        private static string FormatLogItem(LogInformation log) {
+        private static string FormatLogItem(LogInformation log) 
+        {
             return $"[{log.now:HH-mm-ss.ffffff yyyy-MM-dd}]";
         }
 
-        ~TextLogger() {
+        ~TextLogger() 
+        {
             Dispose(false);
         }
 
-        public void Dispose() {
+        public void Dispose() 
+        {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(Boolean dispose) {
-            if (_disposed) {
+        protected virtual void Dispose(Boolean dispose) 
+        {
+            if (_disposed) 
+            {
                 return;
             }
             _disposed = true;
 
-            if (dispose) {
+            if (dispose) 
+            {
                 _ts.Cancel();
                 _ts.Dispose();
             }

@@ -51,7 +51,6 @@ namespace TradingServer.Orderbook
                     orderbookEntry.previous = tailPointer;
                     limit.tail = orderbookEntry;
                 }
-                orders.Add(order.OrderID, orderbookEntry);
             }
             else 
             {
@@ -59,9 +58,9 @@ namespace TradingServer.Orderbook
 
                 baseLimit.head = orderbookEntry;
                 baseLimit.tail = orderbookEntry;
-
-                orders.Add(order.OrderID, orderbookEntry);
             }
+
+            orders.Add(order.OrderID, orderbookEntry);
         }
 
         public void removeOrder(CancelOrder cancel)
@@ -69,7 +68,7 @@ namespace TradingServer.Orderbook
             // we need to find the appropriate ID, and then cancel it
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
             {
-                removeOrder(cancel, orderbookentry, _orders);
+                removeOrder(cancel.OrderID, orderbookentry, _orders);
             }
             // testcase for removing from head, removing from tail, removing from middle
         }
@@ -87,12 +86,42 @@ namespace TradingServer.Orderbook
             }
         }
 
-        public void removeOrder(CancelOrder cancel, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
+        public void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
-            // check each of the limits, find which limit it is in
-            // limitPointer = orderentry.isBuySide ? _askLimits[0] : _bidLimits[0]
-            // check lengths of lists
-            // then go through the limit to remove the value
+
+            if (orderentry.previous != null && orderentry.next != null)
+            {
+                orderentry.next.previous = orderentry.previous;
+                orderentry.previous.next = orderentry.next;
+            }
+
+            else if (orderentry.previous != null)
+            {
+                orderentry.previous.next = null;
+            }
+
+            else if (orderentry.next != null)
+            {
+                orderentry.next.previous = null;
+            }
+
+            if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
+            {
+                orderentry.ParentLimit.head = null;
+                orderentry.ParentLimit.tail = null;
+            }
+
+            else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
+            {
+                orderentry.ParentLimit.head = orderentry.next;
+            }
+
+            else if (orderentry.ParentLimit.tail == orderentry)
+            {
+                orderentry.ParentLimit.tail = orderentry.previous;
+            }
+
+            _orders.Remove(id);
         }
 
         public int count => _orders.Count;
@@ -126,19 +155,21 @@ namespace TradingServer.Orderbook
             }
             return entries;
         }
+
         public bool containsOrder(long orderID)
         {
             return _orders.ContainsKey(orderID);
         }
+
         public OrderbookSpread spread()
         {
             long? bestAsk = null, bestBid = null;
-            if (_askLimits.Any() && !_askLimits.Min.isEmpty)
+            if (_askLimits.Any() && ! _askLimits.Min.isEmpty)
             {
                 bestAsk = _askLimits.Min.Price;
             }
 
-            if (_bidLimits.Any() && !_askLimits.Min.isEmpty)
+            if (_bidLimits.Any() && ! _askLimits.Min.isEmpty)
             {
                 bestBid = _askLimits.Max.Price;
             }

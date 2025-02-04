@@ -6,17 +6,17 @@ namespace TradingServer.Orders
     {
         public static CancelOrderStatus GenerateCancel(CancelOrder cancel) 
         {
-            return new CancelOrderStatus();
+            return new CancelOrderStatus(true);
         }
 
         public static ModifyOrderStatus GenerateModify(ModifyOrder modify) 
         {
-            return new ModifyOrderStatus();
+            return new ModifyOrderStatus(true);
         }
 
         public static NewOrderStatus GenerateNew(Order order) 
         {
-            return new NewOrderStatus();
+            return new NewOrderStatus(true);
         }
     }
 }
