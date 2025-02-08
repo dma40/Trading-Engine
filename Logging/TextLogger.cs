@@ -7,7 +7,6 @@ namespace TradingServer.Logging
 {
     public class TextLogger: AbstractLogger, ITextLogger 
     {
-
         private readonly LoggerConfiguration _logConfig;
 
         public TextLogger(IOptions<LoggerConfiguration> logConfig): base() 

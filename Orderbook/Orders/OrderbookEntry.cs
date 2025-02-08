@@ -60,6 +60,7 @@ namespace TradingServer.Orders
             }
             return records;
         }
+
         public bool isEmpty 
         {
             get
@@ -67,6 +68,7 @@ namespace TradingServer.Orders
                 return head == null && tail == null;
             }
         }
+        
         public Side side 
         {
             get 
@@ -80,7 +82,6 @@ namespace TradingServer.Orders
                 }
             }
         }
-
     }
 
     public class OrderbookEntry
@@ -92,14 +93,10 @@ namespace TradingServer.Orders
             ParentLimit = parentLimit;
         }
 
-        public DateTime CreationTime { get; private set; }
-        
+        public DateTime CreationTime { get; private set; }      
         public Order CurrentOrder { get; private set; }
-
         public Limit ParentLimit { get; private set; }
-
         public OrderbookEntry next { get; set; }
-
         public OrderbookEntry previous { get; set; }
     }
 }

@@ -40,3 +40,11 @@ Logging/bin/Debug/net9.0/TradingServer.Logging.dll
 /Logging/bin
 Logging/bin/Debug/net9.0/TradingServer.Logging.pdb
 /Logging/bin
+TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
+TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
+TradingServer/obj/Debug/net9.0/TradingServer.sourcelink.json
+TradingServer/Program.cs
+TradingServer/obj/Debug/net9.0/TradingServer.sourcelink.json
+*.cache
+*.dll
+*.pdb

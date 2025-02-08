@@ -65,24 +65,9 @@ namespace TradingServer.Orderbook
 
         public void removeOrder(CancelOrder cancel)
         {
-            // we need to find the appropriate ID, and then cancel it
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
             {
                 removeOrder(cancel.OrderID, orderbookentry, _orders);
-            }
-            // testcase for removing from head, removing from tail, removing from middle
-        }
-
-        public void modifyOrder(ModifyOrder modify)
-        // modify from head, modify from tail, modify from middle, modify a empty 
-        {
-            if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
-            {
-                removeOrder(modify.cancelOrder());
-                addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
-                // find the corresponding entry
-                // then remove it 
-                // test if it is null
             }
         }
 
@@ -122,6 +107,16 @@ namespace TradingServer.Orderbook
             }
 
             _orders.Remove(id);
+        }
+
+        public void modifyOrder(ModifyOrder modify)
+        // modify from head, modify from tail, modify from middle, modify a empty 
+        {
+            if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
+            {
+                removeOrder(modify.cancelOrder());
+                addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+            }
         }
 
         public int count => _orders.Count;

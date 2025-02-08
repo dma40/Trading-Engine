@@ -13,19 +13,18 @@ namespace TradingServer.Orders
             
             else 
                 return 1;
-            
         }
     }
 
     public class AskLimitComparer: IComparer<Limit>
     {
         public static IComparer<Limit> comparer { get; } = new AskLimitComparer();
-        public int Compare(Limit ask, Limit other)
+        public int Compare(Limit limit, Limit other)
         {
-            if (ask.Price == other.Price)
+            if (limit.Price == other.Price)
                 return 0;
             
-            else if (ask.Price > other.Price)
+            else if (limit.Price > other.Price)
                 return -1;
             
             else 

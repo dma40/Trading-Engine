@@ -1,11 +1,17 @@
 
 using System;
+using TradingServer.Orders;
 
 namespace TradingServer.Orderbook
 {
     public class MatchResult
     {
-        // maybe return a temporary object of the matched orders
-        // return a head of a linkedlist of OrderbookEntry
+        public MatchResult() 
+        {
+            
+        }
+
+        public List<OrderRecord> result;
+        // should be a list of order records
     }
 }
