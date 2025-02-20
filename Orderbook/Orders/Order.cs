@@ -32,6 +32,12 @@ namespace TradingServer.Orders {
 
         public void DecreaseQuantity(uint decrease) 
         {
+            // Careful! When dealing with uints, if we decrease
+            // by more than the existing quantity, it "loops over" to the 
+            // maximum value of a unsigned int and subtracts from that resultant quantity,
+            // meaning that we need to prevent negative prices from occurring - this can 
+            // lead to serious consequences. 
+            
             if (decrease > CurrentQuantity) 
             {
                 throw new InvalidOperationException("You cannot take away more orders than are currently available!");

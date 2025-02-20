@@ -1,8 +1,12 @@
 
 using System;
+using System.Runtime.InteropServices.Swift;
 
 namespace TradingServer.Orders 
 {
+    // Limit class that does the following:
+    // - Stores orders sequentially based off of when they were added (important to matching orders in FIFO orderbooks)
+    // - get how many orders exist at this price level
     public class Limit 
     {
         public Limit(long price)
@@ -91,6 +95,18 @@ namespace TradingServer.Orders
             CreationTime = DateTime.UtcNow;
             CurrentOrder = currentOrder;
             ParentLimit = parentLimit;
+        }
+
+        public uint queuePosition()
+        {
+            uint count = 0;
+            OrderbookEntry orderPtr = previous;
+            if (previous != null) 
+            {
+                orderPtr = orderPtr.previous;
+                count += 1;
+            }
+            return count;
         }
 
         public DateTime CreationTime { get; private set; }      

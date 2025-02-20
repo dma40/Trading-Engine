@@ -1,8 +1,8 @@
-﻿
-using System;
+﻿using System;
 
 namespace TradingServer.Orderbook
 {
+
 
     public interface IReadOnlyOrderbook 
     {

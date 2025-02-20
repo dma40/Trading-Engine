@@ -1,5 +1,6 @@
 namespace TradingServer.Orderbook
 {
+    // Interface useful when making matching orderbooks in the future
     public interface IMatchingOrderbook: IRetrievalOrderbook
     {
         // matching orderbooks match up orders, and then returing a MatchResult,

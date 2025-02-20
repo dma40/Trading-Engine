@@ -21,6 +21,8 @@ namespace TradingServer.Orderbook
         public MatchResult match()
         {
             MatchResult result = new MatchResult();
+
+            // note the matching engine terminates when there are no more matches to complete
             
             while (canMatch()) // always looks out for matches whenever possible; ends when
             // no more matches can be executed
@@ -33,7 +35,7 @@ namespace TradingServer.Orderbook
 
                 while (askPtr != null && bidPtr != null)
                 {
-                    removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
+                    // removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
                     // find a order that can match bidPtr
 
 

@@ -1,5 +1,4 @@
 
-using System.Runtime.InteropServices.Swift;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -16,13 +15,18 @@ namespace TradingServer.Orderbook
 {
     public class Orderbook: IRetrievalOrderbook
     {
+        // In this orderbook, we define it so that 
+        // orders limits are unique - when we add a order to a price level that 
+        // already exists, we add it to the corresponding limit.
+        // Otherwise, we will create a new Limit with a null head and null tail and add it to that limit level.
+
+        // Instance attributes
         private readonly Security _instrument;
-        // this orderbook contains only a single security, which is why this contains a single Security object
         public readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
         public readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
-        // Precondition: ensure that each order has a unique ID
         public readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
 
+        // Constructor
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
@@ -188,7 +192,7 @@ namespace TradingServer.Orderbook
             {
                 foreach (var bid in _bidLimits)
                 {
-                    if (ask.Price == bid.Price)
+                    if (ask.Price < bid.Price)
                         return true;
                 }
             }
