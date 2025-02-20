@@ -1,4 +1,3 @@
-
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Options;
 using TradingServer.Logging.LoggingConfiguration;

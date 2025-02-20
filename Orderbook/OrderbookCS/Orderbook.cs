@@ -1,4 +1,5 @@
-using System.ComponentModel.Design;
+
+using System.Runtime.InteropServices.Swift;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -17,10 +18,10 @@ namespace TradingServer.Orderbook
     {
         private readonly Security _instrument;
         // this orderbook contains only a single security, which is why this contains a single Security object
-        private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
-        private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
+        public readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
+        public readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
         // Precondition: ensure that each order has a unique ID
-        private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
+        public readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
 
         public Orderbook(Security instrument) 
         {
@@ -73,7 +74,6 @@ namespace TradingServer.Orderbook
 
         public void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
-
             if (orderentry.previous != null && orderentry.next != null)
             {
                 orderentry.next.previous = orderentry.previous;
@@ -169,6 +169,30 @@ namespace TradingServer.Orderbook
                 bestBid = _askLimits.Max.Price;
             }
             return new OrderbookSpread(bestBid, bestAsk);
+        }
+
+        public SortedSet<Limit> getAskLimits()
+        {
+            return _askLimits;
+        }
+
+        public SortedSet<Limit> getBidLimits()
+        {
+            return _bidLimits;
+        }
+
+        public bool canMatch()
+        {
+        // Determines if a match can happen in this limit orderbook
+            foreach (var ask in _askLimits)
+            {
+                foreach (var bid in _bidLimits)
+                {
+                    if (ask.Price == bid.Price)
+                        return true;
+                }
+            }
+            return false;
         }
     }
 }
