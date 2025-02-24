@@ -48,3 +48,4 @@ TradingServer/obj/Debug/net9.0/TradingServer.sourcelink.json
 *.cache
 *.dll
 *.pdb
+.DS_Store
