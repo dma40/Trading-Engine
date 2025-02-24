@@ -4,15 +4,17 @@ using Microsoft.Extensions.Options;
 using TradingServer.Core.Configuration;
 
 using TradingServer.Logging;
+using TradingServer.OrderbookCS;
 
 namespace TradingServer.Core 
 {
-
     class TradingServer: BackgroundService, ITradingServer 
     {
 
         private readonly ITextLogger _logger;
+        private readonly Orderbook _orderbook;
         private readonly TradingServerConfiguration _tradingConfig;
+        // private Orderbook orders;
 
         public TradingServer(ITextLogger logger, IOptions<TradingServerConfiguration> config) 
         {
@@ -32,7 +34,7 @@ namespace TradingServer.Core
                 //cts.Dispose();
             }
             // _logger.LogInformation($"Ending process {nameof(TradingServer)}");
-        return Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }

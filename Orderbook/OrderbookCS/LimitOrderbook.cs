@@ -5,7 +5,7 @@ using TradingServer.Orders;
 // of limit orderbooks. This means that they can both inherit off of LimitOrderbook
 
 // For now this is a limit orderbook using the FIFO algorithm for matching orders
-namespace TradingServer.Orderbook
+namespace TradingServer.OrderbookCS
 {
     public class FIFOrderbook: Orderbook, IMatchingOrderbook
     {

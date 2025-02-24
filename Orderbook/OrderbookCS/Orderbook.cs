@@ -11,7 +11,7 @@ using TradingServer.Orders;
 // the usefulness of why we instantiate the UTC time to find a way of determining the earliest
 // orders
 
-namespace TradingServer.Orderbook
+namespace TradingServer.OrderbookCS
 {
     public class Orderbook: IRetrievalOrderbook
     {

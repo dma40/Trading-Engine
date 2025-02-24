@@ -1,6 +1,6 @@
 using System;
 
-namespace TradingServer.Orderbook
+namespace TradingServer.OrderbookCS
 {
     public class OrderbookSpread
     {

@@ -1,4 +1,4 @@
-namespace TradingServer.Orderbook
+namespace TradingServer.OrderbookCS
 {
     // Interface useful when making matching orderbooks in the future
     public interface IMatchingOrderbook: IRetrievalOrderbook
