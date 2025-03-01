@@ -38,23 +38,23 @@ namespace TradingServer.OrderbookCS
 
                 while (askPtr != null && bidPtr != null)
                 {
-                    uint q1 = bidPtr.CurrentOrder.CurrentQuantity;
-                    uint q2 = askPtr.CurrentOrder.CurrentQuantity;
-                    
-                    if (q1 > q2)
+                    uint buyQuantity = bidPtr.CurrentOrder.CurrentQuantity;
+                    uint sellQuantity = askPtr.CurrentOrder.CurrentQuantity;
+
+                    if (buyQuantity > sellQuantity)
                     {
                         // this is ok because CurrentQuantity is the amount of unfilled orders left
-                        bidPtr.CurrentOrder.DecreaseQuantity(q1 - q2);
-                        askPtr.CurrentOrder.DecreaseQuantity(q2);
+                        bidPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
+                        askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
 
                         askPtr = askPtr.next;
                         removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);
                     }
 
-                    else if (q2 > q1)
+                    else if (sellQuantity > buyQuantity)
                     {
-                        bidPtr.CurrentOrder.DecreaseQuantity(q1);
-                        askPtr.CurrentOrder.DecreaseQuantity(q2 - q1);
+                        bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
+                        askPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
 
                         bidPtr = bidPtr.next;
                         removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
@@ -62,8 +62,8 @@ namespace TradingServer.OrderbookCS
 
                     else 
                     {
-                        bidPtr.CurrentOrder.DecreaseQuantity(q1);
-                        askPtr.CurrentOrder.DecreaseQuantity(q2);
+                        bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
+                        askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
 
                         askPtr = askPtr.next;
                         bidPtr = bidPtr.next;
