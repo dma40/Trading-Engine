@@ -21,9 +21,9 @@ namespace TradingServer.OrderbookCS
         // Otherwise, we will create a new Limit with a null head and null tail and add it to that limit level.
 
         // Instance attributes
-        private readonly Security _instrument;
-        public readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
-        public readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
+        public readonly Security _instrument;
+        private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
+        private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
         public readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
 
         // Constructor

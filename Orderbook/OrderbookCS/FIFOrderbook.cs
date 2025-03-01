@@ -23,6 +23,11 @@ namespace TradingServer.OrderbookCS
         {
             MatchResult result = new MatchResult();
 
+            if (getAskLimits().Count == 0 || getBidLimits().Count == 0)
+            {
+                throw new InvalidOperationException("Orders cannot be matched because there are either no buy orders or no sell orders to match");
+            }
+
             // note the matching engine terminates when there are no more matches to complete
             
             while (canMatch()) 
