@@ -30,16 +30,17 @@ namespace TradingServer.OrderbookCS
             // no more matches can be executed
             {
                 // pair the lowest + highest in the next step
-                Limit limit = getAskLimits().Min; // minimum nonempty limit
-                Limit other = getBidLimits().Max; // maximum available nonempty limit
+                Limit min = getAskLimits().Min; // minimum nonempty limit
+                Limit max = getBidLimits().Max; // maximum available nonempty limit
 
-                OrderbookEntry askPtr = limit.head;
-                OrderbookEntry bidPtr = other.head;
+                OrderbookEntry askPtr = min.head;
+                OrderbookEntry bidPtr = max.head;
 
                 while (askPtr != null && bidPtr != null)
                 {
                     uint q1 = bidPtr.CurrentOrder.CurrentQuantity;
                     uint q2 = askPtr.CurrentOrder.CurrentQuantity;
+                    
                     if (q1 > q2)
                     {
                         // this is ok because CurrentQuantity is the amount of unfilled orders left
