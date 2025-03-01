@@ -3,12 +3,12 @@ using GrpcServices;
 using TradingServer.Logging;
 using TradingServer.Orderbook;
 
-namespace GrpcServices.Services;
+namespace TradingServices.Services;
 
-public class GreeterService : Greeter.GreeterBase
+public class TradingService : TradingService.TradingServerBase
 {
-    private readonly ITextLogger<GreeterService> _logger;
-    public GreeterService(TextLogger<GreeterService> logger)
+    private readonly ITextLogger<TradingService> _logger;
+    public TradingService(TextLogger<TradingService> logger)
     {
         _logger = logger;
     }
