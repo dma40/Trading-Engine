@@ -49,3 +49,9 @@ TradingServer/obj/Debug/net9.0/TradingServer.sourcelink.json
 *.dll
 *.pdb
 .DS_Store
+/Orderbook/Orders/obj
+/TradingServer/obj
+TradingServer/obj/Debug/net9.0/TradingServer.sourcelink.json
+/TradingServer/obj
+/Orderbook/OrderbookCS/bin
+/Logging/bin

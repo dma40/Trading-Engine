@@ -35,26 +35,20 @@ namespace TradingServer.OrderbookCS
 
                 while (askPtr != null && bidPtr != null)
                 {
-                    // removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
+                    askPtr = askPtr.next;
+                    bidPtr = bidPtr.next;
+
+                    result.addTransaction(askPtr);
+
+                    removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);
+                    removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
                     // find a order that can match bidPtr
-
-
                     // cancel one of the two orders
                     // removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
                 }
 
                     // pair lowest + highest
             }
-                // find the least thing that can be matched
-                // match orders using some algorithm, now that there are two matching prices we can
-                // match. How do we match in this instance?
-            
-            //List<OrderbookEntry> asks = getAskOrders();
-            //List<OrderbookEntry> bids = getBidOrders();
-            //while (true)
-            //{
-            //
-            //}
             return result;
             // What should be returned in the result?
             // Maybe return a OrderRecord of all matched orders
