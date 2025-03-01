@@ -5,6 +5,7 @@ using TradingServer.Orders;
 // of limit orderbooks. This means that they can both inherit off of LimitOrderbook
 
 // For now this is a limit orderbook using the FIFO algorithm for matching orders
+
 namespace TradingServer.OrderbookCS
 {
     public class FIFOrderbook: Orderbook, IMatchingOrderbook
@@ -24,9 +25,11 @@ namespace TradingServer.OrderbookCS
 
             // note the matching engine terminates when there are no more matches to complete
             
-            while (canMatch()) // always looks out for matches whenever possible; ends when
+            while (canMatch()) 
+            // always looks out for matches whenever possible; ends when
             // no more matches can be executed
             {
+                // pair the lowest + highest in the next step
                 Limit limit = getAskLimits().Min; // minimum nonempty limit
                 Limit other = getBidLimits().Max; // maximum available nonempty limit
 
@@ -35,24 +38,43 @@ namespace TradingServer.OrderbookCS
 
                 while (askPtr != null && bidPtr != null)
                 {
-                    askPtr = askPtr.next;
-                    bidPtr = bidPtr.next;
+                    uint q1 = bidPtr.CurrentOrder.CurrentQuantity;
+                    uint q2 = askPtr.CurrentOrder.CurrentQuantity;
+                    if (q1 > q2)
+                    {
+                        // this is ok because CurrentQuantity is the amount of unfilled orders left
+                        bidPtr.CurrentOrder.DecreaseQuantity(q1 - q2);
+                        askPtr.CurrentOrder.DecreaseQuantity(q2);
+
+                        askPtr = askPtr.next;
+                        removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);
+                    }
+
+                    else if (q2 > q1)
+                    {
+                        bidPtr.CurrentOrder.DecreaseQuantity(q1);
+                        askPtr.CurrentOrder.DecreaseQuantity(q2 - q1);
+
+                        bidPtr = bidPtr.next;
+                        removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
+                    }
+
+                    else 
+                    {
+                        bidPtr.CurrentOrder.DecreaseQuantity(q1);
+                        askPtr.CurrentOrder.DecreaseQuantity(q2);
+
+                        askPtr = askPtr.next;
+                        bidPtr = bidPtr.next;
+
+                        removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);
+                        removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
+                    }
 
                     result.addTransaction(askPtr);
-
-                    removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);
-                    removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
-                    // find a order that can match bidPtr
-                    // cancel one of the two orders
-                    // removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
                 }
-
-                    // pair lowest + highest
             }
             return result;
-            // What should be returned in the result?
-            // Maybe return a OrderRecord of all matched orders
-            // Pool all the bid and ask orders together, and then match them
         }
 
         private readonly Security _security;
