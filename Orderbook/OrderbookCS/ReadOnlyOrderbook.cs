@@ -2,8 +2,6 @@
 
 namespace TradingServer.OrderbookCS
 {
-
-
     public interface IReadOnlyOrderbook 
     {
         bool containsOrder(long orderID);

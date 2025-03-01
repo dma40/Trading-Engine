@@ -98,6 +98,16 @@ namespace TradingServer.OrderbookCS
             {
                 orderentry.ParentLimit.head = null;
                 orderentry.ParentLimit.tail = null;
+                
+                if (orderentry.CurrentOrder.isBuySide)
+                {
+                    _bidLimits.Remove(orderentry.ParentLimit);
+                }
+
+                else 
+                {
+                    _askLimits.Remove(orderentry.ParentLimit);
+                }
             }
 
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
@@ -187,7 +197,8 @@ namespace TradingServer.OrderbookCS
 
         public bool canMatch()
         {
-        // Determines if a match can happen in this limit orderbook
+        // Determines if a match can happen in this limit orderbook;
+        // we need to also check if the limits we're trying to match are null or not
             foreach (var ask in _askLimits)
             {
                 foreach (var bid in _bidLimits)

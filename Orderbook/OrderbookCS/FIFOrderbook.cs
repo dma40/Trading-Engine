@@ -44,6 +44,7 @@ namespace TradingServer.OrderbookCS
                     if (buyQuantity > sellQuantity)
                     {
                         // this is ok because CurrentQuantity is the amount of unfilled orders left
+                        // fill a certain number of orders
                         bidPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
                         askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
 
