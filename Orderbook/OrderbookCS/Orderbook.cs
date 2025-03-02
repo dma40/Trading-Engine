@@ -24,7 +24,7 @@ namespace TradingServer.OrderbookCS
         public readonly Security _instrument;
         private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
-        public readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
 
         // Constructor
         public Orderbook(Security instrument) 
@@ -76,7 +76,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
+        private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
             if (orderentry.previous != null && orderentry.next != null)
             {

@@ -25,7 +25,7 @@ namespace TradingServer.OrderbookCS
 
             if (getAskLimits().Count == 0 || getBidLimits().Count == 0)
             {
-                throw new InvalidOperationException("Orders cannot be matched because there are either no buy orders or no sell orders to match");
+                throw new InvalidOperationException("Orders cannot be matched because there are either the buy side or the sell side of the orderbook is empty");
             }
 
             // note the matching engine terminates when there are no more matches to complete
@@ -43,6 +43,11 @@ namespace TradingServer.OrderbookCS
 
                 while (askPtr != null && bidPtr != null)
                 {
+                    IOrderCore buyOrderCore = new OrderCore(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID);
+                    IOrderCore askOrderCore = new OrderCore(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID);
+                    CancelOrder buyCancel = new CancelOrder(buyOrderCore);
+                    CancelOrder askCancel = new CancelOrder(askOrderCore);
+
                     uint buyQuantity = bidPtr.CurrentOrder.CurrentQuantity;
                     uint sellQuantity = askPtr.CurrentOrder.CurrentQuantity;
 
@@ -54,7 +59,7 @@ namespace TradingServer.OrderbookCS
                         askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
 
                         askPtr = askPtr.next;
-                        removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);
+                        removeOrder(askCancel);
                     }
 
                     else if (sellQuantity > buyQuantity)
@@ -63,7 +68,7 @@ namespace TradingServer.OrderbookCS
                         askPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
 
                         bidPtr = bidPtr.next;
-                        removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
+                        removeOrder(buyCancel);
                     }
 
                     else 
@@ -74,8 +79,8 @@ namespace TradingServer.OrderbookCS
                         askPtr = askPtr.next;
                         bidPtr = bidPtr.next;
 
-                        removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);
-                        removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
+                        removeOrder(askCancel);
+                        removeOrder(buyCancel);
                     }
 
                     result.addTransaction(askPtr);
