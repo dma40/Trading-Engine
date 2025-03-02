@@ -25,7 +25,7 @@ namespace TradingServer.OrderbookCS
 
             if (getAskLimits().Count == 0 || getBidLimits().Count == 0)
             {
-                throw new InvalidOperationException("Orders cannot be matched because there are either the buy side or the sell side of the orderbook is empty");
+                throw new InvalidOperationException("Orders cannot be matched because either the buy side or the sell side of the orderbook is empty");
             }
 
             // note the matching engine terminates when there are no more matches to complete
@@ -45,7 +45,7 @@ namespace TradingServer.OrderbookCS
                 {
                     IOrderCore buyOrderCore = new OrderCore(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID);
                     IOrderCore askOrderCore = new OrderCore(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID);
-                    CancelOrder buyCancel = new CancelOrder(buyOrderCore);
+                    CancelOrder bidCancel = new CancelOrder(buyOrderCore);
                     CancelOrder askCancel = new CancelOrder(askOrderCore);
 
                     uint buyQuantity = bidPtr.CurrentOrder.CurrentQuantity;
@@ -68,7 +68,7 @@ namespace TradingServer.OrderbookCS
                         askPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
 
                         bidPtr = bidPtr.next;
-                        removeOrder(buyCancel);
+                        removeOrder(bidCancel);
                     }
 
                     else 
@@ -80,7 +80,7 @@ namespace TradingServer.OrderbookCS
                         bidPtr = bidPtr.next;
 
                         removeOrder(askCancel);
-                        removeOrder(buyCancel);
+                        removeOrder(bidCancel);
                     }
 
                     result.addTransaction(askPtr);
