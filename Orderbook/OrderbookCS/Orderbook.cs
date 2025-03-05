@@ -21,7 +21,7 @@ namespace TradingServer.OrderbookCS
         // Otherwise, we will create a new Limit with a null head and null tail and add it to that limit level.
 
         // Instance attributes
-        public readonly Security _instrument;
+        private readonly Security _instrument;
         private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
@@ -170,21 +170,6 @@ namespace TradingServer.OrderbookCS
             return _orders.ContainsKey(orderID);
         }
 
-        public OrderbookSpread spread()
-        {
-            long? bestAsk = null, bestBid = null;
-            if (_askLimits.Any() && ! _askLimits.Min.isEmpty)
-            {
-                bestAsk = _askLimits.Min.Price;
-            }
-
-            if (_bidLimits.Any() && ! _askLimits.Min.isEmpty)
-            {
-                bestBid = _askLimits.Max.Price;
-            }
-            return new OrderbookSpread(bestBid, bestAsk);
-        }
-
         public SortedSet<Limit> getAskLimits()
         {
             return _askLimits;
@@ -193,6 +178,11 @@ namespace TradingServer.OrderbookCS
         public SortedSet<Limit> getBidLimits()
         {
             return _bidLimits;
+        }
+
+        public string getSecurityName()
+        {
+            return _instrument.name;
         }
 
         public bool canMatch()
@@ -208,6 +198,21 @@ namespace TradingServer.OrderbookCS
                 }
             }
             return false;
+        }
+
+        public OrderbookSpread spread()
+        {
+            long? bestAsk = null, bestBid = null;
+            if (_askLimits.Any() && ! _askLimits.Min.isEmpty)
+            {
+                bestAsk = _askLimits.Min.Price;
+            }
+
+            if (_bidLimits.Any() && ! _askLimits.Min.isEmpty)
+            {
+                bestBid = _askLimits.Max.Price;
+            }
+            return new OrderbookSpread(bestBid, bestAsk);
         }
     }
 }

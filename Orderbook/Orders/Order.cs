@@ -16,7 +16,7 @@ namespace TradingServer.Orders {
         modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide) {}
 
         private readonly IOrderCore _orderCore;
-
+        
         public long OrderID => _orderCore.OrderID; 
         public int SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
@@ -25,7 +25,7 @@ namespace TradingServer.Orders {
         // Important: the initial quantity is the initial amount of orders placed.
         // This may become useful for certain things we want to do, for example, keeping 
         // track of how many excess orders there are (if any)
-        
+
         public uint Quantity { get; private set; }
         public uint CurrentQuantity { get; private set; }
         public bool isBuySide { get; private set; }

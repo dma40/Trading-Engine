@@ -11,6 +11,5 @@ TradingServerServiceProvider.serviceProvider = engine.Services;
     await engine.RunAsync().ConfigureAwait(false);
 }
 
-//Console.WriteLine("console");
 
 

@@ -1,7 +1,7 @@
 using GrpcServices.Services;
 
 var server = new Server;
-var channel = GrpcChannel.ForAddress("https://localhost:14000");
+var channel = GrpcChannel.ForAddress("https://localhost:12000");
 
 using var engine = TradingHostBuilder.BuildTradingServer();
 TradingServerServiceProvider.serviceProvider = engine.Services;

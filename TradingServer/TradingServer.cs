@@ -12,7 +12,7 @@ namespace TradingServer.Core
     {
 
         private readonly ITextLogger _logger;
-        private readonly Orderbook _orderbook;
+        private readonly IMatchingOrderbook _orderbook;
         private readonly TradingServerConfiguration _tradingConfig;
         // private Orderbook orders;
 
@@ -21,7 +21,7 @@ namespace TradingServer.Core
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
             // do this for now
-            _orderbook = new Orderbook(new Instrument.Security("AAPL"));
+            _orderbook = new FIFOrderbook(new Instrument.Security("AAPL"));
         }
 
         public Task Run(CancellationToken token) => ExecuteAsync(token);
