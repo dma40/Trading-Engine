@@ -38,5 +38,11 @@ namespace TradingServer.Core
             // _logger.LogInformation($"Ending process {nameof(TradingServer)}");
             return Task.CompletedTask;
         }
+
+        // public async void SubmitOrder(OrderRequest request, ServerCallContext call)
+        // {
+        // now that the OrderRequest is being recieved, find a way to pipe it onto the orderbook!
+        // make sure that the OrderRequest is ACTUALLY being recieved by the hosted TradingServer service.
+        // }
     }
 }
