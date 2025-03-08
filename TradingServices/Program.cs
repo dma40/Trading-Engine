@@ -1,9 +1,10 @@
 using GrpcServices.Services;
+using Microsoft.Services.DependencyInjection;
 
 // redo things
 
-var server = new Server;
-var channel = GrpcChannel.ForAddress("https://localhost:12000");
+// var server = new Server;
+// var channel = GrpcChannel.ForAddress("https://localhost:12000");
 
 // maybe no need to manually reinject this process?
 
@@ -13,6 +14,8 @@ var channel = GrpcChannel.ForAddress("https://localhost:12000");
 //   using var scope = TradingServerServiceProvider.serviceProvider.CreateScope();
 //    await engine.RunAsync().ConfigureAwait(false);
 //}
+
+// Aha! Maybe add a hidden 3rd project (that is not shared to github - add to. gitignore) and then move the common functionalities there
 
 public class Program 
 {
