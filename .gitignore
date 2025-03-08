@@ -55,3 +55,4 @@ TradingServer/obj/Debug/net9.0/TradingServer.sourcelink.json
 /TradingServer/obj
 /Orderbook/OrderbookCS/bin
 /Logging/bin
+Orderbook/Orders/obj/Debug/net9.0/Orders.AssemblyInfo.cs

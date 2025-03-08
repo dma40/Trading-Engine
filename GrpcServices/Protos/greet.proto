@@ -2,20 +2,23 @@ syntax = "proto3";
 
 option csharp_namespace = "GrpcServices";
 
-package greet;
+package TradingService;
 
 // The greeting service definition.
-service Greeter {
+service TradingService {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply);
+  rpc SubmitOrder (OrderRequest) returns (OrderResponse);
 }
 
 // The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+message OrderRequest {
+  uint quantity = 1;
+  uint price = 2;
+  uint side = 3;
+  uint operation = 4;
 }
 
 // The response message containing the greetings.
-message HelloReply {
-  string message = 1;
+message OrderResponse {
+  bool status = 1;
 }

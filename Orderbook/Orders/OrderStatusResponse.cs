@@ -2,7 +2,7 @@ using System;
 
 namespace TradingServer.Orders 
 {
-    public sealed class OrderStatusGenerator 
+    public sealed class OrderStatusRequest
     {
         public static CancelOrderStatus GenerateCancel(CancelOrder cancel) 
         {
