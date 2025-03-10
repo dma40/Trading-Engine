@@ -1,6 +1,10 @@
-﻿namespace OrderHandlers;
+﻿using TradingServer.Services;
 
-public class Class1
+namespace TradingServer.Handlers
 {
+    // this creates shared functionalities that TradingServer can use
+    public class TradingClient
+    {
 
+    }
 }

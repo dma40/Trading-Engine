@@ -31,6 +31,7 @@
   <ItemGroup>
   <ProjectReference Include="../Logging/Logging.csproj" />
   <ProjectReference Include="..\Orderbook\OrderbookCS\OrderbookCS.csproj" />
+  <ProjectReference Include="..\OrderHandlers\OrderHandlers.csproj" />
   </ItemGroup>
 
 </Project>
