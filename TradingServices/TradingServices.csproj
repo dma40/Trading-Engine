@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-      <Protobuf Include="Protos\TradingService.proto" GrpcServices="Server" />
+    <ProjectReference Include="..\OrderHandlers\OrderHandlers.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TradingServer.Core.Configuration;
 using TradingServer.Logging;
+using TradingServer.Handlers;
 
 namespace TradingServer.Core;
 
@@ -16,6 +17,8 @@ public class TradingHostBuilder
         services.AddSingleton<ITextLogger, TextLogger>();
 
         services.AddHostedService<TradingServer>();
+
+        services.AddGrpc();
     })
     .Build();
 }

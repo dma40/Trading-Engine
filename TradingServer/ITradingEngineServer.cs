@@ -1,7 +1,11 @@
+using TradingServer.Handlers;
+
 namespace TradingServer.Core 
 {
-    interface ITradingServer 
-    {
-        Task Run(CancellationToken token);
-    }
+    //public interface ITradingServer 
+    //{
+    //    Task Run(CancellationToken token);
+    //
+    //
+    //}
 }
