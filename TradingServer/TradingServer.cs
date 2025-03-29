@@ -53,22 +53,15 @@ namespace TradingServer.Core
                 };
             }
 
+            // do something to add this order to the orderbook
             await Task.Delay(200); // maybe add a Order object containing the requisite information to the Orderbook
 
             return new OrderResponse
             {
                 Id = request.Id,
-                Status = 500,
+                Status = 200,
                 Message = "Order placed successfully!"
             };
         }
-
-        // public async void SubmitOrder(OrderRequest request, ServerCallContext call)
-        // {
-        // now that the OrderRequest is being recieved, find a way to pipe it onto the orderbook!
-        // make sure that the OrderRequest is ACTUALLY being recieved by the hosted TradingServer service.
-        // }
-
-
     }
 }
