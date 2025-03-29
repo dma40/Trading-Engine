@@ -61,3 +61,6 @@ Orderbook/Orders/obj/Debug/net9.0/Orders.AssemblyInfo.cs
 /OrderHandlers/obj
 TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfo.cs
 Orderbook/Orders/obj/Debug/net9.0/Orders.AssemblyInfo.cs
+/Logging/bin
+/TradingServices/bin
+/TradingServer/obj
