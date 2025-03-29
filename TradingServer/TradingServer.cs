@@ -6,6 +6,7 @@ using TradingServer.Core.Configuration;
 using TradingServer.Logging;
 using TradingServer.OrderbookCS;
 using TradingServer.Handlers;
+using Trading;
 
 namespace TradingServer.Core 
 {
@@ -40,10 +41,34 @@ namespace TradingServer.Core
             return Task.CompletedTask;
         }
 
+        public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Id.ToString()))
+            {
+                return new OrderResponse
+                {
+                    Id = request.Id,
+                    Status = 500,
+                    Message = "You have placed a invalid order"
+                };
+            }
+
+            await Task.Delay(200); // maybe add a Order object containing the requisite information to the Orderbook
+
+            return new OrderResponse
+            {
+                Id = request.Id,
+                Status = 500,
+                Message = "Order placed successfully!"
+            };
+        }
+
         // public async void SubmitOrder(OrderRequest request, ServerCallContext call)
         // {
         // now that the OrderRequest is being recieved, find a way to pipe it onto the orderbook!
         // make sure that the OrderRequest is ACTUALLY being recieved by the hosted TradingServer service.
         // }
+
+
     }
 }
