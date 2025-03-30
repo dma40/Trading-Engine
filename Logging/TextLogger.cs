@@ -42,10 +42,11 @@ namespace TradingServer.Logging
         private static async Task LogAsync(string filepath, BufferBlock<LogInformation> logs, CancellationToken token) 
         {
             using var filestream = new FileStream(filepath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
-            using var streamwriter = new StreamWriter(filestream) {AutoFlush = true};
+            using var streamwriter = new StreamWriter(filestream) {AutoFlush = true}; // maybe do FileMode.Append to allow new entries to be written in
+            // also maybe try making sure the task is running before appending new entries
             try 
             {
-                while (true) 
+                while (!token.IsCancellationRequested) 
                 {
                     var logItem = await logs.ReceiveAsync(token).ConfigureAwait(false);
                     string formatted = FormatLogItem(logItem);

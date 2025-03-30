@@ -9,7 +9,7 @@ namespace TradingServer.Handlers
     // compiled into C# code
     public interface ITradingServer
     {
-        Task Run(CancellationToken token);
+        // Task Run(CancellationToken token);
 
         Task<OrderResponse> ProcessOrderAsync(OrderRequest orderRequest);
     }

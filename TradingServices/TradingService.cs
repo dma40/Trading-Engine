@@ -6,7 +6,7 @@ using Grpc.Core;
 
 namespace Trading
 {
-    public class TradingClient: TradingService.TradingServiceBase
+    public class TradingClient: TradingService.TradingServiceBase, ITradingServer
     {
         private readonly ITradingServer _tradingServer;
 
@@ -15,7 +15,7 @@ namespace Trading
             _tradingServer = tradingServer;
         }
 
-        public override async Task<OrderResponse> PlaceOrder(OrderRequest request, ServerCallContext context)
+        public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
             var response = await _tradingServer.ProcessOrderAsync(request);
             return response;
