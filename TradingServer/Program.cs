@@ -11,5 +11,7 @@ TradingServerServiceProvider.serviceProvider = engine.Services;
     await engine.RunAsync().ConfigureAwait(false);
 }
 
+// Only thing left: create a interactive client that allows the user to add, edit, remove orders.
+
 
 

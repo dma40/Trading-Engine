@@ -7,6 +7,7 @@ using TradingServer.Logging;
 using TradingServer.OrderbookCS;
 using TradingServer.Handlers;
 using Trading;
+using TradingServer.Orders;
 
 namespace TradingServer.Core 
 {
@@ -16,7 +17,6 @@ namespace TradingServer.Core
         private readonly ITextLogger _logger;
         private readonly IMatchingOrderbook _orderbook;
         private readonly TradingServerConfiguration _tradingConfig;
-        // private Orderbook orders;
 
         public TradingServer(ITextLogger logger, IOptions<TradingServerConfiguration> config) 
         {
@@ -37,7 +37,7 @@ namespace TradingServer.Core
                 //cts.Cancel();
                 //cts.Dispose();
             }
-            // _logger.LogInformation($"Ending process {nameof(TradingServer)}");
+            _logger.LogInformation(nameof(TradingServer), $"Ending process {nameof(TradingServer)}");
             return Task.CompletedTask;
         }
 
@@ -53,8 +53,8 @@ namespace TradingServer.Core
                 };
             }
 
-            // do something to add this order to the orderbook
-            await Task.Delay(200); // maybe add a Order object containing the requisite information to the Orderbook
+            // _orderbook.addOrder();
+            await Task.Delay(200); 
 
             return new OrderResponse
             {

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using TradingServer.Core.Configuration;
 using TradingServer.Logging;
 using TradingServer.Handlers;
+// using TradingServer.Services;
 using Trading;
 
 namespace TradingServer.Core;
@@ -14,14 +15,14 @@ public class TradingHostBuilder
         services.AddOptions();
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
 
-        services.AddSingleton<ITradingServer, TradingServer>();
+        services.AddSingleton<IHostedService, TradingServer>();
         services.AddSingleton<ITextLogger, TextLogger>();
 
         services.AddHostedService<TradingServer>();
 
         services.AddGrpc();
 
-        // services.AddSingleton<TradingService>();
+        services.AddScoped<TradingClient>();
     })
     .Build();
 }

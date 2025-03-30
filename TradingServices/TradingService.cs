@@ -2,21 +2,20 @@
 using TradingServer.Handlers;
 using Microsoft.Extensions.Hosting;
 
-using Trading;
 using Grpc.Core;
 
-namespace TradingServer.Services
+namespace Trading
 {
-    public class TradingService // , IHostedService
+    public class TradingClient: TradingService.TradingServiceBase
     {
         private readonly ITradingServer _tradingServer;
 
-        public TradingService(ITradingServer tradingServer)
+        public TradingClient(ITradingServer tradingServer)
         {
             _tradingServer = tradingServer;
         }
 
-        public async Task<OrderResponse> PlaceOrder(OrderRequest request, ServerCallContext context)
+        public override async Task<OrderResponse> PlaceOrder(OrderRequest request, ServerCallContext context)
         {
             var response = await _tradingServer.ProcessOrderAsync(request);
             return response;
@@ -26,6 +25,5 @@ namespace TradingServer.Services
         // - The PlaceOrder method will call this one - in the place of await Task.Delay there will be a step to add the order to 
         // the orderbook.
     }
-    // Success! Now after this is done work on OrderHandlers can continue.
 }
 
