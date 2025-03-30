@@ -1,8 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿
 using TradingServer.Handlers;
-using Microsoft.Extensions.Hosting;
-
-using Grpc.Core;
 
 namespace Trading
 {
@@ -20,10 +17,9 @@ namespace Trading
             var response = await _tradingServer.ProcessOrderAsync(request);
             return response;
         }
-        // In the TradingServer class, this is what will happen:
-        // - Make a PlaceOrder class
-        // - The PlaceOrder method will call this one - in the place of await Task.Delay there will be a step to add the order to 
-        // the orderbook.
+        // The point is that when this method is called,
+        // the message will be relayed to the TradingServer which will then
+        // add the order to the orderbook, which will store all order records.
     }
 }
 
