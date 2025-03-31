@@ -41,8 +41,8 @@ namespace TradingServer.Logging
 
         private static async Task LogAsync(string filepath, BufferBlock<LogInformation> logs, CancellationToken token) 
         {
-            using var filestream = new FileStream(filepath, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
-            using var streamwriter = new StreamWriter(filestream) {AutoFlush = true}; // maybe do FileMode.Append to allow new entries to be written in
+            using var filestream = new FileStream(filepath, FileMode.Append, FileAccess.Write, FileShare.Read);
+            using var streamwriter = new StreamWriter(filestream) {AutoFlush = true}; // maybe do FileMode.Append to allow new entries to be written in, instead of CreateNew
             // also maybe try making sure the task is running before appending new entries
             try 
             {

@@ -8,6 +8,7 @@ using TradingServer.OrderbookCS;
 using TradingServer.Handlers;
 using Trading;
 using TradingServer.Orders;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace TradingServer.Core 
 {

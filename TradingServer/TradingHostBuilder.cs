@@ -20,6 +20,7 @@ public class TradingHostBuilder
 
         services.AddHostedService<TradingServer>(); // this is because TradingServer is a hosted service - there can only be one 
 
+        // figure out how to register TradingClient as a service, this seems to be a error
         services.AddGrpc();
     })
     .Build();
