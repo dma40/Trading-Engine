@@ -3,9 +3,9 @@ using TradingServer.Handlers;
 
 namespace Trading
 {
-    public class TradingClient: TradingService.TradingServiceBase, ITradingServer
+    public class TradingClient: TradingService.TradingServiceBase
     {
-        private readonly ITradingServer _tradingServer;
+        private readonly ITradingServer _tradingServer; 
 
         public TradingClient(ITradingServer tradingServer)
         {
