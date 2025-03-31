@@ -28,7 +28,6 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Price = 100
     };
 
-    // figure out how to fix this - the one underneath is a error
     var response = await tradingService.ProcessOrderAsync(orderRequest);
     await engine.RunAsync().ConfigureAwait(false);
 }

@@ -15,8 +15,8 @@ public class TradingHostBuilder
         services.AddOptions();
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
 
-        services.AddSingleton<TradingClient>(); // because TradingServer handles order processing
-        // services.AddSingleton<TradingClient>();
+        services.AddSingleton<TradingClient>(); // now the point is to figure out WHY this works - it seems like if we don't register
+        // this as a ITradingServer it seems to work out alright
 
         services.AddSingleton<ITextLogger, TextLogger>();
         services.AddSingleton<ITradingServer, TradingServer>();

@@ -3,7 +3,7 @@ using TradingServer.Handlers;
 
 namespace Trading
 {
-    public class TradingClient: TradingService.TradingServiceBase
+    public class TradingClient: TradingService.TradingServiceBase, ITradingServer
     {
         private readonly ITradingServer _tradingServer; 
 
