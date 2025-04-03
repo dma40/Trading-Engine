@@ -5,15 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TradingServer.Core;
 using Trading;
 
-/*
-using var engine = TradingHostBuilder.BuildTradingServer();
-TradingServerServiceProvider.serviceProvider = engine.Services;
-{
-    using var scope = TradingServerServiceProvider.serviceProvider.CreateScope();
-    await engine.RunAsync().ConfigureAwait(false);
-}
-*/
-
 using var engine = TradingHostBuilder.BuildTradingServer();
 TradingServerServiceProvider.serviceProvider = engine.Services;
 
@@ -26,7 +17,8 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 500,
         Quantity = 300,
         Price = 100,
-        Operation = "sell"
+        Side = "Bid",
+        Operation = "Modify" // other options are Add, Remove
     };
 
     var response = await tradingService.ProcessOrderAsync(orderRequest);

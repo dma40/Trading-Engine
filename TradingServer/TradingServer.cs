@@ -47,6 +47,9 @@ namespace TradingServer.Core
             // Next steps: 
             // - Find out how to add a order to our orderbook
             // Then, add support for other operations (such as Buy, Sell, Modify and Cancel)
+
+            // This will probably require a lot of if statements, there are a lot of things that can 
+            // go wrong here.
             if (string.IsNullOrEmpty(request.Id.ToString()))
             {
                 return new OrderResponse

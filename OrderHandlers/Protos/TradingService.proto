@@ -7,7 +7,8 @@ message OrderRequest {
     int64 quantity = 2;
     int64 price = 3;
     // this is the new operation instance variable - there can be add, modify, remove, etc.
-    string operation = 4;
+    string side = 4;
+    string operation = 5;
 }
 
 message OrderResponse {
