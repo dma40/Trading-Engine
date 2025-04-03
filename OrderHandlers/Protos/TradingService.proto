@@ -6,6 +6,8 @@ message OrderRequest {
     int32 id = 1;
     int64 quantity = 2;
     int64 price = 3;
+    // this is the new operation instance variable - there can be add, modify, remove, etc.
+    string operation = 4;
 }
 
 message OrderResponse {

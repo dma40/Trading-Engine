@@ -44,6 +44,9 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
+            // Next steps: 
+            // - Find out how to add a order to our orderbook
+            // Then, add support for other operations (such as Buy, Sell, Modify and Cancel)
             if (string.IsNullOrEmpty(request.Id.ToString()))
             {
                 return new OrderResponse
@@ -56,6 +59,7 @@ namespace TradingServer.Core
 
             // _orderbook.addOrder();
             await Task.Delay(200); 
+            // add exception handling - what if something is wrong?
 
             return new OrderResponse
             {

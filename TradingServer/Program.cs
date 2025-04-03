@@ -25,7 +25,8 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
     {
         Id = 500,
         Quantity = 300,
-        Price = 100
+        Price = 100,
+        Operation = "sell"
     };
 
     var response = await tradingService.ProcessOrderAsync(orderRequest);
