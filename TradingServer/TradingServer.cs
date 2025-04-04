@@ -8,7 +8,6 @@ using TradingServer.OrderbookCS;
 using TradingServer.Handlers;
 using Trading;
 using TradingServer.Orders;
-using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace TradingServer.Core 
 {
@@ -48,21 +47,59 @@ namespace TradingServer.Core
             // - Find out how to add a order to our orderbook
             // Then, add support for other operations (such as Buy, Sell, Modify and Cancel)
 
-            // This will probably require a lot of if statements, there are a lot of things that can 
-            // go wrong here.
-            if (string.IsNullOrEmpty(request.Id.ToString()))
+            // maybe also log the fact that this order was placed
+            // First, check that none of the requisite information is wrong/missing
+
+            // make sure so that the id, price, and quantity are all integers
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, request.Id);
+            ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
+
+            if (string.IsNullOrEmpty(request.Id.ToString()) 
+                || string.IsNullOrEmpty(request.Username.ToString())
+                || string.IsNullOrEmpty(request.Operation.ToString())
+                || string.IsNullOrEmpty(request.Side.ToString())
+                )
             {
                 return new OrderResponse
                 {
                     Id = request.Id,
                     Status = 500,
-                    Message = "You have placed a invalid order"
+                    Message = "You have put in null or empty strings for arguments"
                 };
             }
 
-            // _orderbook.addOrder();
+            else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
+            {
+                return new OrderResponse
+                {
+                    Id = request.Id,
+                    Status = 500,
+                    Message = "You have tried to put a order on a invalid side"
+                };
+            }
+
+            else if (request.Operation == "Add")
+            {
+                Order newOrder = modify.newOrder();
+                _orderbook.addOrder(newOrder);
+            }
+
+            else if (request.Operation == "Cancel")
+            {
+                /* 
+                Make sure that our program knows what to do if we try to 
+                modify orders that don't exist in the orderbook
+                */
+                CancelOrder cancelOrder = modify.cancelOrder();
+                _orderbook.removeOrder(cancelOrder);
+            }
+
+            else if (request.Operation == "Modify")
+            {
+                _orderbook.modifyOrder(modify);
+            }
+
             await Task.Delay(200); 
-            // add exception handling - what if something is wrong?
 
             return new OrderResponse
             {
@@ -70,6 +107,8 @@ namespace TradingServer.Core
                 Status = 200,
                 Message = "Order placed successfully!"
             };
+
+            // Console.WriteLine($"{request.Id}");
         }
     }
 }

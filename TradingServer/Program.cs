@@ -18,7 +18,8 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Quantity = 300,
         Price = 100,
         Side = "Bid",
-        Operation = "Modify" // other options are Add, Remove
+        Operation = "Modify", // other options are Add, Remove
+        Username = "Dylan" // who placed this order
     };
 
     var response = await tradingService.ProcessOrderAsync(orderRequest);

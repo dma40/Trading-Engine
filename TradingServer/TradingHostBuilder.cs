@@ -28,3 +28,6 @@ public class TradingHostBuilder
     })
     .Build();
 }
+
+// Now that it appears that messages can be sent properly, it is time to start doing some of the 
+// logic with respect to adding/removing/modifying orders from the buy/sell sides
