@@ -142,7 +142,8 @@ namespace TradingServer.Core
 
             await Task.Delay(200); 
 
-            // TODO: make sure this transaction is logged in the TextLogger
+            // make sure this transaction is logged in the TextLogger
+            _logger.LogInformation(nameof(TradingServer), $"{request.Id}");
 
             return new OrderResponse
             {
@@ -150,8 +151,6 @@ namespace TradingServer.Core
                 Status = 200,
                 Message = "Order placed successfully!"
             };
-
-            // Console.WriteLine($"{request.Id}");
         }
     }
 }
