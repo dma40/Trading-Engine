@@ -32,9 +32,14 @@ namespace TradingServer.Core
             _logger.LogInformation(nameof(TradingServer), "Starting Process");
             while (!stoppingToken.IsCancellationRequested) 
             {
-                // CancellationTokenSource cts = new CancellationTokenSource();
-                //cts.Cancel();
-                //cts.Dispose();
+                if (_orderbook.canMatch())
+                {
+                    _orderbook.match(); // sees if matches can be executed right now
+                }
+
+                CancellationTokenSource cts = new CancellationTokenSource();
+                cts.Cancel();
+                cts.Dispose();
             }
             _logger.LogInformation(nameof(TradingServer), $"Ending process {nameof(TradingServer)}");
             return Task.CompletedTask;
@@ -71,6 +76,14 @@ namespace TradingServer.Core
                 };
                 // or throw a new InvalidOperationException
             }
+
+            // This matches the orders if the incoming request is to match orders in the orderbook
+            /*
+            else if (request.Operation == "Match")
+            {
+                _orderbook.match();
+            }
+            */
 
             else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
             {
@@ -149,7 +162,7 @@ namespace TradingServer.Core
             {
                 Id = request.Id,
                 Status = 200,
-                Message = "Order placed successfully!"
+                Message = "Operation executed successfully!"
             };
         }
     }
