@@ -6,9 +6,6 @@ message OrderRequest {
     int32 id = 1;
     uint32 quantity = 2;
     int64 price = 3;
-    // this is the new operation instance variable - there can be add, modify, remove, etc.
-    // maybe add a String to represent the username of the person submitting the order?
-    // That would be a nice feature to have in a orderbook
     string side = 4;
     string operation = 5;
     string username = 6;
