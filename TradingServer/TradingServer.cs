@@ -13,7 +13,6 @@ namespace TradingServer.Core
 {
     class TradingServer: BackgroundService, ITradingServer 
     {
-
         private readonly ITextLogger _logger;
         private readonly IMatchingOrderbook _orderbook;
         private readonly TradingServerConfiguration _tradingConfig;
@@ -51,6 +50,10 @@ namespace TradingServer.Core
             // First, check that none of the requisite information is wrong/missing
 
             // make sure so that the id, price, and quantity are all integers
+
+            /*
+            Precondition: everything is of the right type; for example, username is a string
+            */
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, request.Id);
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
 
@@ -80,6 +83,20 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Add")
             {
+                /*
+                This time, we need to make sure that the order we're trying to add
+                DOES NOT exist in the orderbook.
+                */
+                if (_orderbook.containsOrder(modify.OrderID))
+                {
+                    return new OrderResponse
+                    {
+                        Id = request.Id,
+                        Status = 500,
+                        Message = "This order already exists within the orderbook"
+                    };
+                }
+
                 Order newOrder = modify.newOrder();
                 _orderbook.addOrder(newOrder);
             }
@@ -90,12 +107,35 @@ namespace TradingServer.Core
                 Make sure that our program knows what to do if we try to 
                 modify orders that don't exist in the orderbook
                 */
+                if (!_orderbook.containsOrder(modify.OrderID))
+                {
+                    return new OrderResponse
+                    {
+                        Id = request.Id,
+                        Status = 500,
+                        Message = "You cannot cancel a order that is not currently in the orderbook"
+                    };
+                }
+
                 CancelOrder cancelOrder = modify.cancelOrder();
                 _orderbook.removeOrder(cancelOrder);
             }
 
             else if (request.Operation == "Modify")
             {
+                /*
+                Make sure, again, to test that the desired order actually exists!
+                */
+                if (!_orderbook.containsOrder(modify.OrderID))
+                {
+                    return new OrderResponse
+                    {
+                        Id = request.Id,
+                        Status = 500,
+                        Message = "You cannot cancel modify a order that is not currently in the orderbook"
+                    };
+                }
+
                 _orderbook.modifyOrder(modify);
             }
 
