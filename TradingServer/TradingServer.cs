@@ -142,6 +142,8 @@ namespace TradingServer.Core
 
             await Task.Delay(200); 
 
+            // TODO: make sure this transaction is logged in the TextLogger
+
             return new OrderResponse
             {
                 Id = request.Id,

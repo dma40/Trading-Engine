@@ -15,15 +15,14 @@ public class TradingHostBuilder
         services.AddOptions();
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
 
-        services.AddSingleton<TradingClient>(); // now the point is to figure out WHY this works - it seems like if we don't register
-        // this as a ITradingServer it seems to work out alright
+        services.AddSingleton<TradingClient>(); 
+        // This works because of how ITradingServer is resolved at runtime
 
         services.AddSingleton<ITextLogger, TextLogger>();
         services.AddSingleton<ITradingServer, TradingServer>();
 
-        services.AddHostedService<TradingServer>(); // this is because TradingServer is a hosted service - there can only be one 
+        services.AddHostedService<TradingServer>(); // this is because TradingServer is a hosted service
 
-        // figure out how to register TradingClient as a service, this seems to be a error
         services.AddGrpc();
     })
     .Build();

@@ -18,16 +18,16 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Quantity = 300,
         Price = 100,
         Side = "Bid",
-        Operation = "Modify", // other options are Add, Remove
+        Operation = "Add", // other options are Add, Remove
         Username = "Dylan" // who placed this order
     };
+
+    // this comprises the interactive client so far
 
     var response = await tradingService.ProcessOrderAsync(orderRequest);
     await engine.RunAsync().ConfigureAwait(false);
 }
 
-
-// Only thing left: create a interactive client that allows the user to add, edit, remove orders.
 
 
 
