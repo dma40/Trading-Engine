@@ -21,7 +21,6 @@ namespace TradingServer.Core
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
-            // do this for now
             _orderbook = new FIFOrderbook(new Instrument.Security("AAPL"));
         }
 
@@ -30,35 +29,24 @@ namespace TradingServer.Core
         protected override Task ExecuteAsync(CancellationToken stoppingToken) 
         {
             _logger.LogInformation(nameof(TradingServer), "Starting Process");
+            
             while (!stoppingToken.IsCancellationRequested) 
             {
+                /*
                 if (_orderbook.canMatch())
                 {
-                    _orderbook.match(); // sees if matches can be executed right now
+                    _orderbook.match();
+                    _logger.LogInformation(nameof(TradingServer), $"Order match processed at {DateTime.Now}");
                 }
-
-                CancellationTokenSource cts = new CancellationTokenSource();
-                cts.Cancel();
-                cts.Dispose();
+                */
             }
+
             _logger.LogInformation(nameof(TradingServer), $"Ending process {nameof(TradingServer)}");
             return Task.CompletedTask;
         }
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
-            // Next steps: 
-            // - Find out how to add a order to our orderbook
-            // Then, add support for other operations (such as Buy, Sell, Modify and Cancel)
-
-            // maybe also log the fact that this order was placed
-            // First, check that none of the requisite information is wrong/missing
-
-            // make sure so that the id, price, and quantity are all integers
-
-            /*
-            Precondition: everything is of the right type; for example, username is a string
-            */
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, request.Id);
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
 
@@ -74,16 +62,7 @@ namespace TradingServer.Core
                     Status = 500,
                     Message = "Error: you have put in null or empty strings for arguments"
                 };
-                // or throw a new InvalidOperationException
             }
-
-            // This matches the orders if the incoming request is to match orders in the orderbook
-            /*
-            else if (request.Operation == "Match")
-            {
-                _orderbook.match();
-            }
-            */
 
             else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
             {
@@ -97,10 +76,6 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Add")
             {
-                /*
-                This time, we need to make sure that the order we're trying to add
-                DOES NOT exist in the orderbook.
-                */
                 if (_orderbook.containsOrder(modify.OrderID))
                 {
                     return new OrderResponse
@@ -117,10 +92,6 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Cancel")
             {
-                /* 
-                Make sure that our program knows what to do if we try to 
-                modify orders that don't exist in the orderbook
-                */
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
                     return new OrderResponse
@@ -137,9 +108,6 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Modify")
             {
-                /*
-                Make sure, again, to test that the desired order actually exists!
-                */
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
                     return new OrderResponse
@@ -154,9 +122,13 @@ namespace TradingServer.Core
             }
 
             await Task.Delay(200); 
-
-            // make sure this transaction is logged in the TextLogger
             _logger.LogInformation(nameof(TradingServer), $"{request.Id}");
+
+            if (_orderbook.canMatch())
+            {
+                _orderbook.match();
+                _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.Now}");
+            }
 
             return new OrderResponse
             {

@@ -32,17 +32,22 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Username = "Dylan"
     };
 
-    /*
     var orderRequest3 = new OrderRequest
     {
-        Id = 500,
+        Id = 126,
+        Quantity = 300,
+        Price = 50,
+        Side = "Ask",
+        Operation = "Add",
+        Username = "Dylan"
     };
-    */
 
     // this comprises the interactive client so far
 
     var response = await tradingService.ProcessOrderAsync(orderRequest);
     var response2 = await tradingService.ProcessOrderAsync(orderRequest2);
+
+    var response3 = await tradingService.ProcessOrderAsync(orderRequest3);
 
     await engine.RunAsync().ConfigureAwait(false);
 }
