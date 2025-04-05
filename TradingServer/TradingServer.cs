@@ -69,6 +69,7 @@ namespace TradingServer.Core
                     Status = 500,
                     Message = "You have put in null or empty strings for arguments"
                 };
+                // or throw a new InvalidOperationException
             }
 
             else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
@@ -93,7 +94,7 @@ namespace TradingServer.Core
                     {
                         Id = request.Id,
                         Status = 500,
-                        Message = "This order already exists within the orderbook"
+                        Message = "Error: this order already exists within the orderbook"
                     };
                 }
 
@@ -113,7 +114,7 @@ namespace TradingServer.Core
                     {
                         Id = request.Id,
                         Status = 500,
-                        Message = "You cannot cancel a order that is not currently in the orderbook"
+                        Message = "Error: you cannot cancel a order that is not currently in the orderbook"
                     };
                 }
 
@@ -132,7 +133,7 @@ namespace TradingServer.Core
                     {
                         Id = request.Id,
                         Status = 500,
-                        Message = "You cannot cancel modify a order that is not currently in the orderbook"
+                        Message = "Error: you cannot cancel modify a order that is not currently in the orderbook"
                     };
                 }
 
