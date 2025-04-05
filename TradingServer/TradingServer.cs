@@ -67,7 +67,7 @@ namespace TradingServer.Core
                 {
                     Id = request.Id,
                     Status = 500,
-                    Message = "You have put in null or empty strings for arguments"
+                    Message = "Error: you have put in null or empty strings for arguments"
                 };
                 // or throw a new InvalidOperationException
             }
@@ -78,7 +78,7 @@ namespace TradingServer.Core
                 {
                     Id = request.Id,
                     Status = 500,
-                    Message = "You have tried to put a order on a invalid side"
+                    Message = "Error: you have tried to put a order on a invalid side"
                 };
             }
 
