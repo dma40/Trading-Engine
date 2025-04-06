@@ -32,13 +32,9 @@ namespace TradingServer.Core
             
             while (!stoppingToken.IsCancellationRequested) 
             {
-                /*
-                if (_orderbook.canMatch())
-                {
-                    _orderbook.match();
-                    _logger.LogInformation(nameof(TradingServer), $"Order match processed at {DateTime.Now}");
-                }
-                */
+                CancellationTokenSource cts = new CancellationTokenSource();
+                cts.Cancel();
+                cts.Dispose();
             }
 
             _logger.LogInformation(nameof(TradingServer), $"Ending process {nameof(TradingServer)}");
@@ -60,7 +56,7 @@ namespace TradingServer.Core
                 {
                     Id = request.Id,
                     Status = 500,
-                    Message = "Error: you have put in null or empty strings for arguments"
+                    Message = "Error: you have put in null or empty values for arguments"
                 };
             }
 
@@ -121,7 +117,16 @@ namespace TradingServer.Core
                 _orderbook.modifyOrder(modify);
             }
 
-            await Task.Delay(200); 
+            else
+            {
+                return new OrderResponse
+                {
+                    Id = request.Id,
+                    Status = 500,
+                    Message = "An unkown error occurred"
+                };
+            }
+
             _logger.LogInformation(nameof(TradingServer), $"{request.Id}");
 
             if (_orderbook.canMatch())
@@ -129,6 +134,8 @@ namespace TradingServer.Core
                 _orderbook.match();
                 _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.Now}");
             }
+
+            await Task.Delay(200);
 
             return new OrderResponse
             {

@@ -12,6 +12,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 {
     var tradingService = scope.ServiceProvider.GetRequiredService<TradingClient>();
 
+    
     var orderRequest = new OrderRequest
     {
         Id = 500,
@@ -48,7 +49,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
     var response2 = await tradingService.ProcessOrderAsync(orderRequest2);
 
     var response3 = await tradingService.ProcessOrderAsync(orderRequest3);
-
+    
     await engine.RunAsync().ConfigureAwait(false);
 }
 
