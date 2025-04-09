@@ -131,6 +131,7 @@ namespace TradingServer.Core
                 }
 
                 _orderbook.modifyOrder(modify);
+                
                 _logger.LogInformation(nameof(TradingServer), $"Modified order ${request.Id} in {request.Side} at {DateTime.Now}");
             }
 
