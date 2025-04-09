@@ -26,7 +26,6 @@ namespace TradingServer.OrderbookCS
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
 
-        // Constructor
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
@@ -35,7 +34,7 @@ namespace TradingServer.OrderbookCS
         public void addOrder(Order order)
         {
             var baseLimit = new Limit(order.Price);
-            addOrder(order, baseLimit, order.isBuySide ? _askLimits : _bidLimits, _orders);
+            addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
         }
 
         private static void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)

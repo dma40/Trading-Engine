@@ -42,8 +42,7 @@ namespace TradingServer.Logging
         private static async Task LogAsync(string filepath, BufferBlock<LogInformation> logs, CancellationToken token) 
         {
             using var filestream = new FileStream(filepath, FileMode.Append, FileAccess.Write, FileShare.Read);
-            using var streamwriter = new StreamWriter(filestream) {AutoFlush = true}; // maybe do FileMode.Append to allow new entries to be written in, instead of CreateNew
-            // also maybe try making sure the task is running before appending new entries
+            using var streamwriter = new StreamWriter(filestream) {AutoFlush = true}; 
             try 
             {
                 while (!token.IsCancellationRequested) 
@@ -67,7 +66,7 @@ namespace TradingServer.Logging
 
         private static string FormatLogItem(LogInformation log) 
         {
-            return $"[{log.now:HH-mm-ss.ffffff yyyy-MM-dd} {log.type} - {log.module}: {log.msg}]\n";
+            return $"[{log.now:HH-mm-ss.ffffff yyyy-MM-dd} {log.type} - {log.module}: {log.message}]\n";
         }
 
         ~TextLogger() 
@@ -81,7 +80,7 @@ namespace TradingServer.Logging
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(Boolean dispose) 
+        protected virtual void Dispose(bool dispose) 
         {
             if (_disposed) 
             {

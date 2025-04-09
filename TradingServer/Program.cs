@@ -17,7 +17,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 500,
         Quantity = 300,
         Price = 100,
-        Side = "Ask",
+        Side = "Bid",
         Operation = "Add", // other options are Modify, Remove
         Username = "Dylan" // who placed this order
     };
@@ -27,7 +27,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 400,
         Quantity = 200,
         Price = 100,
-        Side = "Ask",
+        Side = "Bid",
         Operation = "Add",
         Username = "Dylan"
     };
@@ -37,17 +37,46 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 126,
         Quantity = 300,
         Price = 50,
-        Side = "Bid",
+        Side = "Ask",
         Operation = "Add",
         Username = "Dylan"
     };
 
-    // this comprises the interactive client so far
-
-    var response = await tradingService.ProcessOrderAsync(orderRequest);
-    var response2 = await tradingService.ProcessOrderAsync(orderRequest2);
+    await tradingService.ProcessOrderAsync(orderRequest);
+    await tradingService.ProcessOrderAsync(orderRequest2);
 
     var response3 = await tradingService.ProcessOrderAsync(orderRequest3);
+
+    Console.WriteLine(response3.Message);
+
+    // stub for the interactive client
+    Console.WriteLine("Input something");
+    string input = Console.ReadLine();
+
+    // frame for the rest of the input that handles the input the user provided
+    if (input == "Add")
+    {
+        
+    }
+
+    else if (input == "Cancel")
+    {
+        var orderRequest4 = new OrderRequest
+        {
+            Id = 500,
+            Operation = "Cancel",
+            Username = "Dylan"
+        };
+
+        await tradingService.ProcessOrderAsync(orderRequest4);
+    }
+
+    else if (input == "Modify")
+    {
+
+    }
+
+    Console.WriteLine("You entered " + input);
     
     await engine.RunAsync().ConfigureAwait(false);
 }

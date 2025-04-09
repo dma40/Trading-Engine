@@ -1,9 +1,6 @@
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
-// For reference: Pro Rata and FIFO can both be used in the context
-// of limit orderbooks. This means that they can both inherit off of LimitOrderbook
-
 namespace TradingServer.OrderbookCS
 {
     public class FIFOrderbook: Orderbook, IMatchingOrderbook
@@ -25,68 +22,69 @@ namespace TradingServer.OrderbookCS
             
             MatchResult result = new MatchResult();
 
-            while (canMatch()) 
+            // investigate this loop, and also the way limits are being
+            // added to the buy and sell sides, as well as the remove() method - those could be causing errors
             // always looks out for matches whenever possible; ends when
             // no more matches can be executed
-            {
+            
                 // pair the lowest + highest in the next step
-                Limit min = getAskLimits().Min; // minimum nonempty limit
-                Limit max = getBidLimits().Max; // maximum available nonempty limit
+            Limit min = getAskLimits().Min; // minimum nonempty limit
+            Limit max = getBidLimits().Max; // maximum available nonempty limit
 
-                OrderbookEntry askPtr = min.head;
-                OrderbookEntry bidPtr = max.head;
+            OrderbookEntry askPtr = min.head;
+            OrderbookEntry bidPtr = max.head;
 
-                while (askPtr != null && bidPtr != null)
+            while (askPtr != null && bidPtr != null)
+            {
+                IOrderCore buyOrderCore = new OrderCore(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID);
+                IOrderCore askOrderCore = new OrderCore(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID);
+                CancelOrder bidCancel = new CancelOrder(buyOrderCore);
+                CancelOrder askCancel = new CancelOrder(askOrderCore);
+
+                uint buyQuantity = bidPtr.CurrentOrder.CurrentQuantity;
+                uint sellQuantity = askPtr.CurrentOrder.CurrentQuantity;
+
+                if (buyQuantity > sellQuantity)
                 {
-                    IOrderCore buyOrderCore = new OrderCore(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID);
-                    IOrderCore askOrderCore = new OrderCore(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID);
-                    CancelOrder bidCancel = new CancelOrder(buyOrderCore);
-                    CancelOrder askCancel = new CancelOrder(askOrderCore);
+                    // this is ok because CurrentQuantity is the amount of unfilled orders left
+                    bidPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
+                    askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
 
-                    uint buyQuantity = bidPtr.CurrentOrder.CurrentQuantity;
-                    uint sellQuantity = askPtr.CurrentOrder.CurrentQuantity;
+                    result.addTransaction(askPtr);
 
-                    if (buyQuantity > sellQuantity)
-                    {
-                        // this is ok because CurrentQuantity is the amount of unfilled orders left
-                        bidPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
-                        askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
+                    askPtr = askPtr.next;
+                    removeOrder(askCancel);
+                }
 
-                        result.addTransaction(askPtr);
+                else if (sellQuantity > buyQuantity)
+                {
+                    bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
+                    askPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
 
-                        askPtr = askPtr.next;
-                        removeOrder(askCancel);
-                    }
+                    result.addTransaction(bidPtr);
 
-                    else if (sellQuantity > buyQuantity)
-                    {
-                        bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
-                        askPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
+                    bidPtr = bidPtr.next;
+                    removeOrder(bidCancel);
+                }
 
-                        result.addTransaction(bidPtr);
+                else 
+                {
+                    bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
+                    askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
 
-                        bidPtr = bidPtr.next;
-                        removeOrder(bidCancel);
-                    }
+                    result.addTransaction(askPtr);
+                    result.addTransaction(bidPtr);
 
-                    else 
-                    {
-                        bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
-                        askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
+                    askPtr = askPtr.next;
+                    bidPtr = bidPtr.next;
 
-                        result.addTransaction(askPtr);
-                        result.addTransaction(bidPtr);
-
-                        askPtr = askPtr.next;
-                        bidPtr = bidPtr.next;
-
-                        removeOrder(askCancel);
-                        removeOrder(bidCancel);
-                    }
+                    removeOrder(askCancel);
+                    removeOrder(bidCancel);
+                }
 
                     // result.addTransaction(askPtr);
-                }
             }
+            
             return result;
         }
 
