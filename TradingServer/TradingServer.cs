@@ -92,6 +92,8 @@ namespace TradingServer.Core
 
                 Order newOrder = modify.newOrder();
                 _orderbook.addOrder(newOrder);
+
+                _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side at {DateTime.Now}");
             }
 
             else if (request.Operation == "Cancel")
@@ -110,6 +112,8 @@ namespace TradingServer.Core
 
                 CancelOrder cancelOrder = modify.cancelOrder();
                 _orderbook.removeOrder(cancelOrder);
+
+                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id} from {request.Side} side at {DateTime.Now}");
             }
 
             else if (request.Operation == "Modify")
@@ -124,10 +128,10 @@ namespace TradingServer.Core
                         Status = 500,
                         Message = "Error: you cannot cancel modify a order that is not currently in the orderbook"
                     };
-                    throw new InvalidOperationException("Cannot modify a non-existent order");
                 }
 
                 _orderbook.modifyOrder(modify);
+                _logger.LogInformation(nameof(TradingServer), $"Modified order ${request.Id} in {request.Side} at {DateTime.Now}");
             }
 
             else
@@ -146,10 +150,13 @@ namespace TradingServer.Core
 
             if (_orderbook.canMatch())
             {
-                _logger.LogInformation(nameof(TradingServer), "Matching orders...");
+                _logger.LogInformation(nameof(TradingServer), "Order matching in progress...");
                 _orderbook.match();
                 _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.Now}");
             }
+
+            _logger.LogInformation(nameof(TradingServer), $"Number of bid orders currently in the orderbook: {_orderbook.getBidOrders().Count}");
+            _logger.LogInformation(nameof(TradingServer), $"Number of ask orders currently in the orderbook: {_orderbook.getAskOrders().Count}");
             
             await Task.Delay(200);
 
