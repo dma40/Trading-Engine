@@ -12,6 +12,8 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 {
     var tradingService = scope.ServiceProvider.GetRequiredService<TradingClient>();
 
+    // Add a few simple tests
+
     var orderRequest = new OrderRequest
     {
         Id = 500,
@@ -44,10 +46,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 
     await tradingService.ProcessOrderAsync(orderRequest);
     await tradingService.ProcessOrderAsync(orderRequest2);
-
-    var response3 = await tradingService.ProcessOrderAsync(orderRequest3);
-
-    Console.WriteLine(response3.Message);
+    await tradingService.ProcessOrderAsync(orderRequest3);
 
     // stub for the interactive client
     Console.WriteLine("Input something");
