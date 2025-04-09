@@ -70,3 +70,5 @@ TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
 /Logging/bin
 /Logging/obj
 /OrderHandlers/bin
+/Orderbook/Orders/bin
+/Orderbook/Orders/obj
