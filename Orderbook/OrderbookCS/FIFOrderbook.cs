@@ -49,9 +49,10 @@ namespace TradingServer.OrderbookCS
                     if (buyQuantity > sellQuantity)
                     {
                         // this is ok because CurrentQuantity is the amount of unfilled orders left
-                        // fill a certain number of orders
                         bidPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
                         askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
+
+                        result.addTransaction(askPtr);
 
                         askPtr = askPtr.next;
                         removeOrder(askCancel);
@@ -62,6 +63,8 @@ namespace TradingServer.OrderbookCS
                         bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
                         askPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
 
+                        result.addTransaction(bidPtr);
+
                         bidPtr = bidPtr.next;
                         removeOrder(bidCancel);
                     }
@@ -71,6 +74,9 @@ namespace TradingServer.OrderbookCS
                         bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
                         askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
 
+                        result.addTransaction(askPtr);
+                        result.addTransaction(bidPtr);
+
                         askPtr = askPtr.next;
                         bidPtr = bidPtr.next;
 
@@ -78,7 +84,7 @@ namespace TradingServer.OrderbookCS
                         removeOrder(bidCancel);
                     }
 
-                    result.addTransaction(askPtr);
+                    // result.addTransaction(askPtr);
                 }
             }
             return result;

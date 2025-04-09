@@ -52,16 +52,22 @@ namespace TradingServer.Core
                 || string.IsNullOrEmpty(request.Side.ToString())
                 )
             {
+                _logger.LogInformation(nameof(TradingServer), $"Rejected order with invalid arguments at {DateTime.Now}");
+
                 return new OrderResponse
                 {
                     Id = request.Id,
                     Status = 500,
                     Message = "Error: you have put in null or empty values for arguments"
                 };
+
+                throw new InvalidOperationException("Cannot have null or empty arguments");
             }
 
             else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
             {
+                _logger.LogInformation(nameof(TradingServer), $"Rejected request attempting to add to a invalid side at {DateTime.Now}");
+
                 return new OrderResponse
                 {
                     Id = request.Id,
@@ -74,6 +80,8 @@ namespace TradingServer.Core
             {
                 if (_orderbook.containsOrder(modify.OrderID))
                 {
+                    _logger.LogInformation(nameof(TradingServer), $"Rejected request to add order that exists in the orderbook at {DateTime.Now}");
+
                     return new OrderResponse
                     {
                         Id = request.Id,
@@ -90,6 +98,8 @@ namespace TradingServer.Core
             {
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
+                    _logger.LogInformation(nameof(TradingServer), $"Rejected a request to cancel a order not in the orderbook at {DateTime.Now}");
+
                     return new OrderResponse
                     {
                         Id = request.Id,
@@ -106,12 +116,15 @@ namespace TradingServer.Core
             {
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
+                    _logger.LogInformation(nameof(TradingServer), $"Rejected a request to modify a order that does not exist at {DateTime.Now}");
+
                     return new OrderResponse
                     {
                         Id = request.Id,
                         Status = 500,
                         Message = "Error: you cannot cancel modify a order that is not currently in the orderbook"
                     };
+                    throw new InvalidOperationException("Cannot modify a non-existent order");
                 }
 
                 _orderbook.modifyOrder(modify);
@@ -119,6 +132,8 @@ namespace TradingServer.Core
 
             else
             {
+                _logger.LogInformation(nameof(TradingServer), $"Rejected request with unknown error at {DateTime.Now}");
+
                 return new OrderResponse
                 {
                     Id = request.Id,
@@ -127,14 +142,15 @@ namespace TradingServer.Core
                 };
             }
 
-            _logger.LogInformation(nameof(TradingServer), $"{request.Id}");
+            _logger.LogInformation(nameof(TradingServer), $"Processed {request.Id} successfully");
 
             if (_orderbook.canMatch())
             {
+                _logger.LogInformation(nameof(TradingServer), "Matching orders...");
                 _orderbook.match();
                 _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.Now}");
             }
-
+            
             await Task.Delay(200);
 
             return new OrderResponse

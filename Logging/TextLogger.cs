@@ -67,7 +67,7 @@ namespace TradingServer.Logging
 
         private static string FormatLogItem(LogInformation log) 
         {
-            return $"[{log.now:HH-mm-ss.ffffff yyyy-MM-dd}]";
+            return $"[{log.now:HH-mm-ss.ffffff yyyy-MM-dd} {log.type} - {log.module}: {log.msg}]\n";
         }
 
         ~TextLogger() 

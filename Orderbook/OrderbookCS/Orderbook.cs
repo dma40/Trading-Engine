@@ -193,7 +193,7 @@ namespace TradingServer.OrderbookCS
             {
                 foreach (var bid in _bidLimits)
                 {
-                    if (ask.Price < bid.Price)
+                    if (ask.Price <= bid.Price)
                         return true;
                 }
             }

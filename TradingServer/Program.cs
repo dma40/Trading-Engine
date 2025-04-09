@@ -12,13 +12,12 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 {
     var tradingService = scope.ServiceProvider.GetRequiredService<TradingClient>();
 
-    
     var orderRequest = new OrderRequest
     {
         Id = 500,
         Quantity = 300,
         Price = 100,
-        Side = "Bid",
+        Side = "Ask",
         Operation = "Add", // other options are Modify, Remove
         Username = "Dylan" // who placed this order
     };
@@ -28,7 +27,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 400,
         Quantity = 200,
         Price = 100,
-        Side = "Bid",
+        Side = "Ask",
         Operation = "Add",
         Username = "Dylan"
     };
@@ -38,7 +37,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 126,
         Quantity = 300,
         Price = 50,
-        Side = "Ask",
+        Side = "Bid",
         Operation = "Add",
         Username = "Dylan"
     };
