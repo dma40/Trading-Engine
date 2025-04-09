@@ -66,3 +66,6 @@ Orderbook/Orders/obj/Debug/net9.0/Orders.AssemblyInfo.cs
 /TradingServer/obj
 TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
 /TradingServer/obj
+/Logging/bin/Debug
+/Logging/bin
+/Logging/obj
