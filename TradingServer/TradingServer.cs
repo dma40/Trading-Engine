@@ -30,6 +30,8 @@ namespace TradingServer.Core
         protected override Task ExecuteAsync(CancellationToken stoppingToken) 
         {
             _logger.LogInformation(nameof(TradingServer), "Starting Process");
+            _logger.LogInformation(nameof(TradingServer), $"Security name: {_tradingConfig.TradingServerSettings.SecurityName}");
+            _logger.LogInformation(nameof(TradingServer), $"Security ID: {_tradingConfig.TradingServerSettings.SecurityID}");
             
             while (!stoppingToken.IsCancellationRequested) 
             {
@@ -60,21 +62,6 @@ namespace TradingServer.Core
                     Status = 500,
                     Message = "Error: you have put in null or empty values for arguments"
                 };
-
-                throw new InvalidOperationException("Cannot have null or empty arguments");
-            }
-
-            // Remove this - Modify and Cancel don't need to have a side.
-            else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
-            {
-                _logger.LogInformation(nameof(TradingServer), $"Rejected request from {request.Username} attempting to add to a invalid side at {DateTime.Now}");
-
-                return new OrderResponse
-                {
-                    Id = request.Id,
-                    Status = 500,
-                    Message = "Error: you have tried to put a order on a invalid side"
-                };
             }
 
             else if (request.Operation == "Add")
@@ -90,6 +77,18 @@ namespace TradingServer.Core
                         Message = "Error: this order already exists within the orderbook"
                     };
                 }
+
+                if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
+                {
+                    _logger.LogInformation(nameof(TradingServer), $"Rejected request from {request.Username} attempting to add to a invalid side at {DateTime.Now}");
+
+                    return new OrderResponse
+                    {
+                        Id = request.Id,
+                        Status = 500,
+                        Message = "Error: you have tried to put a order on a invalid side"
+                    };
+            }
 
                 Order newOrder = modify.newOrder();
                 _orderbook.addOrder(newOrder);
@@ -114,7 +113,7 @@ namespace TradingServer.Core
                 CancelOrder cancelOrder = modify.cancelOrder();
                 _orderbook.removeOrder(cancelOrder);
 
-                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id} from {request.Side} side by {request.Username} at {DateTime.Now}");
+                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id} by {request.Username} at {DateTime.Now}");
             }
 
             else if (request.Operation == "Modify")
@@ -159,7 +158,9 @@ namespace TradingServer.Core
 
             _logger.LogInformation(nameof(TradingServer), $"Number of bid orders currently in the orderbook: {_orderbook.getBidOrders().Count}");
             _logger.LogInformation(nameof(TradingServer), $"Number of ask orders currently in the orderbook: {_orderbook.getAskOrders().Count}");
-            
+            _logger.LogInformation(nameof(TradingServer), $"Number of bid limits in the orderbook: {_orderbook.getBidLimits().Count}");
+            _logger.LogInformation(nameof(TradingServer), $"Number of ask limits in the orderbook: {_orderbook.getAskLimits().Count}");
+            // maybe make a log of all orders to make the debugging process easier
             await Task.Delay(200);
 
             return new OrderResponse

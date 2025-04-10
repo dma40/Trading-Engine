@@ -75,6 +75,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
+        // check this removeOrder it may not be working properly
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
             if (orderentry.previous != null && orderentry.next != null)
@@ -122,8 +123,8 @@ namespace TradingServer.OrderbookCS
             _orders.Remove(id);
         }
 
+        // also check this, it may also not be working properly
         public void modifyOrder(ModifyOrder modify)
-        // modify from head, modify from tail, modify from middle, modify a empty 
         {
             if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
             {

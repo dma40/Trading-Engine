@@ -8,5 +8,5 @@ namespace TradingServer.Orders
     // - user who submitted the order that was matched
     // - Position of that order within the limit
     public record OrderRecord(long orderID, uint quantity, long price, 
-    bool isBuySide, string username, int SecurityID, uint queuePosition);
+    bool isBuySide, string username, string SecurityID, uint queuePosition);
 }

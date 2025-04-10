@@ -18,7 +18,7 @@ namespace TradingServer.Orders {
         private readonly IOrderCore _orderCore;
         
         public long OrderID => _orderCore.OrderID; 
-        public int SecurityID => _orderCore.SecurityID;
+        public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
         public long Price { get; private set;}
 

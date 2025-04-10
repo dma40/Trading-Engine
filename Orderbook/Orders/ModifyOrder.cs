@@ -12,7 +12,7 @@ namespace TradingServer.Orders
             isBuySide = isBuy;
 
         }
-        public int SecurityID => _orderCore.SecurityID;
+        public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
         public long OrderID => _orderCore.OrderID;
         public long ModifyPrice { get; private set; }

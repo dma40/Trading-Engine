@@ -13,7 +13,7 @@ namespace TradingServer.Rejects
         public RejectionReason reason { get; private set; }
         public long OrderID => _orderCore.OrderID;
         public string Username => _orderCore.Username;
-        public int SecurityID => _orderCore.SecurityID;
+        public string SecurityID => _orderCore.SecurityID;
 
         private readonly IOrderCore _orderCore;
     }

@@ -6,6 +6,6 @@ namespace TradingServer.Orders {
     {
         public long OrderID { get; }
         public string Username { get; }
-        public int SecurityID { get; }
+        public string SecurityID { get; }
     }
 }

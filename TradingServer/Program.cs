@@ -46,7 +46,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 
     await tradingService.ProcessOrderAsync(orderRequest);
     await tradingService.ProcessOrderAsync(orderRequest2);
-    await tradingService.ProcessOrderAsync(orderRequest3);
+    //await tradingService.ProcessOrderAsync(orderRequest3);
 
     // stub for the interactive client
     Console.WriteLine("Input something");
@@ -66,7 +66,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
             Operation = "Cancel",
             Username = "Dylan"
         };
-
+        // cancelling seems to work when all the orders are from one side, doesn't work when there's a match apparently
         await tradingService.ProcessOrderAsync(orderRequest4);
     }
 
