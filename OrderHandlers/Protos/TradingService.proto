@@ -18,5 +18,5 @@ message OrderResponse {
 }
 
 service TradingService {
-    rpc PlaceOrder(OrderRequest) returns (OrderResponse);
+    rpc ProcessOrderAsync(OrderRequest) returns (OrderResponse);
 }
