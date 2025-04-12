@@ -3,7 +3,7 @@ using System.Security;
 namespace TradingServer.Orders {
     public class Order: IOrderCore 
     {
-        public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy) 
+        public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
         {
             _orderCore = orderCore;
             Price = price;
@@ -13,7 +13,7 @@ namespace TradingServer.Orders {
         }
 
         public Order(ModifyOrder modify): this(modify, 
-        modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide) {}
+        modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide, modify.OrderType) {}
 
         private readonly IOrderCore _orderCore;
         

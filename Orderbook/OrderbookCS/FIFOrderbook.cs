@@ -29,8 +29,8 @@ namespace TradingServer.OrderbookCS
                 OrderbookEntry ask = min.head;
                 OrderbookEntry bid = max.head;
 
-                IOrderCore buyOrderCore = new OrderCore(bid.CurrentOrder.OrderID, bid.CurrentOrder.Username, bid.CurrentOrder.SecurityID);
-                IOrderCore askOrderCore = new OrderCore(ask.CurrentOrder.OrderID, ask.CurrentOrder.Username, ask.CurrentOrder.SecurityID);
+                IOrderCore buyOrderCore = new OrderCore(bid.CurrentOrder.OrderID, bid.CurrentOrder.Username, bid.CurrentOrder.SecurityID, OrderTypes.GoodForDay);
+                IOrderCore askOrderCore = new OrderCore(ask.CurrentOrder.OrderID, ask.CurrentOrder.Username, ask.CurrentOrder.SecurityID, OrderTypes.GoodForDay);
                 CancelOrder bidCancel = new CancelOrder(buyOrderCore);
                 CancelOrder askCancel = new CancelOrder(askOrderCore);
 

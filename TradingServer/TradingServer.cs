@@ -46,7 +46,8 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID);
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, OrderTypes.GoodForDay); // do this for now,
+                                                                                                                                                        // this is the only existing order type after all
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
 
             if (string.IsNullOrEmpty(request.Id.ToString()) 
@@ -133,6 +134,9 @@ namespace TradingServer.Core
                 }
 
                 _orderbook.modifyOrder(modify);
+
+                //_logger.Debug(nameof(TradingServer), $"Ask side limits: " + askSideLimits);
+                //_logger.Debug(nameof(TradingServer), $"Bid side limits" + bidSideLimits);
                 
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.Now}");
             }
@@ -161,6 +165,11 @@ namespace TradingServer.Core
             string askSideIds = "";
             string bidSideIds = "";
 
+            string bidSideLimits = "";
+            string askSideLimits = "";
+
+            // do this for additional debugging
+
             foreach (var ask in _orderbook.getAskOrders())
             {
                 askSideIds += $" {ask.CurrentOrder.OrderID} ";
@@ -171,8 +180,20 @@ namespace TradingServer.Core
                 bidSideIds += $" {bid.CurrentOrder.OrderID} ";
             }
 
+            foreach (var ask in _orderbook.getAskLimits())
+            {
+                askSideLimits += $" {ask.Price} ";
+            }
+
+            foreach (var bid in _orderbook.getBidLimits())
+            {
+                bidSideLimits += $" {bid.Price} ";
+            }
+
             _logger.Debug(nameof(TradingServer), $"Bid orders in the orderbook: " + bidSideIds);
             _logger.Debug(nameof(TradingServer), $"Ask orders in the orderbook: " + askSideIds);
+            _logger.Debug(nameof(TradingServer), $"Ask side limits: " + askSideLimits);
+            _logger.Debug(nameof(TradingServer), $"Bid side limits" + bidSideLimits);
             
             await Task.Delay(200);
 
