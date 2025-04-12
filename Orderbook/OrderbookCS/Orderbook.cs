@@ -133,7 +133,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void ProcessGoodForDayOrders()
+        public void ProcessGoodForDay()
         {
             // process the good for day orders
             // handle the FillOrKill, IntermediateOrCancel orders in the matching method 
@@ -142,10 +142,14 @@ namespace TradingServer.OrderbookCS
             lock (_ordersLock)
             {
                 DateTime now = DateTime.UtcNow;
-                // do something
+                // do something; maybe shut down the system at the end of the trading day (when it is 4:00 in EST)
             
                 lock (_goodForDayLock)
                 {
+                    foreach (var order in _goodForDay)
+                    {
+                        // do something with the date time
+                    }
                     // process all of the GoodForDay orders
                 }
             }
@@ -158,6 +162,10 @@ namespace TradingServer.OrderbookCS
 
                 lock (_goodTillCancelLock)
                 {
+                    foreach (var order in _goodTillCancel)
+                    {
+
+                    }
                     // delete expired goodTillCancel orders 
                 }
             }
