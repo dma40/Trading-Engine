@@ -54,7 +54,7 @@ namespace TradingServer.Core
                 || string.IsNullOrEmpty(request.Operation.ToString())
                 )
             {
-                _logger.LogInformation(nameof(TradingServer), $"Rejected order with invalid arguments submitted by {request.Username} at {DateTime.Now}");
+                _logger.Error(nameof(TradingServer), $"Rejected order with invalid arguments submitted by {request.Username} at {DateTime.Now}");
 
                 return new OrderResponse
                 {
@@ -68,7 +68,7 @@ namespace TradingServer.Core
             {
                 if (_orderbook.containsOrder(modify.OrderID))
                 {
-                    _logger.LogInformation(nameof(TradingServer), $"Rejected request by {request.Username} to add order that exists in the orderbook at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected request by {request.Username} to add order that exists in the orderbook at {DateTime.Now}");
 
                     return new OrderResponse
                     {
@@ -78,9 +78,11 @@ namespace TradingServer.Core
                     };
                 }
 
+                // maybe add some try/catch blocks to test for various errors
+
                 if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
                 {
-                    _logger.LogInformation(nameof(TradingServer), $"Rejected request from {request.Username} attempting to add to a invalid side at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected request from {request.Username} attempting to add to a invalid side at {DateTime.Now}");
 
                     return new OrderResponse
                     {
@@ -100,7 +102,7 @@ namespace TradingServer.Core
             {
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
-                    _logger.LogInformation(nameof(TradingServer), $"Rejected a request to cancel a order not in the orderbook from {request.Username} at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected a request to cancel a order not in the orderbook from {request.Username} at {DateTime.Now}");
 
                     return new OrderResponse
                     {
@@ -120,7 +122,7 @@ namespace TradingServer.Core
             {
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
-                    _logger.LogInformation(nameof(TradingServer), $"Rejected a request to modify a order that does not exist from {request.Username} at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected a request to modify a order that does not exist from {request.Username} at {DateTime.Now}");
 
                     return new OrderResponse
                     {
@@ -132,12 +134,12 @@ namespace TradingServer.Core
 
                 _orderbook.modifyOrder(modify);
                 
-                _logger.LogInformation(nameof(TradingServer), $"Modified order ${request.Id} in {request.Side} by {request.Username} at {DateTime.Now}");
+                _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.Now}");
             }
 
             else
             {
-                _logger.LogInformation(nameof(TradingServer), $"Rejected request with unknown error from {request.Username} at {DateTime.Now}");
+                _logger.Error(nameof(TradingServer), $"Rejected request with unknown error from {request.Username} at {DateTime.Now}");
 
                 return new OrderResponse
                 {
@@ -156,11 +158,22 @@ namespace TradingServer.Core
                 _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.Now}");
             }
 
-            _logger.LogInformation(nameof(TradingServer), $"Number of bid orders currently in the orderbook: {_orderbook.getBidOrders().Count}");
-            _logger.LogInformation(nameof(TradingServer), $"Number of ask orders currently in the orderbook: {_orderbook.getAskOrders().Count}");
-            _logger.LogInformation(nameof(TradingServer), $"Number of bid limits in the orderbook: {_orderbook.getBidLimits().Count}");
-            _logger.LogInformation(nameof(TradingServer), $"Number of ask limits in the orderbook: {_orderbook.getAskLimits().Count}");
-            // maybe make a log of all orders to make the debugging process easier
+            string askSideIds = "";
+            string bidSideIds = "";
+
+            foreach (var ask in _orderbook.getAskOrders())
+            {
+                askSideIds += $" {ask.CurrentOrder.OrderID} ";
+            }
+
+            foreach (var bid in _orderbook.getBidOrders())
+            {
+                bidSideIds += $" {bid.CurrentOrder.OrderID} ";
+            }
+
+            _logger.Debug(nameof(TradingServer), $"Bid orders in the orderbook: " + bidSideIds);
+            _logger.Debug(nameof(TradingServer), $"Ask orders in the orderbook: " + askSideIds);
+            
             await Task.Delay(200);
 
             return new OrderResponse

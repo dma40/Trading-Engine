@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using TradingServer.Core;
 using Trading;
+using System.Diagnostics;
 
 using var engine = TradingHostBuilder.BuildTradingServer();
 TradingServerServiceProvider.serviceProvider = engine.Services;
@@ -46,7 +47,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 
     await tradingService.ProcessOrderAsync(orderRequest);
     await tradingService.ProcessOrderAsync(orderRequest2);
-    //await tradingService.ProcessOrderAsync(orderRequest3);
+    // await tradingService.ProcessOrderAsync(orderRequest3);
 
     // stub for the interactive client
     Console.WriteLine("Input something");
@@ -55,16 +56,26 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
     // frame for the rest of the input that handles the input the user provided
     if (input == "Add")
     {
-        
+        var request = new OrderRequest
+        {
+            Id = 600,
+            Operation = "Add",
+            Quantity = 500,
+            // Type = "GoodTillCancel",
+            Side = "Ask",
+            Price = 320,
+            Username = "Dylan"
+        };
     }
 
     else if (input == "Cancel")
     {
         var orderRequest4 = new OrderRequest
         {
-            Id = 500,
+            Id = 400,
             Operation = "Cancel",
-            Username = "Dylan"
+            Username = "Dylan",
+            Side = "Bid"
         };
         // cancelling seems to work when all the orders are from one side, doesn't work when there's a match apparently
         await tradingService.ProcessOrderAsync(orderRequest4);
@@ -72,7 +83,17 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 
     else if (input == "Modify")
     {
+        var orderRequest5 = new OrderRequest
+        {
+            Id = 400,
+            Operation = "Modify",
+            Username = "Dylan",
+            Price = 120
+        };
 
+        // the fact that there was no side, caused this to have a problem...
+
+        await tradingService.ProcessOrderAsync(orderRequest5);
     }
 
     Console.WriteLine("You entered " + input);

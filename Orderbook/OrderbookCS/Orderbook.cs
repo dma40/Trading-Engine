@@ -2,29 +2,21 @@
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
-// Todos:
-// PROrderbook (Pro-Rata Orderbook), FIFOrderbook
-// Matching orderbook interface
-// if possible, order types + market type
-
-// Also, FIFO Orderbooks consider orders based on the time at which they come in
-// the usefulness of why we instantiate the UTC time to find a way of determining the earliest
-// orders
-
 namespace TradingServer.OrderbookCS
 {
+    // maybe also have limit orders, GoodForDay, FillOrKill orders as well, in addition to a list of all orders in the orderbook
+    // since those need special handling
+    // this may need us to require OrderType to our IOrderCore interface
     public class Orderbook: IRetrievalOrderbook
     {
-        // In this orderbook, we define it so that 
-        // orders limits are unique - when we add a order to a price level that 
-        // already exists, we add it to the corresponding limit.
-        // Otherwise, we will create a new Limit with a null head and null tail and add it to that limit level.
-
-        // Instance attributes
         private readonly Security _instrument;
         private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _fillOrKill = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _intermediateOrCancel = new Dictionary<long, OrderbookEntry>();
 
         public Orderbook(Security instrument) 
         {
@@ -40,14 +32,15 @@ namespace TradingServer.OrderbookCS
         private static void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
+
             if (levels.TryGetValue(baseLimit, out Limit limit))
             {
-                
                 if (limit.head == null)
                 {
                     limit.head = orderbookEntry;
                     limit.tail = orderbookEntry;
                 }
+
                 else
                 {
                     OrderbookEntry tailPointer = limit.tail;
@@ -56,6 +49,7 @@ namespace TradingServer.OrderbookCS
                     limit.tail = orderbookEntry;
                 }
             }
+
             else 
             {
                 levels.Add(baseLimit);
@@ -65,6 +59,7 @@ namespace TradingServer.OrderbookCS
             }
 
             orders.Add(order.OrderID, orderbookEntry);
+            // add special handling if it is of a different type.
         }
 
         public void removeOrder(CancelOrder cancel)

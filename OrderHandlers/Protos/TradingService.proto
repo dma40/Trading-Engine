@@ -6,9 +6,10 @@ message OrderRequest {
     int32 id = 1;
     uint32 quantity = 2;
     int64 price = 3;
-    string side = 4;
-    string operation = 5;
-    string username = 6;
+    string type = 4;
+    string side = 5;
+    string operation = 6;
+    string username = 7;
 }
 
 message OrderResponse {

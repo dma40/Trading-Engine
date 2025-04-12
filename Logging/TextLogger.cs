@@ -58,9 +58,9 @@ namespace TradingServer.Logging
             }
         }
 
-        protected override void Log(message_types type, string module, string msg)
+        protected override void Log(message_types type, string module, string message)
         {
-            _logQueue.Post(new LogInformation(type, module, msg, DateTime.Now, 
+            _logQueue.Post(new LogInformation(type, module, message, DateTime.Now, 
             Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name));
         }
 

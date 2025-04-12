@@ -3,6 +3,8 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
+    // maybe add support for FillOrKill, GoodForDay and IntermediateOrCancel
+    // Aha! Maybe handle seperately the FillOrKill, GoodForDay and IntermediateOrCancels differently
     public class FIFOrderbook: Orderbook, IMatchingOrderbook
     {
         public FIFOrderbook(Security security): base(security)
@@ -12,77 +14,60 @@ namespace TradingServer.OrderbookCS
 
         public MatchResult match()
         {
-
             if (getAskLimits().Count == 0 || getBidLimits().Count == 0)
             {
                 throw new InvalidOperationException("Orders cannot be matched because either the buy side or the sell side of the orderbook is empty");
             }
-
-            // note the matching engine terminates when there are no more matches to complete
             
             MatchResult result = new MatchResult();
 
-            // investigate this loop, and also the way limits are being
-            // added to the buy and sell sides, as well as the remove() method - those could be causing errors
-            // always looks out for matches whenever possible; ends when
-            // no more matches can be executed
-            
-                // pair the lowest + highest in the next step
             Limit min = getAskLimits().Min; // minimum nonempty limit
             Limit max = getBidLimits().Max; // maximum available nonempty limit
 
-            OrderbookEntry askPtr = min.head;
-            OrderbookEntry bidPtr = max.head;
-
-            while (askPtr != null && bidPtr != null)
+            while (min.head != null && max.head != null)
             {
-                IOrderCore buyOrderCore = new OrderCore(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID);
-                IOrderCore askOrderCore = new OrderCore(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID);
+                OrderbookEntry ask = min.head;
+                OrderbookEntry bid = max.head;
+
+                IOrderCore buyOrderCore = new OrderCore(bid.CurrentOrder.OrderID, bid.CurrentOrder.Username, bid.CurrentOrder.SecurityID);
+                IOrderCore askOrderCore = new OrderCore(ask.CurrentOrder.OrderID, ask.CurrentOrder.Username, ask.CurrentOrder.SecurityID);
                 CancelOrder bidCancel = new CancelOrder(buyOrderCore);
                 CancelOrder askCancel = new CancelOrder(askOrderCore);
 
-                uint buyQuantity = bidPtr.CurrentOrder.CurrentQuantity;
-                uint sellQuantity = askPtr.CurrentOrder.CurrentQuantity;
+                uint buyQuantity = bid.CurrentOrder.CurrentQuantity;
+                uint sellQuantity = ask.CurrentOrder.CurrentQuantity;
 
                 if (buyQuantity > sellQuantity)
                 {
-                    // this is ok because CurrentQuantity is the amount of unfilled orders left
-                    bidPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
-                    askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
+                    bid.CurrentOrder.DecreaseQuantity(sellQuantity);
+                    ask.CurrentOrder.DecreaseQuantity(sellQuantity);
 
-                    result.addTransaction(askPtr);
+                    result.addTransaction(ask);
 
-                    askPtr = askPtr.next;
                     removeOrder(askCancel);
                 }
 
                 else if (sellQuantity > buyQuantity)
                 {
-                    bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
-                    askPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
+                    bid.CurrentOrder.DecreaseQuantity(buyQuantity);
+                    ask.CurrentOrder.DecreaseQuantity(buyQuantity);
 
-                    result.addTransaction(bidPtr);
+                    result.addTransaction(bid);
 
-                    bidPtr = bidPtr.next;
                     removeOrder(bidCancel);
                 }
 
                 else 
                 {
-                    bidPtr.CurrentOrder.DecreaseQuantity(buyQuantity);
-                    askPtr.CurrentOrder.DecreaseQuantity(sellQuantity);
+                    bid.CurrentOrder.DecreaseQuantity(buyQuantity);
+                    ask.CurrentOrder.DecreaseQuantity(sellQuantity);
 
-                    result.addTransaction(askPtr);
-                    result.addTransaction(bidPtr);
-
-                    askPtr = askPtr.next;
-                    bidPtr = bidPtr.next;
+                    result.addTransaction(ask);
+                    result.addTransaction(bid);
 
                     removeOrder(askCancel);
                     removeOrder(bidCancel);
                 }
-
-                    // result.addTransaction(askPtr);
             }
             
             return result;
