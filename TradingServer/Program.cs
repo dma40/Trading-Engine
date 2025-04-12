@@ -87,6 +87,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         {
             Id = 400,
             Operation = "Modify",
+            Side = "Bid",
             Username = "Dylan",
             Price = 120
         };

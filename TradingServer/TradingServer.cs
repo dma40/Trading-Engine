@@ -46,7 +46,7 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, OrderTypes.GoodForDay); // do this for now,
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, OrderTypes.GoodTillCancel); // do this for now,
                                                                                                                                                         // this is the only existing order type after all
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
 
@@ -55,7 +55,7 @@ namespace TradingServer.Core
                 || string.IsNullOrEmpty(request.Operation.ToString())
                 )
             {
-                _logger.Error(nameof(TradingServer), $"Rejected order with invalid arguments submitted by {request.Username} at {DateTime.Now}");
+                _logger.Error(nameof(TradingServer), $"Rejected order with invalid arguments submitted by {request.Username} at {DateTime.UtcNow}");
 
                 return new OrderResponse
                 {
@@ -69,7 +69,7 @@ namespace TradingServer.Core
             {
                 if (_orderbook.containsOrder(modify.OrderID))
                 {
-                    _logger.Error(nameof(TradingServer), $"Rejected request by {request.Username} to add order that exists in the orderbook at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected request by {request.Username} to add order that exists in the orderbook at {DateTime.UtcNow}");
 
                     return new OrderResponse
                     {
@@ -83,7 +83,7 @@ namespace TradingServer.Core
 
                 if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
                 {
-                    _logger.Error(nameof(TradingServer), $"Rejected request from {request.Username} attempting to add to a invalid side at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected request from {request.Username} attempting to add to a invalid side at {DateTime.UtcNow}");
 
                     return new OrderResponse
                     {
@@ -96,14 +96,14 @@ namespace TradingServer.Core
                 Order newOrder = modify.newOrder();
                 _orderbook.addOrder(newOrder);
 
-                _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side by {request.Username} at {DateTime.Now}");
+                _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Cancel")
             {
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
-                    _logger.Error(nameof(TradingServer), $"Rejected a request to cancel a order not in the orderbook from {request.Username} at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected a request to cancel a order not in the orderbook from {request.Username} at {DateTime.UtcNow}");
 
                     return new OrderResponse
                     {
@@ -116,14 +116,14 @@ namespace TradingServer.Core
                 CancelOrder cancelOrder = modify.cancelOrder();
                 _orderbook.removeOrder(cancelOrder);
 
-                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id} by {request.Username} at {DateTime.Now}");
+                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id} by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Modify")
             {
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
-                    _logger.Error(nameof(TradingServer), $"Rejected a request to modify a order that does not exist from {request.Username} at {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), $"Rejected a request to modify a order that does not exist from {request.Username} at {DateTime.UtcNow}");
 
                     return new OrderResponse
                     {
@@ -138,12 +138,12 @@ namespace TradingServer.Core
                 //_logger.Debug(nameof(TradingServer), $"Ask side limits: " + askSideLimits);
                 //_logger.Debug(nameof(TradingServer), $"Bid side limits" + bidSideLimits);
                 
-                _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.Now}");
+                _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.UtcNow}");
             }
 
             else
             {
-                _logger.Error(nameof(TradingServer), $"Rejected request with unknown error from {request.Username} at {DateTime.Now}");
+                _logger.Error(nameof(TradingServer), $"Rejected request with unknown error from {request.Username} at {DateTime.UtcNow}");
 
                 return new OrderResponse
                 {
@@ -157,9 +157,9 @@ namespace TradingServer.Core
 
             if (_orderbook.canMatch())
             {
-                _logger.LogInformation(nameof(TradingServer), $"Orders can now be matched in this orderbook. Order match started at {DateTime.Now}");
+                _logger.LogInformation(nameof(TradingServer), $"Orders can now be matched in this orderbook. Order match started at {DateTime.UtcNow}");
                 _orderbook.match();
-                _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.Now}");
+                _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.UtcNow}");
             }
 
             string askSideIds = "";

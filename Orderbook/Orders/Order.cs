@@ -1,6 +1,8 @@
 using System.Security;
 
-namespace TradingServer.Orders {
+namespace TradingServer.Orders 
+{
+    // we should also probably store when a order came into the orderbook
     public class Order: IOrderCore 
     {
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
@@ -24,13 +26,34 @@ namespace TradingServer.Orders {
         public long Price { get; private set; }
         public OrderTypes OrderType { get; private set; }
 
-        // Important: the initial quantity is the initial amount of orders placed.
-        // This may become useful for certain things we want to do, for example, keeping 
-        // track of how many excess orders there are (if any)
-
         public uint Quantity { get; private set; }
         public uint CurrentQuantity { get; private set; }
         public bool isBuySide { get; private set; }
+
+        public OrderTypes StringToOrderType(string input)
+        {
+            if (input == "FillOrKill")
+            {
+                return OrderTypes.FillOrKill;
+            }
+
+            else if (input == "GoodTillCancel")
+            {
+                return OrderTypes.GoodTillCancel;
+            }
+
+            else if (input == "IntermediateOrCancel")
+            {
+                return OrderTypes.IntermediateOrCancel;
+            }
+
+            else 
+            {
+                return OrderTypes.GoodForDay;    
+            }
+
+        throw new InvalidOperationException("You cannot have this as a input, this is not in the enum");
+    }
 
         public void IncreaseQuantity(uint additional) 
         {

@@ -4,9 +4,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    // maybe also have limit orders, GoodForDay, FillOrKill orders as well, in addition to a list of all orders in the orderbook
-    // since those need special handling
-    // this may need us to require OrderType to our IOrderCore interface
+    // wacky things seem to be happening with removing, modifying orders?
     public class Orderbook: IRetrievalOrderbook
     {
         private readonly Security _instrument;
@@ -14,11 +12,16 @@ namespace TradingServer.OrderbookCS
         private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
 
-        private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>(); // maybe have seperate AskOrders, bidOrders to make this a little easier
         private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _fillOrKill = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); // by default all of our orders are of this type
+                                                                                                                    // set a 90 day limit, when the time is up remove all goodTillCancel orders
         private readonly Dictionary<long, OrderbookEntry> _intermediateOrCancel = new Dictionary<long, OrderbookEntry>();
+
+        private readonly Lock _ordersLock = new();
+        private readonly Lock _goodForDayLock = new();
+        private readonly Lock _goodTillCancelLock = new();
 
         public Orderbook(Security instrument) 
         {
@@ -127,6 +130,36 @@ namespace TradingServer.OrderbookCS
             {
                 removeOrder(modify.cancelOrder());
                 addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+            }
+        }
+
+        public void ProcessGoodForDayOrders()
+        {
+            // process the good for day orders
+            // handle the FillOrKill, IntermediateOrCancel orders in the matching method 
+            // which we will do later
+
+            lock (_ordersLock)
+            {
+                DateTime now = DateTime.UtcNow;
+                // do something
+            
+                lock (_goodForDayLock)
+                {
+                    // process all of the GoodForDay orders
+                }
+            }
+        }
+
+        public void DeleteExpiredGoodTillCancels()
+        {
+            lock (_ordersLock)
+            {
+
+                lock (_goodTillCancelLock)
+                {
+                    // delete expired goodTillCancel orders 
+                }
             }
         }
 
