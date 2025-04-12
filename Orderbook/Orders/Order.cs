@@ -10,6 +10,7 @@ namespace TradingServer.Orders {
             Quantity = quantity;
             CurrentQuantity = quantity;
             isBuySide = isBuy;
+            OrderType = orderType;
         }
 
         public Order(ModifyOrder modify): this(modify, 
@@ -20,7 +21,8 @@ namespace TradingServer.Orders {
         public long OrderID => _orderCore.OrderID; 
         public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
-        public long Price { get; private set;}
+        public long Price { get; private set; }
+        public OrderTypes OrderType { get; private set; }
 
         // Important: the initial quantity is the initial amount of orders placed.
         // This may become useful for certain things we want to do, for example, keeping 
