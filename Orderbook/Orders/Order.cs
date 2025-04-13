@@ -44,7 +44,7 @@ namespace TradingServer.Orders
 
             else if (input == "IntermediateOrCancel")
             {
-                return OrderTypes.IntermediateOrCancel;
+                return OrderTypes.FillAndKill;
             }
 
             else 

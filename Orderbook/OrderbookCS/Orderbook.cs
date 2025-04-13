@@ -133,6 +133,25 @@ namespace TradingServer.OrderbookCS
             }
         }
 
+        public void DeleteExpiredGoodTillCancel()
+        {
+            lock (_goodTillCancelLock)
+            {
+                lock (_goodTillCancelLock)
+                {
+                    foreach (var order in _goodTillCancel)
+                    {
+                        if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
+                        {
+                            removeOrder(new CancelOrder(order.Value.CurrentOrder));
+                        }
+                    }
+                    // delete expired goodTillCancel orders; maybe this should be called periodically, at the same time with 
+                    // ProcessGoodForDay which is done at the end of the trading day
+                }
+            }
+        }
+
         public void ProcessGoodForDay()
         {
             // process the good for day orders
@@ -143,7 +162,7 @@ namespace TradingServer.OrderbookCS
             {
                 DateTime now = DateTime.UtcNow;
                 // do something; maybe shut down the system at the end of the trading day (when it is 4:00 in EST)
-            
+                // when it's the right time also call DeleteExpiredGoodTillCancels
                 lock (_goodForDayLock)
                 {
                     foreach (var order in _goodForDay)
@@ -151,22 +170,6 @@ namespace TradingServer.OrderbookCS
                         // do something with the date time
                     }
                     // process all of the GoodForDay orders
-                }
-            }
-        }
-
-        public void DeleteExpiredGoodTillCancels()
-        {
-            lock (_ordersLock)
-            {
-
-                lock (_goodTillCancelLock)
-                {
-                    foreach (var order in _goodTillCancel)
-                    {
-
-                    }
-                    // delete expired goodTillCancel orders 
                 }
             }
         }

@@ -12,66 +12,27 @@ namespace TradingServer.OrderbookCS
             _security = security;
         }
 
-        public MatchResult match()
+        public MatchResult match() // maybe have a order as a argument here, see if it can be matched
+        // whether or not it is added later is going to be handled seperately
+        // we only let orders match with things that have a lower price than it (or higher depending on whether it's a bid or ask order)
+        // then based on its order type (Market, FillOrKill, IntermediateOrCancel, etc) we either add or don't add it to the orderbook
         {
+            // we also need to know what side the incoming order is in 
             if (getAskLimits().Count == 0 || getBidLimits().Count == 0)
             {
                 throw new InvalidOperationException("Orders cannot be matched because either the buy side or the sell side of the orderbook is empty");
             }
             
             MatchResult result = new MatchResult();
+            // also this is mostly wrong, we don't match orders like that
+            // study the matching algorithm more, how are the market orders matched?
 
-            Limit min = getAskLimits().Min; // minimum nonempty limit
-            Limit max = getBidLimits().Max; // maximum available nonempty limit
+            // add seperate processing for FillOrKill, IntermediateOrCancel, Market, AllOrNone
 
-            while (min.head != null && max.head != null)
-            {
-                OrderbookEntry ask = min.head;
-                OrderbookEntry bid = max.head;
-
-                IOrderCore buyOrderCore = new OrderCore(bid.CurrentOrder.OrderID, bid.CurrentOrder.Username, bid.CurrentOrder.SecurityID, OrderTypes.GoodForDay);
-                IOrderCore askOrderCore = new OrderCore(ask.CurrentOrder.OrderID, ask.CurrentOrder.Username, ask.CurrentOrder.SecurityID, OrderTypes.GoodForDay);
-                CancelOrder bidCancel = new CancelOrder(buyOrderCore);
-                CancelOrder askCancel = new CancelOrder(askOrderCore);
-
-                uint buyQuantity = bid.CurrentOrder.CurrentQuantity;
-                uint sellQuantity = ask.CurrentOrder.CurrentQuantity;
-
-                if (buyQuantity > sellQuantity)
-                {
-                    bid.CurrentOrder.DecreaseQuantity(sellQuantity);
-                    ask.CurrentOrder.DecreaseQuantity(sellQuantity);
-
-                    result.addTransaction(ask);
-
-                    removeOrder(askCancel);
-                }
-
-                else if (sellQuantity > buyQuantity)
-                {
-                    bid.CurrentOrder.DecreaseQuantity(buyQuantity);
-                    ask.CurrentOrder.DecreaseQuantity(buyQuantity);
-
-                    result.addTransaction(bid);
-
-                    removeOrder(bidCancel);
-                }
-
-                else 
-                {
-                    bid.CurrentOrder.DecreaseQuantity(buyQuantity);
-                    ask.CurrentOrder.DecreaseQuantity(sellQuantity);
-
-                    result.addTransaction(ask);
-                    result.addTransaction(bid);
-
-                    removeOrder(askCancel);
-                    removeOrder(bidCancel);
-                }
-            }
-            
+            // also do the thing where we match the GoodForDay, GoodTillCancel order against the thing
             return result;
         }
+    
 
         private readonly Security _security;
     }
