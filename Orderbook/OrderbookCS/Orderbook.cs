@@ -47,7 +47,7 @@ namespace TradingServer.OrderbookCS
             {
                 lock (_fillAndKillLock)
                 {
-                    _fillAndKill.Remove(order.OrderID);
+                    _fillAndKill.Add(order.OrderID, orderbookEntry);
                 }
             }
 
@@ -63,7 +63,7 @@ namespace TradingServer.OrderbookCS
             {
                 lock (_goodForDayLock)
                 {
-                    _goodForDay.Remove(order.OrderID);
+                    _goodForDay.Add(order.OrderID, orderbookEntry);
                 }
             }
 
@@ -71,7 +71,7 @@ namespace TradingServer.OrderbookCS
             {
                 lock (_goodTillCancelLock)
                 {
-                    _goodTillCancel.Remove(order.OrderID);
+                    _goodTillCancel.Add(order.OrderID, orderbookEntry);
                 }
             }
 
