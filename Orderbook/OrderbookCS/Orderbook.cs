@@ -135,21 +135,19 @@ namespace TradingServer.OrderbookCS
 
         public void DeleteExpiredGoodTillCancel()
         {
-            lock (_goodTillCancelLock)
+           lock (_goodTillCancelLock)
             {
-                lock (_goodTillCancelLock)
+                foreach (var order in _goodTillCancel)
                 {
-                    foreach (var order in _goodTillCancel)
+                    if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
                     {
-                        if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
-                        {
-                            removeOrder(new CancelOrder(order.Value.CurrentOrder));
-                        }
+                        removeOrder(new CancelOrder(order.Value.CurrentOrder));
                     }
-                    // delete expired goodTillCancel orders; maybe this should be called periodically, at the same time with 
-                    // ProcessGoodForDay which is done at the end of the trading day
                 }
+                // delete expired goodTillCancel orders; maybe this should be called periodically, at the same time with 
+                // ProcessGoodForDay which is done at the end of the trading day
             }
+            
         }
 
         public void ProcessGoodForDay()
