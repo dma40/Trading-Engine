@@ -46,7 +46,7 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, OrderTypes.GoodTillCancel); // do this for now,
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); // do this for now,
                                                                                                                                                         // this is the only existing order type after all
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
 
@@ -101,6 +101,7 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Cancel")
             {
+                // no match occurs when we cancel a order
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
                     _logger.Error(nameof(TradingServer), $"Rejected a request to cancel a order not in the orderbook from {request.Username} at {DateTime.UtcNow}");
@@ -121,6 +122,8 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Modify")
             {
+                // here, maybe get the order, then get the id, and then put it back in the orderbook as a new order
+                // and then try to match it
                 if (!_orderbook.containsOrder(modify.OrderID))
                 {
                     _logger.Error(nameof(TradingServer), $"Rejected a request to modify a order that does not exist from {request.Username} at {DateTime.UtcNow}");
@@ -154,13 +157,14 @@ namespace TradingServer.Core
             }
 
             _logger.LogInformation(nameof(TradingServer), $"Processed {request.Id} from {request.Username} successfully");
-
+            /*
             if (_orderbook.canMatch())
             {
                 _logger.LogInformation(nameof(TradingServer), $"Orders can now be matched in this orderbook. Order match started at {DateTime.UtcNow}");
                 _orderbook.match();
                 _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.UtcNow}");
             }
+            */
 
             string askSideIds = "";
             string bidSideIds = "";

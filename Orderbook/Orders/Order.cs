@@ -30,7 +30,7 @@ namespace TradingServer.Orders
         public uint CurrentQuantity { get; private set; }
         public bool isBuySide { get; private set; }
 
-        public OrderTypes StringToOrderType(string input)
+        public static OrderTypes StringToOrderType(string input)
         {
             if (input == "FillOrKill")
             {

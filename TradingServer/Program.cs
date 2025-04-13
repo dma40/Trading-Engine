@@ -20,6 +20,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 500,
         Quantity = 300,
         Price = 100,
+        Type = "GoodTillCancel",
         Side = "Bid",
         Operation = "Add", // other options are Modify, Remove
         Username = "Dylan" // who placed this order
@@ -30,6 +31,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 400,
         Quantity = 200,
         Price = 100,
+        Type = "GoodTillCancel",
         Side = "Bid",
         Operation = "Add",
         Username = "Dylan"
@@ -40,6 +42,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
         Id = 126,
         Quantity = 300,
         Price = 50,
+        Type = "GoodTillCancel",
         Side = "Ask",
         Operation = "Add",
         Username = "Dylan"
@@ -72,10 +75,10 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
     {
         var orderRequest4 = new OrderRequest
         {
-            Id = 400,
+            Id = 500,
             Operation = "Cancel",
             Username = "Dylan",
-            Side = "Bid"
+            Side = "Bid" // for this one don't take a input - instead try and find the order, and then determine its side.
         };
         // cancelling seems to work when all the orders are from one side, doesn't work when there's a match apparently
         await tradingService.ProcessOrderAsync(orderRequest4);
@@ -85,7 +88,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
     {
         var orderRequest5 = new OrderRequest
         {
-            Id = 400,
+            Id = 500,
             Operation = "Modify",
             Side = "Bid",
             Username = "Dylan",

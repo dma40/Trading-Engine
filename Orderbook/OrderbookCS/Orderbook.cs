@@ -18,10 +18,15 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); // by default all of our orders are of this type
                                                                                                                     // set a 90 day limit, when the time is up remove all goodTillCancel orders
         private readonly Dictionary<long, OrderbookEntry> _fillAndKill = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _market = new Dictionary<long, OrderbookEntry>();
 
         private readonly Lock _ordersLock = new();
         private readonly Lock _goodForDayLock = new();
         private readonly Lock _goodTillCancelLock = new();
+        private readonly Lock _fillOrKillLock = new();
+        private readonly Lock _fillAndKillLock = new();
+        private readonly Lock _marketLock = new();
+        // careful with how these locks are being used!
 
         public Orderbook(Security instrument) 
         {
@@ -34,36 +39,80 @@ namespace TradingServer.OrderbookCS
             addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
         }
 
-        private static void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
+        private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (levels.TryGetValue(baseLimit, out Limit limit))
+            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
             {
-                if (limit.head == null)
+                lock (_fillAndKillLock)
                 {
-                    limit.head = orderbookEntry;
-                    limit.tail = orderbookEntry;
-                }
-
-                else
-                {
-                    OrderbookEntry tailPointer = limit.tail;
-                    tailPointer.next = orderbookEntry;
-                    orderbookEntry.previous = tailPointer;
-                    limit.tail = orderbookEntry;
+                    _fillAndKill.Remove(order.OrderID);
                 }
             }
 
-            else 
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.FillOrKill)
             {
-                levels.Add(baseLimit);
-
-                baseLimit.head = orderbookEntry;
-                baseLimit.tail = orderbookEntry;
+                lock (_fillOrKillLock)
+                {
+                    _fillOrKill.Add(order.OrderID, orderbookEntry);
+                }
             }
 
-            orders.Add(order.OrderID, orderbookEntry);
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
+            {
+                lock (_goodForDayLock)
+                {
+                    _goodForDay.Remove(order.OrderID);
+                }
+            }
+
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodTillCancel)
+            {
+                lock (_goodTillCancelLock)
+                {
+                    _goodTillCancel.Remove(order.OrderID);
+                }
+            }
+
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.Market)
+            {
+                lock (_marketLock)
+                {
+                    _market.Add(order.OrderID, orderbookEntry);
+                }
+            }
+
+            lock (_ordersLock) 
+            {
+
+                if (levels.TryGetValue(baseLimit, out Limit limit))
+                {
+                    if (limit.head == null)
+                    {
+                        limit.head = orderbookEntry;
+                        limit.tail = orderbookEntry;
+                    }
+
+                    else
+                    {
+                        OrderbookEntry tailPointer = limit.tail;
+                        tailPointer.next = orderbookEntry;
+                        orderbookEntry.previous = tailPointer;
+                        limit.tail = orderbookEntry;
+                    }
+                }
+
+                else 
+                {
+                    levels.Add(baseLimit);
+
+                    baseLimit.head = orderbookEntry;
+                    baseLimit.tail = orderbookEntry;
+                }
+
+                orders.Add(order.OrderID, orderbookEntry);
+            }
             // add special handling if it is of a different type.
         }
 
@@ -78,58 +127,104 @@ namespace TradingServer.OrderbookCS
         // check this removeOrder it may not be working properly
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
-            if (orderentry.previous != null && orderentry.next != null)
+            if (orderentry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
             {
-                orderentry.next.previous = orderentry.previous;
-                orderentry.previous.next = orderentry.next;
+                lock (_fillAndKillLock)
+                {
+                    _fillAndKill.Remove(id);
+                }
             }
 
-            else if (orderentry.previous != null)
+            else if (orderentry.CurrentOrder.OrderType == OrderTypes.FillOrKill)
             {
-                orderentry.previous.next = null;
+                lock (_fillOrKillLock)
+                {
+                    _fillOrKill.Remove(id);
+                }
             }
 
-            else if (orderentry.next != null)
+            else if (orderentry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
-                orderentry.next.previous = null;
+                lock (_goodForDayLock)
+                {
+                    _goodForDay.Remove(id);
+                }
             }
 
-            if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
+            else if (orderentry.CurrentOrder.OrderType == OrderTypes.GoodTillCancel)
             {
-                orderentry.ParentLimit.head = null;
-                orderentry.ParentLimit.tail = null;
+                lock (_goodTillCancelLock)
+                {
+                    _goodTillCancel.Remove(id);
+                }
+            }
+
+            else if (orderentry.CurrentOrder.OrderType == OrderTypes.Market)
+            {
+                lock (_marketLock)
+                {
+                    _market.Remove(id);
+                }
+            }
+
+            lock (_ordersLock)
+            {
+                if (orderentry.previous != null && orderentry.next != null)
+                {
+                    orderentry.next.previous = orderentry.previous;
+                    orderentry.previous.next = orderentry.next;
+                }
+
+                else if (orderentry.previous != null)
+                {
+                    orderentry.previous.next = null;
+                }
+
+                else if (orderentry.next != null)
+                {
+                    orderentry.next.previous = null;
+                }
+
+                if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
+                {
+                    orderentry.ParentLimit.head = null;
+                    orderentry.ParentLimit.tail = null;
                 
-                if (orderentry.CurrentOrder.isBuySide)
-                {
-                    _bidLimits.Remove(orderentry.ParentLimit);
+                    if (orderentry.CurrentOrder.isBuySide)
+                    {
+                        _bidLimits.Remove(orderentry.ParentLimit);
+                    }
+
+                    else 
+                    {
+                        _askLimits.Remove(orderentry.ParentLimit);
+                    }
                 }
 
-                else 
+                else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
                 {
-                    _askLimits.Remove(orderentry.ParentLimit);
+                    orderentry.ParentLimit.head = orderentry.next;
                 }
-            }
 
-            else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
-            {
-                orderentry.ParentLimit.head = orderentry.next;
-            }
+                else if (orderentry.ParentLimit.tail == orderentry)
+                {
+                    orderentry.ParentLimit.tail = orderentry.previous;
+                }
 
-            else if (orderentry.ParentLimit.tail == orderentry)
-            {
-                orderentry.ParentLimit.tail = orderentry.previous;
+                _orders.Remove(id);
             }
-
-            _orders.Remove(id);
         }
 
         // also check this, it may also not be working properly
-        public void modifyOrder(ModifyOrder modify)
+        public void modifyOrder(ModifyOrder modify) // side is never modified by our methods so we don't restrict access in this method
         {
-            if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
+            lock (_ordersLock)
             {
-                removeOrder(modify.cancelOrder());
-                addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+                if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
+                {
+                    removeOrder(modify.cancelOrder());
+                    addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+                }
             }
         }
 

@@ -12,7 +12,7 @@ namespace TradingServer.OrderbookCS
             _security = security;
         }
 
-        public MatchResult match() // maybe have a order as a argument here, see if it can be matched
+        public MatchResult match(Order order) // have a order as a argument here, see if it can be matched
         // whether or not it is added later is going to be handled seperately
         // we only let orders match with things that have a lower price than it (or higher depending on whether it's a bid or ask order)
         // then based on its order type (Market, FillOrKill, IntermediateOrCancel, etc) we either add or don't add it to the orderbook
