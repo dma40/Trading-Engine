@@ -17,7 +17,7 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _fillOrKill = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); // by default all of our orders are of this type
                                                                                                                     // set a 90 day limit, when the time is up remove all goodTillCancel orders
-        private readonly Dictionary<long, OrderbookEntry> _intermediateOrCancel = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _fillAndKill = new Dictionary<long, OrderbookEntry>();
 
         private readonly Lock _ordersLock = new();
         private readonly Lock _goodForDayLock = new();
