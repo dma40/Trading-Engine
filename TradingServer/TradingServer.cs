@@ -46,6 +46,7 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
+            // maybe somewhere set the creation time to be at 9:30 in the morning if the result comes in at after hours
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); // do this for now,
                                                                                                                                                         // this is the only existing order type after all
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");

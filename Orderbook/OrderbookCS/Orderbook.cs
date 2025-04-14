@@ -19,12 +19,12 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _fillAndKill = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _market = new Dictionary<long, OrderbookEntry>();
 
-        private readonly Lock _ordersLock = new();
-        private readonly Lock _goodForDayLock = new();
-        private readonly Lock _goodTillCancelLock = new();
-        private readonly Lock _fillOrKillLock = new();
-        private readonly Lock _fillAndKillLock = new();
-        private readonly Lock _marketLock = new();
+        private readonly Mutex _ordersLock = new Mutex();
+        private readonly Mutex _goodForDayLock = new Mutex();
+        private readonly Mutex _goodTillCancelLock = new Mutex();
+        private readonly Mutex _fillOrKillLock = new Mutex();
+        private readonly Mutex _fillAndKillLock = new Mutex();
+        private readonly Mutex _marketLock = new Mutex();
         // careful with how these locks are being used!
         // maybe we should also store now time as a instance variable
 
@@ -263,6 +263,12 @@ namespace TradingServer.OrderbookCS
                     DateTime tomorrow = currentTime.AddDays(1);
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     now = nextTradingDayStart;
+
+                    TimeSpan closed = nextTradingDayStart - DateTime.Now;
+
+                    Monitor.Wait(_ordersLock, closed);
+                    Thread.Sleep(closed);
+                    // alternatively maybe set the thread to sleep until that time
                 }
 
                 else 

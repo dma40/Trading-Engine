@@ -55,9 +55,9 @@ namespace TradingServer.Orders
             while (headPointer != null)
             {
                 var current = headPointer.CurrentOrder;
-                records.Add(new OrderRecord(current.OrderID, current.CurrentQuantity, 
-                current.Price, current.isBuySide, 
-                current.Username, current.SecurityID, queuePosition));
+                records.Add(new OrderRecord(current.OrderID, current.CurrentQuantity, current.CurrentQuantity,
+                current.Price, current.Price, current.isBuySide, 
+                current.Username, current.SecurityID, queuePosition, queuePosition));
 
                 queuePosition++;
                 headPointer = headPointer.next;
