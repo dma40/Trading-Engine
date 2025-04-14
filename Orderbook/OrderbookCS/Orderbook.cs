@@ -29,6 +29,7 @@ namespace TradingServer.OrderbookCS
         // maybe we should also store now time as a instance variable
 
         private readonly Thread _goodForDayThread;
+        private DateTime now; // this will be used later on
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
@@ -252,31 +253,36 @@ namespace TradingServer.OrderbookCS
 
         public void ProcessGoodForDay()
         {
-            // also maybe we should create a shared system time variable and then increment it at the end of the day
-            // process the good for day orders
-            // handle the FillOrKill, IntermediateOrCancel orders in the matching method 
-            // which we will do later
-
             // should it immediately roll over into the next day, or shut down the orderbook at 4PM UTC?
-
-            lock (_ordersLock)
+            while (true) 
             {
-                DateTime now = DateTime.UtcNow;
-                // do something; maybe shut down the system at the end of the trading day (when it is 4:00 in EST)
-                // when it's the right time also call DeleteExpiredGoodTillCancels
-                lock (_goodForDayLock)
-                {
-                    foreach (var order in _goodForDay)
-                    {
-                        // do something with the date time
-                        // delete the goodforday orders
-                        // maybe have a CancelOrderInternal type method so that we only use the lock once
-                        // because performance isn't as good when we have to lock and release the same lock over and over if we have many good for day orders
-                        removeOrder(new CancelOrder(order.Value.CurrentOrder));
-                    }
+                DateTime currentTime = DateTime.UtcNow;
 
-                    DeleteExpiredGoodTillCancel(); // do this at the appropriate time in the day
-                    // process all of the GoodForDay orders
+                if (currentTime.Hour >= 16)
+                {
+                    DateTime tomorrow = currentTime.AddDays(1);
+                    DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
+                    now = nextTradingDayStart;
+                }
+
+                else 
+                {
+                    now = currentTime;
+                }
+
+                lock (_ordersLock)
+                {
+                    lock (_goodForDayLock)
+                    {
+                        foreach (var order in _goodForDay)
+                        {
+                        // modify to have better performance
+                        // because performance isn't as good when we have to lock and release the same lock over and over if we have many good for day orders
+                            removeOrder(new CancelOrder(order.Value.CurrentOrder));
+                        }
+
+                        DeleteExpiredGoodTillCancel(); 
+                    }
                 }
             }
         }
