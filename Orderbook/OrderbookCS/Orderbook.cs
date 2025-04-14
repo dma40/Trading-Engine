@@ -4,7 +4,6 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    // wacky things seem to be happening with removing, modifying orders?
     public class Orderbook: IRetrievalOrderbook
     {
         private readonly Security _instrument;
@@ -25,11 +24,9 @@ namespace TradingServer.OrderbookCS
         private readonly Mutex _fillOrKillMutex = new Mutex();
         private readonly Mutex _fillAndKillMutex = new Mutex();
         private readonly Mutex _marketMutex = new Mutex();
-        // careful with how these locks are being used!
-        // maybe we should also store now time as a instance variable
 
         private readonly Thread _goodForDayThread;
-        private DateTime now; // this will be used later on
+        private DateTime now; 
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
@@ -83,6 +80,7 @@ namespace TradingServer.OrderbookCS
             else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
                 _goodForDayMutex.WaitOne();
+
                 try
                 {
                     _goodForDay.Add(order.OrderID, orderbookEntry);
@@ -158,7 +156,7 @@ namespace TradingServer.OrderbookCS
 
             finally
             {
-             _orderMutex.ReleaseMutex();
+                _orderMutex.ReleaseMutex();
             }
             // add special handling if it is of a different type.
         }
@@ -171,7 +169,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        // check this removeOrder it may not be working properly
+        // check this removeOrder it may not be working properly; wacky things may be happening
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
             if (orderentry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
@@ -249,7 +247,7 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-         _orderMutex.WaitOne();
+            _orderMutex.WaitOne();
 
             try
             {
@@ -300,7 +298,7 @@ namespace TradingServer.OrderbookCS
 
             finally
             {
-             _orderMutex.ReleaseMutex();
+                _orderMutex.ReleaseMutex();
             }
         }
 
@@ -391,7 +389,7 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                 _orderMutex.ReleaseMutex();
+                    _orderMutex.ReleaseMutex();
                     _goodForDayMutex.ReleaseMutex();
                 }
             }
