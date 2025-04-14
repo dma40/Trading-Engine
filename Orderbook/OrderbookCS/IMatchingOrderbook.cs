@@ -7,7 +7,7 @@ namespace TradingServer.OrderbookCS
         // matching orderbooks match up orders, and then returing a MatchResult,
         // reporting the results of the match
         MatchResult match(Order order); // or a IOrderCore object 
-        public bool canMatch();
+        public bool canMatch(Order order);
         public SortedSet<Limit> getAskLimits();
         public SortedSet<Limit> getBidLimits();
     }

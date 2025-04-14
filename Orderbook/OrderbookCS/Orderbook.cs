@@ -19,12 +19,12 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _fillAndKill = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _market = new Dictionary<long, OrderbookEntry>();
 
-        private readonly Mutex _ordersLock = new Mutex();
-        private readonly Mutex _goodForDayLock = new Mutex();
-        private readonly Mutex _goodTillCancelLock = new Mutex();
-        private readonly Mutex _fillOrKillLock = new Mutex();
-        private readonly Mutex _fillAndKillLock = new Mutex();
-        private readonly Mutex _marketLock = new Mutex();
+        private readonly Mutex _orderMutex = new Mutex();
+        private readonly Mutex _goodForDayMutex = new Mutex();
+        private readonly Mutex _goodTillCancelMutex = new Mutex();
+        private readonly Mutex _fillOrKillMutex = new Mutex();
+        private readonly Mutex _fillAndKillMutex = new Mutex();
+        private readonly Mutex _marketMutex = new Mutex();
         // careful with how these locks are being used!
         // maybe we should also store now time as a instance variable
 
@@ -52,7 +52,7 @@ namespace TradingServer.OrderbookCS
 
             if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
             {
-                _fillAndKillLock.WaitOne();
+                _fillAndKillMutex.WaitOne();
 
                 try
                 {
@@ -61,13 +61,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _fillAndKillLock.ReleaseMutex();
+                    _fillAndKillMutex.ReleaseMutex();
                 }
             }
 
             else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.FillOrKill)
             {
-                _fillOrKillLock.WaitOne();
+                _fillOrKillMutex.WaitOne();
 
                 try
                 {
@@ -76,13 +76,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _fillOrKillLock.ReleaseMutex();
+                    _fillOrKillMutex.ReleaseMutex();
                 }
             }
 
             else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
-                _goodForDayLock.WaitOne();
+                _goodForDayMutex.WaitOne();
                 try
                 {
                     _goodForDay.Add(order.OrderID, orderbookEntry);
@@ -90,13 +90,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _goodForDayLock.ReleaseMutex();
+                    _goodForDayMutex.ReleaseMutex();
                 }
             }
 
             else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodTillCancel)
             {
-                _goodTillCancelLock.WaitOne();
+                _goodTillCancelMutex.WaitOne();
 
                 try
                 {
@@ -105,13 +105,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _goodTillCancelLock.ReleaseMutex();
+                    _goodTillCancelMutex.ReleaseMutex();
                 }
             }
 
             else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.Market)
             {
-                _marketLock.WaitOne();
+                _marketMutex.WaitOne();
 
                 try
                 {
@@ -120,11 +120,11 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _marketLock.ReleaseMutex();
+                    _marketMutex.ReleaseMutex();
                 }
             }
 
-            _ordersLock.WaitOne();
+         _orderMutex.WaitOne();
 
             try
             {
@@ -158,7 +158,7 @@ namespace TradingServer.OrderbookCS
 
             finally
             {
-                _ordersLock.ReleaseMutex();
+             _orderMutex.ReleaseMutex();
             }
             // add special handling if it is of a different type.
         }
@@ -176,7 +176,7 @@ namespace TradingServer.OrderbookCS
         {
             if (orderentry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
             {
-                _fillAndKillLock.WaitOne();
+                _fillAndKillMutex.WaitOne();
 
                 try
                 {
@@ -185,13 +185,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _fillAndKillLock.ReleaseMutex();
+                    _fillAndKillMutex.ReleaseMutex();
                 }
             }
 
             else if (orderentry.CurrentOrder.OrderType == OrderTypes.FillOrKill)
             {
-                _fillOrKillLock.WaitOne();
+                _fillOrKillMutex.WaitOne();
 
                 try
                 {
@@ -200,13 +200,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _fillOrKillLock.ReleaseMutex();
+                    _fillOrKillMutex.ReleaseMutex();
                 }
             }
 
             else if (orderentry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
-                _goodForDayLock.WaitOne();
+                _goodForDayMutex.WaitOne();
 
                 try
                 {
@@ -215,13 +215,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _goodForDayLock.ReleaseMutex();
+                    _goodForDayMutex.ReleaseMutex();
                 }
             }
 
             else if (orderentry.CurrentOrder.OrderType == OrderTypes.GoodTillCancel)
             {
-                _goodTillCancelLock.WaitOne();
+                _goodTillCancelMutex.WaitOne();
 
                 try
                 {
@@ -230,13 +230,13 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _goodTillCancelLock.ReleaseMutex();
+                    _goodTillCancelMutex.ReleaseMutex();
                 }
             }
 
             else if (orderentry.CurrentOrder.OrderType == OrderTypes.Market)
             {
-                _marketLock.WaitOne();
+                _marketMutex.WaitOne();
 
                 try
                 {
@@ -245,11 +245,11 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _marketLock.ReleaseMutex();
+                    _marketMutex.ReleaseMutex();
                 }
             }
 
-            _ordersLock.WaitOne();
+         _orderMutex.WaitOne();
 
             try
             {
@@ -300,14 +300,16 @@ namespace TradingServer.OrderbookCS
 
             finally
             {
-                _ordersLock.ReleaseMutex();
+             _orderMutex.ReleaseMutex();
             }
         }
 
         // also check this, it may also not be working properly
         public void modifyOrder(ModifyOrder modify) // side is never modified by our methods so we don't restrict access in this method
         {
-            lock (_ordersLock)
+            _orderMutex.WaitOne();
+            
+            try
             {
                 if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
                 {
@@ -315,11 +317,16 @@ namespace TradingServer.OrderbookCS
                     addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
                 }
             }
+
+            finally
+            {
+                _orderMutex.ReleaseMutex();
+            }
         }
 
         public void DeleteExpiredGoodTillCancel()
         {
-            _goodTillCancelLock.WaitOne();
+            _goodTillCancelMutex.WaitOne();
 
            try
             {
@@ -336,7 +343,7 @@ namespace TradingServer.OrderbookCS
 
             finally
             {
-                _goodTillCancelLock.ReleaseMutex();
+                _goodTillCancelMutex.ReleaseMutex();
             }
             
         }
@@ -356,7 +363,7 @@ namespace TradingServer.OrderbookCS
 
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    Monitor.Wait(_ordersLock, closed);
+                    Monitor.Wait(_orderMutex, closed);
                     Thread.Sleep(closed);
                     // alternatively maybe set the thread to sleep until that time
                 }
@@ -366,8 +373,8 @@ namespace TradingServer.OrderbookCS
                     now = currentTime;
                 }
 
-                _ordersLock.WaitOne();
-                _goodForDayLock.WaitOne();
+                _orderMutex.WaitOne();
+                _goodForDayMutex.WaitOne();
 
                 try
                 {
@@ -384,8 +391,8 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _ordersLock.ReleaseMutex();
-                    _goodForDayLock.ReleaseMutex();
+                 _orderMutex.ReleaseMutex();
+                    _goodForDayMutex.ReleaseMutex();
                 }
             }
         }
