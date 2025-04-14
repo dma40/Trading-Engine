@@ -26,6 +26,14 @@ namespace TradingServer.OrderbookCS
         private readonly Mutex _fillAndKillMutex = new Mutex();
         private readonly Mutex _marketMutex = new Mutex();
 
+        private readonly Lock _orderLock = new();
+        private readonly Lock _goodForDayLock = new();
+        private readonly Lock _goodTillCancelLock = new();
+        private readonly Lock _fillOrKillLock = new();
+        private readonly Lock _fillAndKillLock = new();
+        private readonly Lock _marketLock = new();
+
+
         private readonly Thread _goodForDayThread;
         private DateTime now; 
 
@@ -36,7 +44,7 @@ namespace TradingServer.OrderbookCS
         {
             _instrument = instrument;
             _goodForDayThread = new Thread(() => ProcessGoodForDay().GetAwaiter().GetResult());
-            _goodForDayThread.Start();
+            // _goodForDayThread.Start();
         }
 
         public void addOrder(Order order)
