@@ -4,7 +4,7 @@ using TradingServer.Logging.LoggingConfiguration;
 
 namespace TradingServer.Logging 
 {
-    public class TextLogger: AbstractLogger, ITextLogger 
+    public class TextLogger: AbstractLogger, ITextLogger, IDisposable 
     {
         private readonly LoggerConfiguration _logConfig;
 
@@ -74,7 +74,7 @@ namespace TradingServer.Logging
             Dispose(false);
         }
 
-        public void Dispose() 
+        public void Dispose() // do something like this in Orderbook, dispose of this object when we don't want it anymore
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -86,6 +86,7 @@ namespace TradingServer.Logging
             {
                 return;
             }
+
             _disposed = true;
 
             if (dispose) 

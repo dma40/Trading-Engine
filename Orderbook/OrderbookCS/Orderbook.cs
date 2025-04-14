@@ -15,8 +15,7 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>(); // maybe have seperate AskOrders, bidOrders to make this a little easier
         private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _fillOrKill = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); // by default all of our orders are of this type
-                                                                                                                    // set a 90 day limit, when the time is up remove all goodTillCancel orders
+        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
         private readonly Dictionary<long, OrderbookEntry> _fillAndKill = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _market = new Dictionary<long, OrderbookEntry>();
 
@@ -27,10 +26,17 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _fillAndKillLock = new();
         private readonly Lock _marketLock = new();
         // careful with how these locks are being used!
+        // maybe we should also store now time as a instance variable
+
+        private readonly Thread _goodForDayThread;
+
+        private bool _disposed = false;
+        CancellationTokenSource _ts = new CancellationTokenSource();
 
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
+            _goodForDayThread = new Thread(ProcessGoodForDay);
         }
 
         public void addOrder(Order order)
@@ -85,7 +91,6 @@ namespace TradingServer.OrderbookCS
 
             lock (_ordersLock) 
             {
-
                 if (levels.TryGetValue(baseLimit, out Limit limit))
                 {
                     if (limit.head == null)
@@ -247,9 +252,12 @@ namespace TradingServer.OrderbookCS
 
         public void ProcessGoodForDay()
         {
+            // also maybe we should create a shared system time variable and then increment it at the end of the day
             // process the good for day orders
             // handle the FillOrKill, IntermediateOrCancel orders in the matching method 
             // which we will do later
+
+            // should it immediately roll over into the next day, or shut down the orderbook at 4PM UTC?
 
             lock (_ordersLock)
             {
@@ -261,7 +269,13 @@ namespace TradingServer.OrderbookCS
                     foreach (var order in _goodForDay)
                     {
                         // do something with the date time
+                        // delete the goodforday orders
+                        // maybe have a CancelOrderInternal type method so that we only use the lock once
+                        // because performance isn't as good when we have to lock and release the same lock over and over if we have many good for day orders
+                        removeOrder(new CancelOrder(order.Value.CurrentOrder));
                     }
+
+                    DeleteExpiredGoodTillCancel(); // do this at the appropriate time in the day
                     // process all of the GoodForDay orders
                 }
             }
@@ -347,6 +361,34 @@ namespace TradingServer.OrderbookCS
                 bestBid = _askLimits.Max.Price;
             }
             return new OrderbookSpread(bestBid, bestAsk);
+        }
+
+        ~Orderbook()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose() // do something like this in Orderbook, dispose of this object when we don't want it anymore
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool dispose) 
+        {
+            if (_disposed) 
+            { 
+                return;
+            }
+
+            _disposed = true;
+
+            if (dispose) 
+            {
+                _goodForDayThread.Join(); // make sure nothing can call while this is being deleted
+                _ts.Cancel();
+                _ts.Dispose();
+            }
         }
     }
 }
