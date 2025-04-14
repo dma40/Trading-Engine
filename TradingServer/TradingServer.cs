@@ -50,6 +50,9 @@ namespace TradingServer.Core
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); // do this for now,
                                                                                                                                                         // this is the only existing order type after all
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
+            DateTime now = DateTime.Now;
+
+            // TODO: add a seperate OrderResponse that details what to do if the market is closed right now
 
             if (string.IsNullOrEmpty(request.Id.ToString()) 
                 || string.IsNullOrEmpty(request.Username.ToString())
@@ -63,6 +66,16 @@ namespace TradingServer.Core
                     Id = request.Id,
                     Status = 500,
                     Message = "Error: you have put in null or empty values for arguments"
+                };
+            }
+
+            else if (now.Hour >= 16)
+            {
+                return new OrderResponse
+                {
+                    Id = request.Id,
+                    Status = 403,
+                    Message = "You cannot submit orders now, the exchange is closed. Please try again later"
                 };
             }
 
