@@ -75,7 +75,7 @@ namespace TradingServer.Core
                 {
                     Id = request.Id,
                     Status = 403,
-                    Message = "You cannot submit orders now, the exchange is closed. Please try again later"
+                    Message = "You cannot submit orders now, the exchange is closed. Please try again when the market reopens"
                 };
             }
 

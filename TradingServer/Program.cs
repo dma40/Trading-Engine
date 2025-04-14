@@ -15,6 +15,9 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 
     // Add a few simple tests
 
+    Console.WriteLine("Input another thing");
+    string input2 = Console.ReadLine();
+
     var orderRequest = new OrderRequest
     {
         Id = 500,

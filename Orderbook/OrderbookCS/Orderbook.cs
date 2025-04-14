@@ -1,4 +1,5 @@
 
+using System.Threading.Tasks;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -34,7 +35,8 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
-            _goodForDayThread = new Thread(ProcessGoodForDay);
+            _goodForDayThread = new Thread(() => ProcessGoodForDay().GetAwaiter().GetResult());
+            _goodForDayThread.Start();
         }
 
         public void addOrder(Order order)
@@ -123,7 +125,7 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-         _orderMutex.WaitOne();
+            _orderMutex.WaitOne();
 
             try
             {
@@ -190,7 +192,7 @@ namespace TradingServer.OrderbookCS
 
             else if (orderentry.CurrentOrder.OrderType == OrderTypes.FillOrKill)
             {
-                _fillOrKillMutex.WaitOne();
+                _fillOrKillMutex.WaitOne(); // do some investigating as to whether lock or mutex is better for this case
 
                 try
                 {
@@ -323,31 +325,30 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void DeleteExpiredGoodTillCancel()
+        private void DeleteExpiredGoodTillCancel()
         {
-            _goodTillCancelMutex.WaitOne();
+            // _goodTillCancelMutex.WaitOne();
 
-           try
+            // try
+            foreach (var order in _goodTillCancel)
             {
-                foreach (var order in _goodTillCancel)
+                if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
                 {
-                    if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
-                    {
                         removeOrder(new CancelOrder(order.Value.CurrentOrder));
-                    }
                 }
+            }
                 // delete expired goodTillCancel orders; maybe this should be called periodically, at the same time with 
-                // ProcessGoodForDay which is done at the end of the trading day
-            }
-
-            finally
-            {
-                _goodTillCancelMutex.ReleaseMutex();
-            }
+                // ProcessGoodForDay which is done at the end of the trading day. Also maybe modify so that we don't catch/release the same mutex 
+                // multiple times
             
+
+            // finally
+            // {
+            //     _goodTillCancelMutex.ReleaseMutex();
+            // } 
         }
 
-        public void ProcessGoodForDay()
+        private async Task ProcessGoodForDay()
         {
             // should it immediately roll over into the next day, or shut down the orderbook at 4PM UTC?
             while (true) 
@@ -362,17 +363,49 @@ namespace TradingServer.OrderbookCS
 
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    Monitor.Wait(_orderMutex, closed);
-                    Thread.Sleep(closed);
-                    // alternatively maybe set the thread to sleep until that time
-                }
+                    _orderMutex.WaitOne();
+                    _goodForDayMutex.WaitOne();
 
+                    _fillAndKillMutex.WaitOne();
+                    _fillOrKillMutex.WaitOne();
+                    _goodTillCancelMutex.WaitOne();
+                    _marketMutex.WaitOne();
+
+                    try
+                    {
+                        foreach (var order in _goodForDay)
+                        {
+                            // modify to have better performance
+                            removeOrder(new CancelOrder(order.Value.CurrentOrder));
+                        }
+
+                        DeleteExpiredGoodTillCancel(); // make sure we're not catching + releasing lock twice
+                        Thread.Sleep(closed);
+                    }
+
+                    finally
+                    {
+                        _orderMutex.ReleaseMutex();
+                        _goodForDayMutex.ReleaseMutex();
+
+                        _fillAndKillMutex.ReleaseMutex();
+                        _fillOrKillMutex.ReleaseMutex();
+                        _marketMutex.ReleaseMutex();
+                    }
+
+                    // Monitor.Wait(_orderMutex, closed);
+                    
+                }
+                
                 else 
                 {
                     now = currentTime;
                 }
 
-                _orderMutex.WaitOne();
+                await Task.Delay(5000);
+
+                // _orderMutex.WaitOne();
+                /*
                 _goodForDayMutex.WaitOne();
 
                 try
@@ -390,9 +423,10 @@ namespace TradingServer.OrderbookCS
 
                 finally
                 {
-                    _orderMutex.ReleaseMutex();
+                    // _orderMutex.ReleaseMutex();
                     _goodForDayMutex.ReleaseMutex();
                 }
+                */
             }
         }
 
