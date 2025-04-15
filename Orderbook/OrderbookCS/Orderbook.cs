@@ -40,7 +40,7 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
-            Task.Run(() => ProcessGoodForDay());
+            _ = Task.Run(() => ProcessGoodForDay()); // need to handle this shutdown more gracefully
         }
 
         public void addOrder(Order order)
@@ -126,11 +126,28 @@ namespace TradingServer.OrderbookCS
             // add special handling if it is of a different type.
         }
 
+        public void removeOrders(List<CancelOrder> cancels)
+        {
+            lock (_ordersLock)
+            {
+                foreach (CancelOrder cancel in cancels)
+                {
+                    if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
+                    {
+                        removeOrder(cancel.OrderID, orderbookentry, _orders);
+                    }
+                }
+            }
+        }
+
         public void removeOrder(CancelOrder cancel)
         {
-            if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
+            lock (_ordersLock)
             {
-                removeOrder(cancel.OrderID, orderbookentry, _orders);
+                if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
+                {
+                    removeOrder(cancel.OrderID, orderbookentry, _orders);
+                }
             }
         }
 
@@ -177,9 +194,6 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-            _orderMutex.WaitOne();
-
-            lock (_ordersLock)
             {
                 if (orderentry.previous != null && orderentry.next != null)
                 {
@@ -242,12 +256,14 @@ namespace TradingServer.OrderbookCS
 
         private void DeleteExpiredGoodTillCancel()
         {
+            List<CancelOrder> goodTillCancelOrders = new List<CancelOrder>();
             foreach (var order in _goodTillCancel) // figure out time problems!
             {
                 if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
                 {
-                        removeOrder(new CancelOrder(order.Value.CurrentOrder));
+                    goodTillCancelOrders.Add(new CancelOrder(order.Value.CurrentOrder));
                 }
+                removeOrders(goodTillCancelOrders);
             }
         }
 
@@ -270,13 +286,15 @@ namespace TradingServer.OrderbookCS
                     
                     try
                     {
+                        List<CancelOrder> goodForDayOrders = new List<CancelOrder>();
+
                         foreach (var order in _goodForDay)
                         {
-                            // modify to have better performance
-                            removeOrder(new CancelOrder(order.Value.CurrentOrder));
+                            goodForDayOrders.Add(new CancelOrder(order.Value.CurrentOrder));
                         }
 
-                        DeleteExpiredGoodTillCancel(); // make sure we're not catching + releasing lock twice
+                        removeOrders(goodForDayOrders);
+                        DeleteExpiredGoodTillCancel(); 
 
                         _goodForDayMutex.WaitOne();
 
