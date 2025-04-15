@@ -52,8 +52,6 @@ namespace TradingServer.Core
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
-            // TODO: add a seperate OrderResponse that details what to do if the market is closed right now
-
             if (string.IsNullOrEmpty(request.Id.ToString()) 
                 || string.IsNullOrEmpty(request.Username.ToString())
                 || string.IsNullOrEmpty(request.Operation.ToString())
@@ -71,12 +69,12 @@ namespace TradingServer.Core
 
             else if (now.Hour >= 16)
             {
-                return new OrderResponse
-                {
-                    Id = request.Id,
-                    Status = 403,
-                    Message = "You cannot submit orders now, the exchange is closed. Please try again when the market reopens"
-                };
+                // return new OrderResponse
+                // {
+                //    Id = request.Id,
+                //    Status = 403,
+                //    Message = "You cannot submit orders now, the exchange is closed. Please try again when the market reopens"
+                //};
             }
 
             else if (request.Operation == "Add")

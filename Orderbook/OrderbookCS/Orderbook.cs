@@ -286,8 +286,6 @@ namespace TradingServer.OrderbookCS
 
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    _orderMutex.WaitOne();
-                    
                     try
                     {
                         List<CancelOrder> goodForDayOrders = new List<CancelOrder>();
@@ -300,8 +298,9 @@ namespace TradingServer.OrderbookCS
                         removeOrders(goodForDayOrders);
                         DeleteExpiredGoodTillCancel(); 
 
-                        _goodForDayMutex.WaitOne();
+                        _orderMutex.WaitOne();
 
+                        _goodForDayMutex.WaitOne();
                         _fillAndKillMutex.WaitOne();
                         _fillOrKillMutex.WaitOne();
                         _goodTillCancelMutex.WaitOne();
@@ -313,8 +312,8 @@ namespace TradingServer.OrderbookCS
                     finally
                     {
                         _orderMutex.ReleaseMutex();
-                        _goodForDayMutex.ReleaseMutex();
 
+                        _goodForDayMutex.ReleaseMutex();
                         _fillAndKillMutex.ReleaseMutex();
                         _fillOrKillMutex.ReleaseMutex();
                         _goodTillCancelMutex.ReleaseMutex();
