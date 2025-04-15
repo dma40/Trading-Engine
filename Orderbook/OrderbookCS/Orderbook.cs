@@ -1,4 +1,5 @@
 
+using System.Runtime.InteropServices;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -123,7 +124,6 @@ namespace TradingServer.OrderbookCS
 
                 orders.Add(order.OrderID, orderbookEntry);
             }
-            // add special handling if it is of a different type.
         }
 
         public void removeOrders(List<CancelOrder> cancels)
@@ -257,7 +257,7 @@ namespace TradingServer.OrderbookCS
         private void DeleteExpiredGoodTillCancel()
         {
             List<CancelOrder> goodTillCancelOrders = new List<CancelOrder>();
-            foreach (var order in _goodTillCancel) // figure out time problems!
+            foreach (var order in _goodTillCancel)
             {
                 if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
                 {
@@ -269,10 +269,14 @@ namespace TradingServer.OrderbookCS
 
         private async Task ProcessGoodForDay()
         {
-            // should it immediately roll over into the next day, or shut down the orderbook at 4PM UTC?
-            while (true) // also work out how the UTC time is being used here
+            while (true)
             {
-                DateTime currentTime = DateTime.Now; // time in the trader's timezone
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                DateTime currentTime = DateTime.Now;
 
                 if (currentTime.Hour >= 16)
                 {
@@ -323,7 +327,12 @@ namespace TradingServer.OrderbookCS
                     now = currentTime;
                 }
 
-                await Task.Delay(5000);
+                await Task.Delay(200, _ts.Token);
+
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
             }
         }
 
@@ -411,10 +420,10 @@ namespace TradingServer.OrderbookCS
 
         ~Orderbook()
         {
-            Dispose(false);
+            Dispose();
         }
 
-        public void Dispose() // do something like this in Orderbook, dispose of this object when we don't want it anymore
+        public void Dispose() 
         {
             Dispose(true);
             GC.SuppressFinalize(this);
