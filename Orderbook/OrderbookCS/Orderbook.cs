@@ -1,5 +1,4 @@
 
-using System.Threading.Tasks;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -44,7 +43,7 @@ namespace TradingServer.OrderbookCS
         {
             _instrument = instrument;
             _goodForDayThread = new Thread(() => ProcessGoodForDay().GetAwaiter().GetResult());
-            // _goodForDayThread.Start();
+            Task.Run(() => ProcessGoodForDay());
         }
 
         public void addOrder(Order order)
@@ -246,9 +245,6 @@ namespace TradingServer.OrderbookCS
 
         private void DeleteExpiredGoodTillCancel()
         {
-            // _goodTillCancelMutex.WaitOne();
-
-            // try
             foreach (var order in _goodTillCancel)
             {
                 if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
@@ -256,21 +252,12 @@ namespace TradingServer.OrderbookCS
                         removeOrder(new CancelOrder(order.Value.CurrentOrder));
                 }
             }
-                // delete expired goodTillCancel orders; maybe this should be called periodically, at the same time with 
-                // ProcessGoodForDay which is done at the end of the trading day. Also maybe modify so that we don't catch/release the same mutex 
-                // multiple times
-            
-
-            // finally
-            // {
-            //     _goodTillCancelMutex.ReleaseMutex();
-            // } 
         }
 
         private async Task ProcessGoodForDay()
         {
             // should it immediately roll over into the next day, or shut down the orderbook at 4PM UTC?
-            while (true) 
+            while (true) // also work out how the UTC time is being used here
             {
                 DateTime currentTime = DateTime.UtcNow;
 

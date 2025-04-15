@@ -3,8 +3,6 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    // maybe add support for FillOrKill, GoodForDay and IntermediateOrCancel
-    // Aha! Maybe handle seperately the FillOrKill, GoodForDay and IntermediateOrCancels differently
     public class FIFOrderbook: Orderbook, IMatchingOrderbook
     {
         public FIFOrderbook(Security security): base(security)
@@ -39,12 +37,12 @@ namespace TradingServer.OrderbookCS
                  */
                  if (order.isBuySide)
                  {
-                    // process the bid side
+                    // process the ask side
                  }
 
                  else 
                  {
-                    // process the ask side
+                    // process the bid side
                  }
             }
 
@@ -56,12 +54,12 @@ namespace TradingServer.OrderbookCS
                  */
                 if (order.isBuySide)
                 {
-                    // process the bid side
+                    // process the ask side
                 }
 
                 else 
                 {
-                    // process the ask side
+                    // process the bid side
                 }
             }
 
@@ -82,17 +80,10 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-            else // the only other cases are GoodTillCancel, GoodForDay which don't require special handling 
+            else 
             {
                 // treat as a standard GTC or GFD
             }
-            // we need to get all things with a price less than the desired price, so that they can be matched
-            // also this is mostly wrong, we don't match orders like that
-            // study the matching algorithm more, how are the market orders matched?
-
-            // add seperate processing for FillOrKill, IntermediateOrCancel, Market, AllOrNone
-
-            // also do the thing where we match the GoodForDay, GoodTillCancel order against the thing
             return result;
         }
     
