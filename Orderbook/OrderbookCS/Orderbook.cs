@@ -32,8 +32,6 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _fillAndKillLock = new();
         private readonly Lock _marketLock = new();
 
-
-        private readonly Thread _goodForDayThread;
         private DateTime now; 
 
         private bool _disposed = false;
@@ -42,7 +40,6 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
-            _goodForDayThread = new Thread(() => ProcessGoodForDay().GetAwaiter().GetResult());
             Task.Run(() => ProcessGoodForDay());
         }
 
@@ -259,7 +256,7 @@ namespace TradingServer.OrderbookCS
             // should it immediately roll over into the next day, or shut down the orderbook at 4PM UTC?
             while (true) // also work out how the UTC time is being used here
             {
-                DateTime currentTime = DateTime.UtcNow;
+                DateTime currentTime = DateTime.Now; // time in the trader's timezone
 
                 if (currentTime.Hour >= 16)
                 {
@@ -416,7 +413,6 @@ namespace TradingServer.OrderbookCS
 
             if (dispose) 
             {
-                _goodForDayThread.Join(); // make sure nothing can call while this is being deleted
                 _ts.Cancel();
                 _ts.Dispose();
             }
