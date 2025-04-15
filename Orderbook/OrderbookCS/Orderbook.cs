@@ -1,5 +1,4 @@
 
-using System.Runtime.InteropServices;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -257,6 +256,7 @@ namespace TradingServer.OrderbookCS
         private void DeleteExpiredGoodTillCancel()
         {
             List<CancelOrder> goodTillCancelOrders = new List<CancelOrder>();
+
             foreach (var order in _goodTillCancel)
             {
                 if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
