@@ -245,7 +245,7 @@ namespace TradingServer.OrderbookCS
 
         private void DeleteExpiredGoodTillCancel()
         {
-            foreach (var order in _goodTillCancel)
+            foreach (var order in _goodTillCancel) // figure out time problems!
             {
                 if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
                 {
