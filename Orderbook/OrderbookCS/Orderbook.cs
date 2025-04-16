@@ -371,6 +371,65 @@ namespace TradingServer.OrderbookCS
             }
         }
 
+        public void fill(Order order)
+        {
+            if (order.isBuySide)
+            {
+                foreach (var ask in _askLimits)
+                {
+                    if (ask.Price <= order.Price)
+                    {
+                        OrderbookEntry askPtr = ask.head;
+                        while (askPtr != null)
+                        {
+                            if (askPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
+                            {
+                                askPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
+                                order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
+                            }
+
+                            else 
+                            {
+                                uint quantity = askPtr.CurrentOrder.CurrentQuantity;
+
+                                askPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
+                                order.DecreaseQuantity(quantity);
+                                removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
+                            }
+                        }
+                    }
+                }
+            }
+
+            else 
+            {
+                foreach (var bid in _bidLimits)
+                {
+                    if (bid.Price >= order.Price)
+                    {
+                        OrderbookEntry bidPtr = bid.head;
+                        while (bidPtr != null)
+                        {
+                            if (bidPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
+                            {
+                                bidPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
+                                order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
+                            }
+
+                            else 
+                            {
+                                uint quantity = bidPtr.CurrentOrder.CurrentQuantity;
+
+                                bidPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
+                                order.DecreaseQuantity(quantity);
+                                removeOrder(bidPtr.CurrentOrder.OrderID, bidPtr, _orders);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public OrderbookSpread spread()
         {
             long? bestAsk = null, bestBid = null;

@@ -6,12 +6,40 @@ namespace TradingServer.Orders
     {
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
         {
+            if (orderType == OrderTypes.Market)
+            {
+                throw new InvalidDataException("Market orders cannot have a price");
+            }
+
             _orderCore = orderCore;
             Price = price;
             Quantity = quantity;
             CurrentQuantity = quantity;
             isBuySide = isBuy;
             OrderType = orderType;
+        }
+
+        public Order(IOrderCore orderCore, uint quantity, bool isBuy, OrderTypes orderType)
+        {
+            if (orderType != OrderTypes.Market)
+            {
+                throw new InvalidDataException("Only market orders can have no price");
+            }
+
+            _orderCore = orderCore;
+            Quantity = quantity;
+            isBuySide = isBuy;
+            OrderType = OrderTypes.Market;
+
+            if (isBuySide)
+            {
+                Price = Int32.MaxValue;
+            }
+
+            else 
+            {
+                Price = Int32.MinValue;
+            }
         }
 
         public Order(ModifyOrder modify): this(modify, 
