@@ -398,8 +398,9 @@ namespace TradingServer.OrderbookCS
                                 askPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
                                 order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
 
-                                result.addTransaction(incoming);
-                                result.addTransaction(resting);
+                                Trade transaction = new Trade(incoming, resting);
+
+                                result.addTransaction(transaction);
                                 break;
                             }
 
@@ -419,8 +420,9 @@ namespace TradingServer.OrderbookCS
                                 askPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
                                 order.DecreaseQuantity(quantity);
 
-                                result.addTransaction(incoming);
-                                result.addTransaction(resting);
+                                Trade transaction = new Trade(incoming, resting);
+
+                                result.addTransaction(transaction);
 
                                 removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
                             }
@@ -452,8 +454,8 @@ namespace TradingServer.OrderbookCS
                                 bidPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
                                 order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
 
-                                result.addTransaction(incoming);
-                                result.addTransaction(resting);
+                                Trade transaction = new Trade(incoming, resting);
+                                result.addTransaction(transaction);
 
                                 break;
                             }
@@ -473,8 +475,8 @@ namespace TradingServer.OrderbookCS
                                 bidPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
                                 order.DecreaseQuantity(quantity);
 
-                                result.addTransaction(incoming);
-                                result.addTransaction(resting);
+                                Trade transaction = new Trade(incoming, resting);
+                                result.addTransaction(transaction);
 
                                 removeOrder(bidPtr.CurrentOrder.OrderID, bidPtr, _orders);
                             }
