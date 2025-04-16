@@ -10,11 +10,6 @@ namespace TradingServer.OrderbookCS
             _security = security;
         }
 
-        public bool canMatch(Order order)
-        {
-            return false; // once again we need the order's types...
-        }
-
         // either fix up this matching engine first or do something else first
 
         public MatchResult match(Order order) // have a order as a argument here, see if it can be matched

@@ -1,4 +1,5 @@
 
+using System.Security.Cryptography;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -326,19 +327,48 @@ namespace TradingServer.OrderbookCS
             return _instrument.name;
         }
 
-        public bool canMatch()
+        // code another method that gets all of the orders that we can match with this one
+        public bool canFill(Order order)
         {
-        // Determines if a match can happen in this limit orderbook;
-        // we need to also check if the limits we're trying to match are null or not
-            foreach (var ask in _askLimits)
+            if (order.isBuySide)
             {
+                uint askQuantity = 0;
+
+                foreach (var ask in _askLimits)
+                {
+                    if (ask.Price <= order.Price)
+                    {
+                        OrderbookEntry askHead = ask.head;
+                        while (askHead != null)
+                        {
+                            askQuantity += askHead.CurrentOrder.CurrentQuantity;
+                            askHead = askHead.next;
+                        }
+                    }
+                }
+                return askQuantity >= order.CurrentQuantity;
+            }
+
+            else
+            {
+                uint bidQuantity = 0;
+                
                 foreach (var bid in _bidLimits)
                 {
-                    if (ask.Price <= bid.Price)
-                        return true;
+                    if (bid.Price >= order.Price)
+                    {
+                        OrderbookEntry bidHead = bid.head;
+
+                        while (bidHead != null)
+                        {
+                            bidQuantity += bidHead.CurrentOrder.CurrentQuantity;
+                            bidHead = bidHead.next;
+                        }
+                    }
                 }
+
+                return bidQuantity >= order.CurrentQuantity;
             }
-            return false;
         }
 
         public OrderbookSpread spread()
