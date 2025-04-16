@@ -79,8 +79,8 @@ namespace TradingServer.Orders
                 return OrderTypes.GoodForDay;    
             }
 
-        throw new InvalidOperationException("You cannot have this as a input, this is not in the enum");
-    }
+            throw new InvalidOperationException("You cannot have this as a input, this is not in the enum");
+        }
 
         public void IncreaseQuantity(uint additional) 
         {
