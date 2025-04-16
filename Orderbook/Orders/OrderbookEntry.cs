@@ -18,6 +18,7 @@ namespace TradingServer.Orders
         {
             uint count = 0;
             OrderbookEntry headPointer = head;
+
             while (headPointer != null)
             {
                 if (headPointer.CurrentOrder.CurrentQuantity != 0) 
@@ -33,12 +34,14 @@ namespace TradingServer.Orders
         {
             uint count = 0;
             OrderbookEntry headPointer = head;
+
             while (headPointer != null)
             {
                 if (headPointer.CurrentOrder.CurrentQuantity != 0)
                 {
                     count += headPointer.CurrentOrder.CurrentQuantity;
                 }
+
                 headPointer = headPointer.next;
             }
             return count;
@@ -49,6 +52,7 @@ namespace TradingServer.Orders
             List<OrderRecord> records = new List<OrderRecord>();
             OrderbookEntry headPointer = head;
             uint queuePosition = 0;
+
             while (headPointer != null)
             {
                 var current = headPointer.CurrentOrder;
@@ -78,7 +82,8 @@ namespace TradingServer.Orders
                 {
                     return Side.Unknown;
                 }
-                else {
+                else 
+                {
                     return head.CurrentOrder.isBuySide ? Side.Bid : Side.Ask;
                 }
             }
@@ -98,11 +103,13 @@ namespace TradingServer.Orders
         {
             uint count = 0;
             OrderbookEntry orderPtr = previous;
-            if (previous != null) 
+            
+            while (orderPtr != null)
             {
                 orderPtr = orderPtr.previous;
                 count += 1;
             }
+            
             return count;
         }
 

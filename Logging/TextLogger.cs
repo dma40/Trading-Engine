@@ -43,6 +43,7 @@ namespace TradingServer.Logging
         {
             using var filestream = new FileStream(filepath, FileMode.Append, FileAccess.Write, FileShare.Read);
             using var streamwriter = new StreamWriter(filestream) {AutoFlush = true}; 
+            
             try 
             {
                 while (!token.IsCancellationRequested) 
@@ -52,6 +53,7 @@ namespace TradingServer.Logging
                     await streamwriter.WriteAsync(formatted).ConfigureAwait(false);
                 }
             }
+
             catch (OperationCanceledException) 
             {
                 Console.WriteLine("Something went wrong!");

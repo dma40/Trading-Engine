@@ -10,11 +10,11 @@ namespace TradingServer.OrderbookCS
             _security = security;
         }
 
-        public MatchResult match(Order order) 
+        public Trades match(Order order) 
         {   
             Lock _orderLock = new(); 
 
-            MatchResult result = new MatchResult();
+            Trades result = new Trades();
 
             lock (_orderLock)
             {
@@ -45,8 +45,6 @@ namespace TradingServer.OrderbookCS
                         addOrder(order);
                     }
                 }
-                // initial final prices are going to be determined in each of the loops; depends on buy, sell side;
-                // we also want to record what happened to each of the orders 
 
                 return result;
             }

@@ -43,8 +43,7 @@ namespace TradingServer.OrderbookCS
                 addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
             }
         }
-        // maybe add ask, bid sides for orders? maybe that would be helpful when looking for orders to match
-
+        
         private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
@@ -120,7 +119,6 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        // check this removeOrder it may not be working properly; wacky things may be happening. ALSO: every entry needs to have a unique ID. This must be enforced
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
             if (orderentry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
@@ -186,7 +184,6 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        // also check this, it may also not be working properly
         public void modifyOrder(ModifyOrder modify)
         {   
             lock (_ordersLock)
@@ -283,6 +280,7 @@ namespace TradingServer.OrderbookCS
             foreach (var limit in _askLimits)
             {
                 var headPointer = limit.head;
+
                 while (headPointer != null)
                 {
                     entries.Add(headPointer);
@@ -298,6 +296,7 @@ namespace TradingServer.OrderbookCS
             foreach (var limit in _bidLimits)
             {
                 var headPointer = limit.head;
+
                 while (headPointer != null)
                 {
                     entries.Add(headPointer);
@@ -327,7 +326,6 @@ namespace TradingServer.OrderbookCS
             return _instrument.name;
         }
 
-        // code another method that gets all of the orders that we can match with this one
         public bool canFill(Order order)
         {
             if (order.isBuySide)
@@ -339,6 +337,7 @@ namespace TradingServer.OrderbookCS
                     if (ask.Price <= order.Price)
                     {
                         OrderbookEntry askHead = ask.head;
+
                         while (askHead != null)
                         {
                             askQuantity += askHead.CurrentOrder.CurrentQuantity;
@@ -371,9 +370,9 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public MatchResult fill(Order order)
+        public Trades fill(Order order)
         {
-            MatchResult result = new MatchResult();
+            Trades result = new Trades();
 
             if (order.isBuySide)
             {
@@ -382,6 +381,7 @@ namespace TradingServer.OrderbookCS
                     if (ask.Price <= order.Price)
                     {
                         OrderbookEntry askPtr = ask.head;
+
                         while (askPtr != null)
                         {
                             if (askPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
@@ -438,6 +438,7 @@ namespace TradingServer.OrderbookCS
                     if (bid.Price >= order.Price)
                     {
                         OrderbookEntry bidPtr = bid.head;
+
                         while (bidPtr != null)
                         {
                             if (bidPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
