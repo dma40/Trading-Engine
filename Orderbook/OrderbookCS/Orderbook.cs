@@ -371,8 +371,10 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void fill(Order order)
+        public MatchResult fill(Order order)
         {
+            MatchResult result = new MatchResult();
+
             if (order.isBuySide)
             {
                 foreach (var ask in _askLimits)
@@ -384,16 +386,30 @@ namespace TradingServer.OrderbookCS
                         {
                             if (askPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
                             {
+                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, 0, order.Price, order.Price, true, order.Username, order.SecurityID, 0, 0);
+                                OrderRecord resting = new OrderRecord(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.CurrentQuantity, askPtr.CurrentOrder.CurrentQuantity - order.CurrentQuantity, askPtr.CurrentOrder.Price, order.Price, false, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID, askPtr.queuePosition(), askPtr.queuePosition());
+
                                 askPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
                                 order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
+
+                                result.addTransaction(incoming);
+                                result.addTransaction(resting);
+                                break;
                             }
 
                             else 
                             {
                                 uint quantity = askPtr.CurrentOrder.CurrentQuantity;
 
+                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, order.CurrentQuantity - askPtr.CurrentOrder.CurrentQuantity, order.Price, askPtr.CurrentOrder.Price, true, order.Username, order.SecurityID, 0, 0);
+                                OrderRecord resting = new OrderRecord(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.CurrentQuantity, 0, askPtr.CurrentOrder.Price, askPtr.CurrentOrder.Price, false, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID, askPtr.queuePosition(), 0);
+
                                 askPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
                                 order.DecreaseQuantity(quantity);
+
+                                result.addTransaction(incoming);
+                                result.addTransaction(resting);
+
                                 removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
                             }
                         }
@@ -412,22 +428,39 @@ namespace TradingServer.OrderbookCS
                         {
                             if (bidPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
                             {
+                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, 0, order.Price, bidPtr.CurrentOrder.Price, true, order.Username, order.SecurityID, 0, 0);
+                                OrderRecord resting = new OrderRecord(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.CurrentQuantity, bidPtr.CurrentOrder.CurrentQuantity - order.CurrentQuantity, bidPtr.CurrentOrder.Price, order.Price, true, bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID, bidPtr.queuePosition(), bidPtr.queuePosition());
+
                                 bidPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
                                 order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
+
+                                result.addTransaction(incoming);
+                                result.addTransaction(resting);
+
+                                break;
                             }
 
                             else 
                             {
+                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, order.CurrentQuantity - bidPtr.CurrentOrder.CurrentQuantity, order.Price, bidPtr.CurrentOrder.Price, true, order.Username, order.SecurityID, 0, 0);
+                                OrderRecord resting = new OrderRecord(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.CurrentQuantity, 0, bidPtr.CurrentOrder.Price, bidPtr.CurrentOrder.Price, true, bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID, bidPtr.queuePosition(), 0);
+
                                 uint quantity = bidPtr.CurrentOrder.CurrentQuantity;
 
                                 bidPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
                                 order.DecreaseQuantity(quantity);
+
+                                result.addTransaction(incoming);
+                                result.addTransaction(resting);
+
                                 removeOrder(bidPtr.CurrentOrder.OrderID, bidPtr, _orders);
                             }
                         }
                     }
                 }
             }
+
+            return result;
         }
 
         public OrderbookSpread spread()

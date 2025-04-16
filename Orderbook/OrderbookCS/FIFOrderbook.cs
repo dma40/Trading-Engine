@@ -22,23 +22,23 @@ namespace TradingServer.OrderbookCS
                 {
                     if (canFill(order))
                     {
-                        fill(order);
+                        result = fill(order);
                     }
                 }
 
                 else if (order.OrderType == OrderTypes.FillAndKill)
                 {
-                    fill(order);
+                    result = fill(order);
                 } 
 
                 else if (order.OrderType == OrderTypes.Market)
                 {
-                    fill(order);
+                    result = fill(order);
                 }
 
                 else 
                 {
-                    fill(order);
+                    result = fill(order);
                 
                     if (order.remainingQuantity() > 0)
                     {
