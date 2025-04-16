@@ -40,15 +40,18 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
-            _ = Task.Run(() => ProcessGoodForDay()); // need to handle this shutdown more gracefully
+            _ = Task.Run(() => ProcessGoodForDay());
         }
 
         public void addOrder(Order order)
         {
-            var baseLimit = new Limit(order.Price);
-            addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+            lock (_ordersLock) 
+            {
+                var baseLimit = new Limit(order.Price);
+                addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+            }
         }
-        // maybe add ask, bid sides for orders? maybe that would be helpful
+        // maybe add ask, bid sides for orders? maybe that would be helpful when looking for orders to match
 
         private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
         {
@@ -94,35 +97,33 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-            lock (_ordersLock)
+            if (levels.TryGetValue(baseLimit, out Limit limit))
             {
-                if (levels.TryGetValue(baseLimit, out Limit limit))
+                if (limit.head == null)
                 {
-                    if (limit.head == null)
-                    {
-                        limit.head = orderbookEntry;
-                        limit.tail = orderbookEntry;
-                    }
-
-                    else
-                    {
-                        OrderbookEntry tailPointer = limit.tail;
-                        tailPointer.next = orderbookEntry;
-                        orderbookEntry.previous = tailPointer;
-                        limit.tail = orderbookEntry;
-                    }
+                    limit.head = orderbookEntry;
+                    limit.tail = orderbookEntry;
                 }
 
-                else 
+                else
                 {
-                    levels.Add(baseLimit);
-
-                    baseLimit.head = orderbookEntry;
-                    baseLimit.tail = orderbookEntry;
+                    OrderbookEntry tailPointer = limit.tail;
+                    tailPointer.next = orderbookEntry;
+                    orderbookEntry.previous = tailPointer;
+                    limit.tail = orderbookEntry;
                 }
-
-                orders.Add(order.OrderID, orderbookEntry);
             }
+
+            else 
+            {
+                levels.Add(baseLimit);
+
+                baseLimit.head = orderbookEntry;
+                baseLimit.tail = orderbookEntry;
+            }
+
+            orders.Add(order.OrderID, orderbookEntry);
+            
         }
 
         public void removeOrders(List<CancelOrder> cancels)
@@ -150,7 +151,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        // check this removeOrder it may not be working properly; wacky things may be happening
+        // check this removeOrder it may not be working properly; wacky things may be happening. ALSO: every entry needs to have a unique ID. This must be enforced
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
             if (orderentry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
@@ -241,13 +242,13 @@ namespace TradingServer.OrderbookCS
         }
 
         // also check this, it may also not be working properly
-        public void modifyOrder(ModifyOrder modify) // side is never modified by our methods so we don't restrict access in this method
+        public void modifyOrder(ModifyOrder modify)
         {   
             lock (_ordersLock)
             {
                 if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
                 {
-                    removeOrder(modify.cancelOrder());
+                    removeOrder(modify.OrderID, orderentry, _orders);
                     addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
                 }
             }

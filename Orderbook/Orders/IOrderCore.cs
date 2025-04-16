@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace TradingServer.Orders {
 
     public interface IOrderCore

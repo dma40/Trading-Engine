@@ -1,7 +1,4 @@
 
-using System;
-using System.Runtime.InteropServices.Swift;
-
 namespace TradingServer.Orders 
 {
     // Limit class that does the following:
