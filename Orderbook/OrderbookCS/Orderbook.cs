@@ -123,7 +123,6 @@ namespace TradingServer.OrderbookCS
             }
 
             orders.Add(order.OrderID, orderbookEntry);
-            
         }
 
         public void removeOrders(List<CancelOrder> cancels)
@@ -194,51 +193,49 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
+            if (orderentry.previous != null && orderentry.next != null)
             {
-                if (orderentry.previous != null && orderentry.next != null)
-                {
-                    orderentry.next.previous = orderentry.previous;
-                    orderentry.previous.next = orderentry.next;
-                }
-
-                else if (orderentry.previous != null)
-                {
-                    orderentry.previous.next = null;
-                }
-
-                else if (orderentry.next != null)
-                {
-                    orderentry.next.previous = null;
-                }
-
-                if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
-                {
-                    orderentry.ParentLimit.head = null;
-                    orderentry.ParentLimit.tail = null;
-                
-                    if (orderentry.CurrentOrder.isBuySide)
-                    {
-                        _bidLimits.Remove(orderentry.ParentLimit);
-                    }
-
-                    else 
-                    {
-                        _askLimits.Remove(orderentry.ParentLimit);
-                    }
-                }
-
-                else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
-                {
-                    orderentry.ParentLimit.head = orderentry.next;
-                }
-
-                else if (orderentry.ParentLimit.tail == orderentry)
-                {
-                    orderentry.ParentLimit.tail = orderentry.previous;
-                }
-
-                _orders.Remove(id);
+                orderentry.next.previous = orderentry.previous;
+                orderentry.previous.next = orderentry.next;
             }
+
+            else if (orderentry.previous != null)
+            {
+                orderentry.previous.next = null;
+            }
+
+            else if (orderentry.next != null)
+            {
+                orderentry.next.previous = null;
+            }
+
+            if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
+            {
+                orderentry.ParentLimit.head = null;
+                orderentry.ParentLimit.tail = null;
+                
+                if (orderentry.CurrentOrder.isBuySide)
+                {
+                    _bidLimits.Remove(orderentry.ParentLimit);
+                }
+
+                else 
+                {
+                        _askLimits.Remove(orderentry.ParentLimit);
+                }
+            }
+
+            else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
+            {
+                orderentry.ParentLimit.head = orderentry.next;
+            }
+
+            else if (orderentry.ParentLimit.tail == orderentry)
+            {
+                orderentry.ParentLimit.tail = orderentry.previous;
+            }
+
+            _orders.Remove(id);
         }
 
         // also check this, it may also not be working properly
