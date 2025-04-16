@@ -97,32 +97,34 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-            if (levels.TryGetValue(baseLimit, out Limit limit))
             {
-                if (limit.head == null)
+                if (levels.TryGetValue(baseLimit, out Limit limit))
                 {
-                    limit.head = orderbookEntry;
-                    limit.tail = orderbookEntry;
+                    if (limit.head == null)
+                    {
+                        limit.head = orderbookEntry;
+                        limit.tail = orderbookEntry;
+                    }
+
+                    else
+                    {
+                        OrderbookEntry tailPointer = limit.tail;
+                        tailPointer.next = orderbookEntry;
+                        orderbookEntry.previous = tailPointer;
+                        limit.tail = orderbookEntry;
+                    }
                 }
 
-                else
+                else 
                 {
-                    OrderbookEntry tailPointer = limit.tail;
-                    tailPointer.next = orderbookEntry;
-                    orderbookEntry.previous = tailPointer;
-                    limit.tail = orderbookEntry;
+                    levels.Add(baseLimit);
+
+                    baseLimit.head = orderbookEntry;
+                    baseLimit.tail = orderbookEntry;
                 }
+
+                orders.Add(order.OrderID, orderbookEntry);
             }
-
-            else 
-            {
-                levels.Add(baseLimit);
-
-                baseLimit.head = orderbookEntry;
-                baseLimit.tail = orderbookEntry;
-            }
-
-            orders.Add(order.OrderID, orderbookEntry);
         }
 
         public void removeOrders(List<CancelOrder> cancels)
@@ -193,49 +195,51 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-            if (orderentry.previous != null && orderentry.next != null)
             {
-                orderentry.next.previous = orderentry.previous;
-                orderentry.previous.next = orderentry.next;
-            }
+                if (orderentry.previous != null && orderentry.next != null)
+                {
+                    orderentry.next.previous = orderentry.previous;
+                    orderentry.previous.next = orderentry.next;
+                }
 
-            else if (orderentry.previous != null)
-            {
-                orderentry.previous.next = null;
-            }
+                else if (orderentry.previous != null)
+                {
+                    orderentry.previous.next = null;
+                }
 
-            else if (orderentry.next != null)
-            {
-                orderentry.next.previous = null;
-            }
+                else if (orderentry.next != null)
+                {
+                    orderentry.next.previous = null;
+                }
 
-            if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
-            {
-                orderentry.ParentLimit.head = null;
-                orderentry.ParentLimit.tail = null;
+                if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
+                {
+                    orderentry.ParentLimit.head = null;
+                    orderentry.ParentLimit.tail = null;
                 
-                if (orderentry.CurrentOrder.isBuySide)
-                {
-                    _bidLimits.Remove(orderentry.ParentLimit);
-                }
+                    if (orderentry.CurrentOrder.isBuySide)
+                    {   
+                        _bidLimits.Remove(orderentry.ParentLimit);
+                    }
 
-                else 
-                {
+                    else 
+                    {
                         _askLimits.Remove(orderentry.ParentLimit);
+                    }
                 }
-            }
 
-            else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
-            {
-                orderentry.ParentLimit.head = orderentry.next;
-            }
+                else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
+                {
+                    orderentry.ParentLimit.head = orderentry.next;
+                }
 
-            else if (orderentry.ParentLimit.tail == orderentry)
-            {
-                orderentry.ParentLimit.tail = orderentry.previous;
-            }
+                else if (orderentry.ParentLimit.tail == orderentry)
+                {
+                    orderentry.ParentLimit.tail = orderentry.previous;
+                }
 
-            _orders.Remove(id);
+                _orders.Remove(id);
+            }
         }
 
         // also check this, it may also not be working properly
