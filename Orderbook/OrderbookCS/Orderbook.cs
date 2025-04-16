@@ -13,24 +13,15 @@ namespace TradingServer.OrderbookCS
 
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _fillOrKill = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
-        private readonly Dictionary<long, OrderbookEntry> _fillAndKill = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _market = new Dictionary<long, OrderbookEntry>();
 
         private readonly Mutex _orderMutex = new Mutex();
         private readonly Mutex _goodForDayMutex = new Mutex();
         private readonly Mutex _goodTillCancelMutex = new Mutex();
-        private readonly Mutex _fillOrKillMutex = new Mutex();
-        private readonly Mutex _fillAndKillMutex = new Mutex();
-        private readonly Mutex _marketMutex = new Mutex();
 
         private readonly Lock _ordersLock = new();
         private readonly Lock _goodForDayLock = new();
         private readonly Lock _goodTillCancelLock = new();
-        private readonly Lock _fillOrKillLock = new();
-        private readonly Lock _fillAndKillLock = new();
-        private readonly Lock _marketLock = new();
 
         private DateTime now; 
 
@@ -57,23 +48,7 @@ namespace TradingServer.OrderbookCS
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
-            {
-                lock (_fillAndKillLock)
-                {
-                    _fillAndKill.Add(order.OrderID, orderbookEntry);
-                }
-            }
-
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.FillOrKill)
-            {
-                lock (_fillOrKillLock)
-                {
-                    _fillOrKill.Add(order.OrderID, orderbookEntry);
-                }
-            }
-
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
+            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
                 lock (_goodForDayLock)
                 {
@@ -86,14 +61,6 @@ namespace TradingServer.OrderbookCS
                 lock (_goodTillCancelLock)
                 {
                     _goodTillCancel.Add(order.OrderID, orderbookEntry);
-                }
-            }
-
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.Market)
-            {
-                lock (_marketLock)
-                {
-                    _market.Add(order.OrderID, orderbookEntry);
                 }
             }
 
@@ -155,23 +122,7 @@ namespace TradingServer.OrderbookCS
         // check this removeOrder it may not be working properly; wacky things may be happening. ALSO: every entry needs to have a unique ID. This must be enforced
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
         {
-            if (orderentry.CurrentOrder.OrderType == OrderTypes.FillAndKill)
-            {
-                lock (_fillAndKillLock)
-                {
-                    _fillAndKill.Remove(id);
-                }
-            }
-
-            else if (orderentry.CurrentOrder.OrderType == OrderTypes.FillOrKill)
-            {
-                lock (_fillOrKillLock)
-                {
-                    _fillOrKill.Remove(id);
-                }
-            }
-
-            else if (orderentry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
+            if (orderentry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
                 lock (_goodForDayLock)
                 {
@@ -184,14 +135,6 @@ namespace TradingServer.OrderbookCS
                 lock (_goodTillCancelLock)
                 {
                     _goodTillCancel.Remove(id);
-                }
-            }
-
-            else if (orderentry.CurrentOrder.OrderType == OrderTypes.Market)
-            {
-                lock (_marketLock)
-                {
-                    _market.Remove(id);
                 }
             }
 
@@ -303,10 +246,7 @@ namespace TradingServer.OrderbookCS
                         _orderMutex.WaitOne();
 
                         _goodForDayMutex.WaitOne();
-                        _fillAndKillMutex.WaitOne();
-                        _fillOrKillMutex.WaitOne();
                         _goodTillCancelMutex.WaitOne();
-                        _marketMutex.WaitOne();
 
                         Thread.Sleep(closed);
                     }
@@ -316,10 +256,7 @@ namespace TradingServer.OrderbookCS
                         _orderMutex.ReleaseMutex();
 
                         _goodForDayMutex.ReleaseMutex();
-                        _fillAndKillMutex.ReleaseMutex();
-                        _fillOrKillMutex.ReleaseMutex();
                         _goodTillCancelMutex.ReleaseMutex();
-                        _marketMutex.ReleaseMutex();
                     }
                 }
                 
