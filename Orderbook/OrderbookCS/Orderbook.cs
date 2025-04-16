@@ -387,8 +387,8 @@ namespace TradingServer.OrderbookCS
                             if (askPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
                             {
                                 OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, 0, 
-                                order.Price, order.Price, true, 
-                                order.Username, order.SecurityID, 0, 0);
+                                                                    order.Price, order.Price, true, 
+                                                                    order.Username, order.SecurityID, 0, 0);
                                 OrderRecord resting = new OrderRecord(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.CurrentQuantity, 
                                                                     askPtr.CurrentOrder.CurrentQuantity - order.CurrentQuantity, 
                                                                     askPtr.CurrentOrder.Price, order.Price, false, 
@@ -407,8 +407,14 @@ namespace TradingServer.OrderbookCS
                             {
                                 uint quantity = askPtr.CurrentOrder.CurrentQuantity;
 
-                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, order.CurrentQuantity - askPtr.CurrentOrder.CurrentQuantity, order.Price, askPtr.CurrentOrder.Price, true, order.Username, order.SecurityID, 0, 0);
-                                OrderRecord resting = new OrderRecord(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.CurrentQuantity, 0, askPtr.CurrentOrder.Price, askPtr.CurrentOrder.Price, false, askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID, askPtr.queuePosition(), 0);
+                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, 
+                                                                    order.CurrentQuantity - askPtr.CurrentOrder.CurrentQuantity,
+                                                                    order.Price, askPtr.CurrentOrder.Price, 
+                                                                    true, order.Username, order.SecurityID, 0, 0);
+                                OrderRecord resting = new OrderRecord(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.CurrentQuantity, 0, 
+                                                                askPtr.CurrentOrder.Price, askPtr.CurrentOrder.Price, false, 
+                                                                askPtr.CurrentOrder.Username, 
+                                                                askPtr.CurrentOrder.SecurityID, askPtr.queuePosition(), 0);
 
                                 askPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
                                 order.DecreaseQuantity(quantity);
