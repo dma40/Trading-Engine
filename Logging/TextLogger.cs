@@ -76,7 +76,7 @@ namespace TradingServer.Logging
             Dispose(false);
         }
 
-        public void Dispose() // do something like this in Orderbook, dispose of this object when we don't want it anymore
+        public void Dispose() 
         {
             Dispose(true);
             GC.SuppressFinalize(this);

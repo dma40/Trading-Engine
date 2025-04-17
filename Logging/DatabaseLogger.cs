@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 
 namespace TradingServer.Logging
 {
-    public class DatabaseLogger//: AbstractLogger, ITextLogger
+    public class DatabaseLogger: AbstractLogger, ITextLogger
     {
         private readonly LoggerConfiguration _logConfig;
 
@@ -32,9 +32,8 @@ namespace TradingServer.Logging
 
             string user = Environment.GetEnvironmentVariable("MYSQL_USER");
             string password = Environment.GetEnvironmentVariable("MYSQL_PASS");
-            string connection = $"Server=localhost;User Id={user};Password={password}";
-
-            string db = $"CREATE DATABASE IF NOT EXISTS {DateTime.Now:yyyy-MM-dd}";
+            string db = $"CREATE DATABASE IF NOT EXISTS {DateTime.Now:yyyy-MM-dd}"; // create table within the database
+            string connection = $"Server=localhost;Database={db};User ID={user};Password={password}";
 
             using (var conn = new MySqlConnection(connection))
             {
@@ -43,9 +42,55 @@ namespace TradingServer.Logging
             }
         }
 
-        private static async Task LogAsync(string connection, BufferBlock<LogInformation> logs, CancellationToken token)
+        private static async Task LogAsync(string db, BufferBlock<LogInformation> logs, CancellationToken token)
         {
+            try 
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    var item = logs.ReceiveAsync(token).ConfigureAwait(false);
+                    // format, execute the command, put it into the database afterwards
+                }
+            }
 
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Something went wrong!");
+            }
+
+        }
+
+        protected override void Log(message_types type, string module, string message)
+        {
+            _logQueue.Post(new LogInformation(type, module, message, DateTime.Now, 
+            Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name));
+        }
+
+        ~DatabaseLogger() 
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool dispose) 
+        {
+            if (_disposed) 
+            {
+                return;
+            }
+
+            _disposed = true;
+
+            if (dispose) 
+            {
+                _ts.Cancel();
+                _ts.Dispose();
+            }
         }
 
         private readonly BufferBlock<LogInformation> _logQueue = new BufferBlock<LogInformation>();
