@@ -7,6 +7,7 @@ namespace TradingServer.Rejects
         Unknown,
         OrderNotFound,
         ModifyWrongSide,
-        OperationNotFound
+        OperationNotFound,
+        InvalidOrEmptyArgument
     }
 }

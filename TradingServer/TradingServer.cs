@@ -9,6 +9,7 @@ using TradingServer.Handlers;
 using Trading;
 using TradingServer.Orders;
 using TradingServer.Instrument;
+using TradingServer.Rejects;
 
 namespace TradingServer.Core 
 {
@@ -44,6 +45,46 @@ namespace TradingServer.Core
             return Task.CompletedTask;
         }
 
+        private Tuple<bool, Reject> checkIfOrderIsInvalid(OrderRequest request)
+        {
+            RejectCreator creator = new RejectCreator(); 
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type));
+
+            bool isInvalid = false;
+            RejectionReason reason = RejectionReason.Unknown;
+
+            if (string.IsNullOrWhiteSpace(request.Id.ToString()) 
+                || string.IsNullOrWhiteSpace(request.Username) 
+                || string.IsNullOrWhiteSpace(request.Type))
+            {
+                isInvalid = true;
+                reason = RejectionReason.InvalidOrEmptyArgument;
+            }
+
+            else if (request.Operation == "Add" && _orderbook.containsOrder(request.Id))
+            {
+                isInvalid = true;
+                reason = RejectionReason.ModifyWrongSide;
+            }
+
+            else if ((request.Operation == "Modify" || request.Operation == "Cancel") && _orderbook.containsOrder(request.Id))
+            {
+                isInvalid = true;
+                reason = RejectionReason.OrderNotFound;
+            }
+
+            else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
+            {
+                isInvalid = true;
+                reason = RejectionReason.InvalidOrEmptyArgument;
+            }
+
+            Reject reject = RejectCreator.GenerateRejection(orderCore, reason);
+
+            Tuple<bool, Reject> result = new Tuple<bool, Reject>(isInvalid, reject);
+            return result;
+        }
+
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
             // maybe somewhere set the creation time to be at 9:30 in the morning if the result comes in at after hours
@@ -52,19 +93,11 @@ namespace TradingServer.Core
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
-            if (string.IsNullOrEmpty(request.Id.ToString()) 
-                || string.IsNullOrEmpty(request.Username.ToString())
-                || string.IsNullOrEmpty(request.Operation.ToString())
-                )
-            {
-                _logger.Error(nameof(TradingServer), $"Rejected order with invalid arguments submitted by {request.Username} at {DateTime.UtcNow}");
+            Tuple<bool, Reject> result = checkIfOrderIsInvalid(request);
 
-                return new OrderResponse
-                {
-                    Id = request.Id,
-                    Status = 500,
-                    Message = "Error: you have put in null or empty values for arguments"
-                };
+            if (result.Item1)
+            {
+                _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(result.Item2.reason));
             }
 
             else if (now.Hour >= 16)
@@ -79,32 +112,6 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Add")
             {
-                if (_orderbook.containsOrder(modify.OrderID))
-                {
-                    _logger.Error(nameof(TradingServer), $"Rejected request by {request.Username} to add order that exists in the orderbook at {DateTime.UtcNow}");
-
-                    return new OrderResponse
-                    {
-                        Id = request.Id,
-                        Status = 500,
-                        Message = "Error: this order already exists within the orderbook"
-                    };
-                }
-
-                // maybe add some try/catch blocks to test for various errors
-
-                if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
-                {
-                    _logger.Error(nameof(TradingServer), $"Rejected request from {request.Username} attempting to add to a invalid side at {DateTime.UtcNow}");
-
-                    return new OrderResponse
-                    {
-                        Id = request.Id,
-                        Status = 500,
-                        Message = "Error: you have tried to put a order on a invalid side"
-                    };
-            }
-
                 Order newOrder = modify.newOrder();
                 _orderbook.addOrder(newOrder);
 
@@ -113,19 +120,6 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Cancel")
             {
-                // no match occurs when we cancel a order
-                if (!_orderbook.containsOrder(modify.OrderID))
-                {
-                    _logger.Error(nameof(TradingServer), $"Rejected a request to cancel a order not in the orderbook from {request.Username} at {DateTime.UtcNow}");
-
-                    return new OrderResponse
-                    {
-                        Id = request.Id,
-                        Status = 500,
-                        Message = "Error: you cannot cancel a order that is not currently in the orderbook"
-                    };
-                }
-
                 CancelOrder cancelOrder = modify.cancelOrder();
                 _orderbook.removeOrder(cancelOrder);
 
@@ -136,17 +130,6 @@ namespace TradingServer.Core
             {
                 // here, maybe get the order, then get the id, and then put it back in the orderbook as a new order
                 // and then try to match it
-                if (!_orderbook.containsOrder(modify.OrderID))
-                {
-                    _logger.Error(nameof(TradingServer), $"Rejected a request to modify a order that does not exist from {request.Username} at {DateTime.UtcNow}");
-
-                    return new OrderResponse
-                    {
-                        Id = request.Id,
-                        Status = 500,
-                        Message = "Error: you cannot cancel modify a order that is not currently in the orderbook"
-                    };
-                }
 
                 _orderbook.modifyOrder(modify);
 
@@ -156,27 +139,7 @@ namespace TradingServer.Core
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.UtcNow}");
             }
 
-            else
-            {
-                _logger.Error(nameof(TradingServer), $"Rejected request with unknown error from {request.Username} at {DateTime.UtcNow}");
-
-                return new OrderResponse
-                {
-                    Id = request.Id,
-                    Status = 500,
-                    Message = "An unkown error occurred"
-                };
-            }
-
             _logger.LogInformation(nameof(TradingServer), $"Processed {request.Id} from {request.Username} successfully");
-            /*
-            if (_orderbook.canMatch())
-            {
-                _logger.LogInformation(nameof(TradingServer), $"Orders can now be matched in this orderbook. Order match started at {DateTime.UtcNow}");
-                _orderbook.match();
-                _logger.LogInformation(nameof(TradingServer), $"Order match executed at {DateTime.UtcNow}");
-            }
-            */
 
             string askSideIds = "";
             string bidSideIds = "";
