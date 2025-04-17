@@ -417,7 +417,16 @@ namespace TradingServer.OrderbookCS
 
                                 result.addTransaction(transaction);
 
-                                removeOrder(askPtr.CurrentOrder.OrderID, askPtr, _orders);
+                                if (askPtr.next != null)
+                                {
+                                    askPtr = askPtr.next;
+                                    removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr, _orders);    
+                                }
+
+                                else 
+                                {
+                                    askPtr = askPtr.next;
+                                }
                             }
                         }
                     }
@@ -472,7 +481,16 @@ namespace TradingServer.OrderbookCS
                                 Trade transaction = new Trade(incoming, resting);
                                 result.addTransaction(transaction);
 
-                                removeOrder(bidPtr.CurrentOrder.OrderID, bidPtr, _orders);
+                                if (bidPtr.next != null)
+                                {
+                                    bidPtr = bidPtr.next;
+                                    removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
+                                }
+
+                                else 
+                                {
+                                    bidPtr = bidPtr.next;
+                                }
                             }
                         }
                     }
