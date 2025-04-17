@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
 WORKDIR /TradingEngine
 
-COPY TradingServer.sln
+COPY TradingServer.sln .
 
 COPY Logging/Logging.csproj ./Logging/
 COPY OrderHandlers/OrderHandlers/csproj ./OrderHandlers/
@@ -19,12 +19,14 @@ COPY . .
 
 RUN dotnet publish TradingServer.sln -c Release -o /TradingEngine/publish
 
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /TradingEngine
 EXPOSE 12000
 
 # next steps:
 # release the project, then add the appropriate copy statement here
 
-COPY --from=build /TradingEngine/publish
+COPY --from=build /TradingEngine/publish .
 
 # verify that this file works right
 ENTRYPOINT ["dotnet", "TradingServer.dll"]
