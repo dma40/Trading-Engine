@@ -453,7 +453,7 @@ namespace TradingServer.OrderbookCS
                                                                     bidPtr.queuePosition(), bidPtr.queuePosition());
 
                                 bidPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
-                                order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
+                                order.DecreaseQuantity(order.CurrentQuantity); 
 
                                 Trade transaction = new Trade(incoming, resting);
                                 result.addTransaction(transaction);
@@ -473,7 +473,7 @@ namespace TradingServer.OrderbookCS
 
                                 uint quantity = bidPtr.CurrentOrder.CurrentQuantity;
 
-                                bidPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
+                                bidPtr.CurrentOrder.DecreaseQuantity(quantity); 
                                 order.DecreaseQuantity(quantity);
 
                                 Trade transaction = new Trade(incoming, resting);
