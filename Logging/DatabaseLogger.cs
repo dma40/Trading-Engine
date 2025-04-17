@@ -35,20 +35,41 @@ namespace TradingServer.Logging
             string db = $"CREATE DATABASE IF NOT EXISTS {DateTime.Now:yyyy-MM-dd}"; // create table within the database
             string connection = $"Server=localhost;Database={db};User ID={user};Password={password}";
 
+            string createTableRequest = @"
+            CREATE TABLE IF NOT EXISTS LogInformation (
+                type INT,
+                module VARCHAR(100),
+                message VARCHAR(200),
+                now TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                id INT,
+                name VARCHAR(100)
+            )";
+
             using (var conn = new MySqlConnection(connection))
             {
                 conn.Open();
+                using (var command = new MySqlCommand(createTableRequest, conn))
+                {
+                    command.ExecuteNonQueryAsync(); 
+                }
                 _ = Task.Run(() => LogAsync(connection, _logQueue, _ts.Token));
             }
         }
 
         private static async Task LogAsync(string db, BufferBlock<LogInformation> logs, CancellationToken token)
         {
+            MySqlConnection connection = new MySqlConnection(db);
+
             try 
             {
                 while (!token.IsCancellationRequested)
                 {
-                    var item = logs.ReceiveAsync(token).ConfigureAwait(false);
+                    var item = await logs.ReceiveAsync(token).ConfigureAwait(false);
+                    string request = FormatLogItem(item);
+                    using (var command = new MySqlCommand(request, connection))
+                    {
+                        await command.ExecuteNonQueryAsync();
+                    }
                     // format, execute the command, put it into the database afterwards
                 }
             }
@@ -64,6 +85,12 @@ namespace TradingServer.Logging
         {
             _logQueue.Post(new LogInformation(type, module, message, DateTime.Now, 
             Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name));
+        }
+
+        private static string FormatLogItem(LogInformation log)
+        {
+            return "INSERT INTO LogInformation (type, module, message, now, id, name) " 
+            + $"VALUES ({log.type}, {log.module}, {log.message}, {log.now}, {log.id}, {log.name})";
         }
 
         ~DatabaseLogger() 
