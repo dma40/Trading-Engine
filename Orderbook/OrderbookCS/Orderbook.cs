@@ -13,8 +13,8 @@ namespace TradingServer.OrderbookCS
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
 
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
+        private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
         private readonly Mutex _orderMutex = new Mutex();
         private readonly Mutex _goodForDayMutex = new Mutex();
@@ -52,7 +52,7 @@ namespace TradingServer.OrderbookCS
             {
                 lock (_goodForDayLock)
                 {
-                    _goodForDay.Add(order.OrderID, orderbookEntry);
+                    _goodForDay.Add(order.OrderID, new CancelOrder(order));
                 }
             }
 
@@ -231,14 +231,7 @@ namespace TradingServer.OrderbookCS
 
                     try
                     {
-                        List<CancelOrder> goodForDayOrders = new List<CancelOrder>();
-
-                        foreach (var order in _goodForDay)
-                        {
-                            goodForDayOrders.Add(new CancelOrder(order.Value.CurrentOrder));
-                        }
-
-                        removeOrders(goodForDayOrders);
+                        removeOrders(_goodForDay.Values.ToList());
                         DeleteExpiredGoodTillCancel(); 
 
                         _orderMutex.WaitOne();
