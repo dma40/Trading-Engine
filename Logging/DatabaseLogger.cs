@@ -37,12 +37,12 @@ namespace TradingServer.Logging
 
             string createTableRequest = @"
             CREATE TABLE IF NOT EXISTS LogInformation (
-                type INT,
-                module VARCHAR(100),
-                message VARCHAR(200),
+                type INT NOT NULL,
+                module VARCHAR(100) NOT NULL,
+                message VARCHAR(200) NOT NULL,
                 now TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                id INT,
-                name VARCHAR(100)
+                id INT NOT NULL,
+                name VARCHAR(100) NOT NULL
             )";
 
             using (var conn = new MySqlConnection(connection))
@@ -70,7 +70,6 @@ namespace TradingServer.Logging
                     {
                         await command.ExecuteNonQueryAsync();
                     }
-                    // format, execute the command, put it into the database afterwards
                 }
             }
 
