@@ -5,7 +5,7 @@ WORKDIR /TradingEngine
 COPY TradingServer.sln .
 
 COPY Logging/Logging.csproj ./Logging/
-COPY OrderHandlers/OrderHandlers/csproj ./OrderHandlers/
+COPY OrderHandlers/OrderHandlers.csproj ./OrderHandlers/
 COPY TradingServer/TradingServer.csproj ./TradingServer/
 
 COPY Orderbook/Orders/Orders.csproj ./Orders/
