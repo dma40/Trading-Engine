@@ -18,7 +18,7 @@ namespace TradingServer.Logging
                 TextLoggerConfiguration = new TextLoggerConfiguration 
                 {
                     Directory = "/Users/dylan.ma/Documents/Trading-Engine",
-                    Filename = "TradingLogFile",
+                    Filename = "TradingLogDatabase",
                     FileExtension = ".log"
                 }
             };
@@ -30,10 +30,13 @@ namespace TradingServer.Logging
                 throw new InvalidOperationException("You can't initialize a DatabaseLogger in this way. That is the wrong type");
             }
 
+            DateTime now = DateTime.UtcNow;
+
             string user = Environment.GetEnvironmentVariable("MYSQL_USER");
             string password = Environment.GetEnvironmentVariable("MYSQL_PASS");
-            string db = $"CREATE DATABASE IF NOT EXISTS {DateTime.Now:yyyy-MM-dd}"; // create table within the database
-            string connection = $"Server=localhost;Database={db};User ID={user};Password={password}";
+            string db = $"CREATE DATABASE IF NOT EXISTS {_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
+            string dbname = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
+            string link = $"Server=localhost;User ID={user};Password={password}";
 
             string createTableRequest = @"
             CREATE TABLE IF NOT EXISTS LogInformation (
@@ -45,14 +48,22 @@ namespace TradingServer.Logging
                 name VARCHAR(100) NOT NULL
             )";
 
-            using (var conn = new MySqlConnection(connection))
+            using (var conn = new MySqlConnection(link))
             {
                 conn.Open();
-                using (var command = new MySqlCommand(createTableRequest, conn))
+                using (var command = new MySqlCommand(db, conn))
                 {
-                    command.ExecuteNonQueryAsync(); 
+                    command.ExecuteNonQueryAsync();
+
+                    string dblink = $"Server=localhost;Database={dbname};User={user};Password={password}";
+
+                    var connection = new MySqlConnection(dblink);
+                    using (var request = new MySqlCommand(createTableRequest, connection))
+                    {
+                        request.ExecuteNonQueryAsync();
+                    }
                 }
-                _ = Task.Run(() => LogAsync(connection, _logQueue, _ts.Token));
+                _ = Task.Run(() => LogAsync(link, _logQueue, _ts.Token));
             }
         }
 
