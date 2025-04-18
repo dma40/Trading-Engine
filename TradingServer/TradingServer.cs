@@ -53,6 +53,18 @@ namespace TradingServer.Core
             bool isInvalid = false;
             RejectionReason reason = RejectionReason.Unknown;
 
+            if (Order.StringToOrderType(request.Type) == OrderTypes.Market && (!string.IsNullOrWhiteSpace(request.Price.ToString()) || !string.IsNullOrWhiteSpace(request.Operation)))
+            {
+                isInvalid = true;
+                reason = RejectionReason.InvalidOrEmptyArgument;
+            }
+
+            if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill || (Order.StringToOrderType(request.Type) == OrderTypes.FillOrKill)) && (!string.IsNullOrEmpty(request.Operation)))
+            {
+                isInvalid = true;
+                reason = RejectionReason.OperationNotFound;
+            }
+
             if (string.IsNullOrWhiteSpace(request.Id.ToString()) 
                 || string.IsNullOrWhiteSpace(request.Username) 
                 || string.IsNullOrWhiteSpace(request.Type))
@@ -113,7 +125,7 @@ namespace TradingServer.Core
             else if (request.Operation == "Add")
             {
                 Order newOrder = modify.newOrder();
-                _orderbook.addOrder(newOrder);
+                _orderbook.match(newOrder);
 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side by {request.Username} at {DateTime.UtcNow}");
             }
@@ -131,7 +143,8 @@ namespace TradingServer.Core
                 // here, maybe get the order, then get the id, and then put it back in the orderbook as a new order
                 // and then try to match it
 
-                _orderbook.modifyOrder(modify);
+                _orderbook.removeOrder(modify.cancelOrder());
+                _orderbook.match(modify.newOrder());
 
                 //_logger.Debug(nameof(TradingServer), $"Ask side limits: " + askSideLimits);
                 //_logger.Debug(nameof(TradingServer), $"Bid side limits" + bidSideLimits);

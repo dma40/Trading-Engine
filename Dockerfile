@@ -1,4 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mysql:8.0
+
+ARG MYSQL_USER
+ARG MYSQL_PASSWORD
+
+ENV MYSQL_USER = ${MYSQL_USER}
+ENV MYSQL_ROOT_PASSWORD = ${MYSQL_PASSWORD}
 
 WORKDIR /TradingEngine
 
