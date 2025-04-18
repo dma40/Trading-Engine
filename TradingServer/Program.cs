@@ -64,11 +64,13 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
             Id = 600,
             Operation = "Add",
             Quantity = 500,
-            // Type = "GoodTillCancel",
+            Type = "GoodTillCancel",
             Side = "Ask",
-            Price = 320,
+            Price = 20,
             Username = "Dylan"
         };
+
+        await tradingService.ProcessOrderAsync(request);
     }
 
     else if (input == "Cancel")

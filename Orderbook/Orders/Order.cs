@@ -14,7 +14,7 @@ namespace TradingServer.Orders
             _orderCore = orderCore;
             Price = price;
             Quantity = quantity;
-            CurrentQuantity = 0; // this seems to be creating a error; should be amount of order filled
+            CurrentQuantity = quantity; // this seems to be creating a error; should be amount of order filled
             isBuySide = isBuy;
             OrderType = orderType;
         }

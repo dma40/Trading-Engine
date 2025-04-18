@@ -40,11 +40,11 @@ namespace TradingServer.OrderbookCS
                 {
                     result = fill(order);
                 
-                    if (order.remainingQuantity() > 0)
+                    if (order.CurrentQuantity > 0)
                     {
                         addOrder(order);
                     }
-                    addOrder(order);
+                    // addOrder(order);
                 }
 
                 return result;
