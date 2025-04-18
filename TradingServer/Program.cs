@@ -15,9 +15,6 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
 
     // Add a few simple tests
 
-    Console.WriteLine("Input another thing");
-    string input2 = Console.ReadLine();
-
     var orderRequest = new OrderRequest
     {
         Id = 500,
@@ -78,7 +75,7 @@ using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
     {
         var orderRequest4 = new OrderRequest
         {
-            Id = 500,
+            Id = 400,
             Operation = "Cancel",
             Username = "Dylan",
             Side = "Bid" // for this one don't take a input - instead try and find the order, and then determine its side.

@@ -10,6 +10,7 @@ using Trading;
 using TradingServer.Orders;
 using TradingServer.Instrument;
 using TradingServer.Rejects;
+using Org.BouncyCastle.Asn1;
 
 namespace TradingServer.Core 
 {
@@ -65,9 +66,8 @@ namespace TradingServer.Core
                 reason = RejectionReason.OperationNotFound;
             }
 
-            if (string.IsNullOrWhiteSpace(request.Id.ToString()) 
-                || string.IsNullOrWhiteSpace(request.Username) 
-                || string.IsNullOrWhiteSpace(request.Type))
+            else if (string.IsNullOrWhiteSpace(request.Id.ToString()) 
+                || string.IsNullOrWhiteSpace(request.Username))
             {
                 isInvalid = true;
                 reason = RejectionReason.InvalidOrEmptyArgument;
@@ -79,7 +79,7 @@ namespace TradingServer.Core
                 reason = RejectionReason.ModifyWrongSide;
             }
 
-            else if ((request.Operation == "Modify" || request.Operation == "Cancel") && _orderbook.containsOrder(request.Id))
+            else if ((request.Operation == "Modify" || request.Operation == "Cancel") && !_orderbook.containsOrder(request.Id))
             {
                 isInvalid = true;
                 reason = RejectionReason.OrderNotFound;
@@ -99,9 +99,7 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
-            // maybe somewhere set the creation time to be at 9:30 in the morning if the result comes in at after hours
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); // do this for now,
-                                                                                                                                                        // this is the only existing order type after all
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); 
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
@@ -114,17 +112,18 @@ namespace TradingServer.Core
 
             else if (now.Hour >= 16)
             {
-                // return new OrderResponse
-                // {
-                //    Id = request.Id,
-                //    Status = 403,
-                //    Message = "You cannot submit orders now, the exchange is closed. Please try again when the market reopens"
-                //};
+                return new OrderResponse
+                {
+                    Id = request.Id,
+                    Status = 403,
+                    Message = "You cannot submit orders now, the exchange is closed. Please try again when the market reopens"
+                };
             }
 
             else if (request.Operation == "Add")
             {
                 Order newOrder = modify.newOrder();
+                //_orderbook.addOrder(newOrder);
                 _orderbook.match(newOrder);
 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side by {request.Username} at {DateTime.UtcNow}");
@@ -140,27 +139,19 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Modify")
             {
-                // here, maybe get the order, then get the id, and then put it back in the orderbook as a new order
-                // and then try to match it
-
                 _orderbook.removeOrder(modify.cancelOrder());
                 _orderbook.match(modify.newOrder());
-
-                //_logger.Debug(nameof(TradingServer), $"Ask side limits: " + askSideLimits);
-                //_logger.Debug(nameof(TradingServer), $"Bid side limits" + bidSideLimits);
                 
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.UtcNow}");
             }
 
-            _logger.LogInformation(nameof(TradingServer), $"Processed {request.Id} from {request.Username} successfully");
+            // _logger.LogInformation(nameof(TradingServer), $"Processed {request.Id} from {request.Username} successfully");
 
             string askSideIds = "";
             string bidSideIds = "";
 
             string bidSideLimits = "";
             string askSideLimits = "";
-
-            // do this for additional debugging
 
             foreach (var ask in _orderbook.getAskOrders())
             {
