@@ -14,7 +14,7 @@ namespace TradingServer.Orders
             _orderCore = orderCore;
             Price = price;
             Quantity = quantity;
-            CurrentQuantity = quantity;
+            CurrentQuantity = 0; // this seems to be creating a error; should be amount of order filled
             isBuySide = isBuy;
             OrderType = orderType;
         }
@@ -102,7 +102,7 @@ namespace TradingServer.Orders
             
             if (decrease > CurrentQuantity) 
             {
-                throw new InvalidOperationException("You cannot take away more orders than are currently available!");
+                throw new InvalidOperationException("You cannot take away more orders than are currently open!");
             }
             CurrentQuantity -= decrease;
         }

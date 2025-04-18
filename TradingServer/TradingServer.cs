@@ -125,6 +125,7 @@ namespace TradingServer.Core
                 Order newOrder = modify.newOrder();
                 //_orderbook.addOrder(newOrder);
                 _orderbook.match(newOrder);
+                _logger.Debug(nameof(TradingServer), $"Quantity remaining in this order: {newOrder.remainingQuantity()}");
 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side by {request.Username} at {DateTime.UtcNow}");
             }
