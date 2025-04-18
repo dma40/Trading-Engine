@@ -36,6 +36,7 @@ namespace TradingServer.Logging
             string password = Environment.GetEnvironmentVariable("MYSQL_PASS");
             string db = $"CREATE DATABASE IF NOT EXISTS {_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
             string dbname = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
+            string dblink = $"Server=localhost;Database={dbname};User={user};Password={password}";
             string link = $"Server=localhost;User ID={user};Password={password}";
 
             string createTableRequest = @"
@@ -55,15 +56,13 @@ namespace TradingServer.Logging
                 {
                     command.ExecuteNonQueryAsync();
 
-                    string dblink = $"Server=localhost;Database={dbname};User={user};Password={password}";
-
                     var connection = new MySqlConnection(dblink);
                     using (var request = new MySqlCommand(createTableRequest, connection))
                     {
                         request.ExecuteNonQueryAsync();
                     }
                 }
-                _ = Task.Run(() => LogAsync(link, _logQueue, _ts.Token));
+                _ = Task.Run(() => LogAsync(dblink, _logQueue, _ts.Token));
             }
         }
 
