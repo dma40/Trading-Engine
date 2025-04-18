@@ -49,18 +49,24 @@ namespace TradingServer.Core
         private Tuple<bool, Reject> checkIfOrderIsInvalid(OrderRequest request)
         {
             RejectCreator creator = new RejectCreator(); 
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type));
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, 
+                                                _tradingConfig.TradingServerSettings.SecurityID, 
+                                                Order.StringToOrderType(request.Type));
 
             bool isInvalid = false;
             RejectionReason reason = RejectionReason.Unknown;
 
-            if (Order.StringToOrderType(request.Type) == OrderTypes.Market && (!string.IsNullOrWhiteSpace(request.Price.ToString()) || !string.IsNullOrWhiteSpace(request.Operation)))
+            if (Order.StringToOrderType(request.Type) == OrderTypes.Market && 
+                (!string.IsNullOrWhiteSpace(request.Price.ToString())
+                 || !string.IsNullOrWhiteSpace(request.Operation)))
             {
                 isInvalid = true;
                 reason = RejectionReason.InvalidOrEmptyArgument;
             }
 
-            if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill || (Order.StringToOrderType(request.Type) == OrderTypes.FillOrKill)) && (!string.IsNullOrEmpty(request.Operation)))
+            if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill 
+                || (Order.StringToOrderType(request.Type) == OrderTypes.FillOrKill)) 
+                && (!string.IsNullOrEmpty(request.Operation)))
             {
                 isInvalid = true;
                 reason = RejectionReason.OperationNotFound;
@@ -79,7 +85,8 @@ namespace TradingServer.Core
                 reason = RejectionReason.ModifyWrongSide;
             }
 
-            else if ((request.Operation == "Modify" || request.Operation == "Cancel") && !_orderbook.containsOrder(request.Id))
+            else if ((request.Operation == "Modify" || request.Operation == "Cancel") 
+                    && !_orderbook.containsOrder(request.Id))
             {
                 isInvalid = true;
                 reason = RejectionReason.OrderNotFound;
