@@ -6,11 +6,11 @@ using TradingServer.Instrument;
 
 namespace TradingServer.Tests
 {
-    public class OrderbookTestHarness
+    public sealed class OrderbookTestHarness
     {
         private void addSingleOrders()
         {
-            FIFOrderbook orders = new FIFOrderbook(new Security("AAPL"));
+            Orderbook orders = new Orderbook(new Security("AAPL"));
 
             IOrderCore orderCore1 = new OrderCore(100, "Dylan", "037833100", OrderTypes.GoodTillCancel);
             ModifyOrder modify1 = new ModifyOrder(orderCore1, 50, 100, true);
@@ -19,15 +19,16 @@ namespace TradingServer.Tests
             ModifyOrder modify2 = new ModifyOrder(orderCore2, 50, 100, false);
 
             orders.addOrder(modify1.newOrder());
-            orders.addOrder(modify2.newOrder());
+            orders.addOrder(modify2.newOrder()); // add method to get ids, check if the IDs are correct and/or references correct
 
             Console.WriteLine("ADD SINGLE ORDER TEST A: " + true + '\n');
             Console.WriteLine("ADD SINGLE ORDER TEST B: " + false + '\n');
+            Console.WriteLine("ADD SINGLE ORDER TEST C" + true + "\n");
         }
 
         private void removeSingleOrders()
         {
-            Orderbook orders = new FIFOrderbook(new Security("AAPL"));
+            Orderbook orders = new Orderbook(new Security("AAPL"));
 
             Console.WriteLine("REMOVE SINGLE ORDER TEST A: " + true + '\n');
             Console.WriteLine("REMOVE SINGLE ORDER TEST B: " + false + '\n');
@@ -40,25 +41,12 @@ namespace TradingServer.Tests
             
         }
 
-        private void addNearEnds()
-        {
-            Console.WriteLine("ADD NEAR START TEST A: " + true + '\n');
-            Console.WriteLine("ADD NEAR END TEST B: " + false + '\n');
-            Console.WriteLine("ADD NEAR START TEST C: " + true + '\n');
-            Console.WriteLine("ADD NEAR END TEST D: " + false + '\n');
-        }
-
         private void removeNearEnds()
         {
 
         }
 
         private void modifyNearEnds()
-        {
-
-        }
-
-        private void addInMiddle()
         {
 
         }
@@ -114,11 +102,14 @@ namespace TradingServer.Tests
             removeSingleOrders();
             modifySingleOrders();
 
-            addNearEnds();
+            removeNearMiddle();
+            modifyNearMiddle();
+
             removeNearEnds();
             modifyNearEnds();
 
             testMatchBasic();
+            testMatchWithResting();
             testMatchWithFillAndKill();
             testMatchWithFillOrKill();
             testMatchwithMarket();
