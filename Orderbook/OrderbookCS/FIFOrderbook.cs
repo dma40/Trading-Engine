@@ -44,7 +44,6 @@ namespace TradingServer.OrderbookCS
                     {
                         addOrder(order);
                     }
-                    // addOrder(order);
                 }
 
                 return result;

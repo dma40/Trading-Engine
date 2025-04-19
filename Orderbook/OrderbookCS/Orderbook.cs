@@ -39,8 +39,11 @@ namespace TradingServer.OrderbookCS
         {
             lock (_ordersLock) 
             {
-                var baseLimit = new Limit(order.Price);
-                addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry orderbookentry)) 
+                {
+                    var baseLimit = new Limit(order.Price);
+                    addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+                }
             }
         }
         
@@ -389,7 +392,7 @@ namespace TradingServer.OrderbookCS
                                                                     askPtr.queuePosition(), askPtr.queuePosition());
 
                                 askPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
-                                order.DecreaseQuantity(order.CurrentQuantity); // check if this does anything weird
+                                order.DecreaseQuantity(order.CurrentQuantity); 
 
                                 Trade transaction = new Trade(incoming, resting);
 
@@ -410,7 +413,7 @@ namespace TradingServer.OrderbookCS
                                                                 askPtr.CurrentOrder.Username, 
                                                                 askPtr.CurrentOrder.SecurityID, askPtr.queuePosition(), 0);
 
-                                askPtr.CurrentOrder.DecreaseQuantity(quantity); // check this also
+                                askPtr.CurrentOrder.DecreaseQuantity(quantity); 
                                 order.DecreaseQuantity(quantity);
 
                                 Trade transaction = new Trade(incoming, resting);

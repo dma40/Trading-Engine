@@ -1,11 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-FROM mysql:8.0
+FROM mysql:8.0.34-slim
 
-ARG MYSQL_USER
-ARG MYSQL_PASSWORD
+RUN apt-get update && apt-get upgrade -y && apt-get clean
 
-ENV MYSQL_USER = ${MYSQL_USER}
-ENV MYSQL_ROOT_PASSWORD = ${MYSQL_PASSWORD}
+USER mysql
 
 WORKDIR /TradingEngine
 
@@ -30,10 +28,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /TradingEngine
 EXPOSE 12000
 
-# next steps:
-# release the project, then add the appropriate copy statement here
-
 COPY --from=build /TradingEngine/publish .
 
-# verify that this file works right
 ENTRYPOINT ["dotnet", "TradingServer.dll"]

@@ -125,15 +125,20 @@ namespace TradingServer.Core
             else if (result.Item1)
             {
                 _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(result.Item2.reason));
+
+                return new OrderResponse
+                {
+                    Id = request.Id,
+                    Status = 500,
+                    Message = RejectCreator.RejectReasonToString(result.Item2.reason)
+                };
             }
 
             else if (request.Operation == "Add")
             {
                 Order newOrder = modify.newOrder();
-                _orderbook.addOrder(newOrder);
-                //_orderbook.match(newOrder);
-                _logger.Debug(nameof(TradingServer), $"Quantity remaining in this order: {newOrder.remainingQuantity()}");
-
+                _orderbook.match(newOrder);
+                
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side by {request.Username} at {DateTime.UtcNow}");
             }
 
