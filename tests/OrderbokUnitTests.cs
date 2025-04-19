@@ -6,7 +6,7 @@ using TradingServer.Instrument;
 
 namespace TradingServer.Tests
 {
-    public sealed class OrderbookTestHarness
+    public sealed class OrderbookUnitTests
     {
         // just check each of the limits, and then check if each of the orders has the same reference - this should do the trick
         private static void addSingleOrders()
@@ -103,6 +103,8 @@ namespace TradingServer.Tests
 
         public static void runTests()
         {
+            Console.WriteLine("Unit test results: \n");
+
             addSingleOrders();
             removeSingleOrders();
             modifySingleOrders();
