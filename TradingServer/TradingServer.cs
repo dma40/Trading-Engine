@@ -112,12 +112,7 @@ namespace TradingServer.Core
 
             Tuple<bool, Reject> result = checkIfOrderIsInvalid(request);
 
-            if (result.Item1)
-            {
-                _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(result.Item2.reason));
-            }
-
-            else if (now.Hour >= 16)
+            if (now.Hour >= 16)
             {
                 return new OrderResponse
                 {
@@ -125,6 +120,11 @@ namespace TradingServer.Core
                     Status = 403,
                     Message = "You cannot submit orders now, the exchange is closed. Please try again when the market reopens"
                 };
+            }
+
+            else if (result.Item1)
+            {
+                _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(result.Item2.reason));
             }
 
             else if (request.Operation == "Add")
@@ -152,40 +152,7 @@ namespace TradingServer.Core
                 
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.UtcNow}");
             }
-
-            // _logger.LogInformation(nameof(TradingServer), $"Processed {request.Id} from {request.Username} successfully");
-
-            string askSideIds = "";
-            string bidSideIds = "";
-
-            string bidSideLimits = "";
-            string askSideLimits = "";
-
-            foreach (var ask in _orderbook.getAskOrders())
-            {
-                askSideIds += $" {ask.CurrentOrder.OrderID} ";
-            }
-
-            foreach (var bid in _orderbook.getBidOrders())
-            {
-                bidSideIds += $" {bid.CurrentOrder.OrderID} ";
-            }
-
-            foreach (var ask in _orderbook.getAskLimits())
-            {
-                askSideLimits += $" {ask.Price} ";
-            }
-
-            foreach (var bid in _orderbook.getBidLimits())
-            {
-                bidSideLimits += $" {bid.Price} ";
-            }
-
-            _logger.Debug(nameof(TradingServer), $"Bid orders in the orderbook: " + bidSideIds);
-            _logger.Debug(nameof(TradingServer), $"Ask orders in the orderbook: " + askSideIds);
-            _logger.Debug(nameof(TradingServer), $"Ask side limits: " + askSideLimits);
-            _logger.Debug(nameof(TradingServer), $"Bid side limits" + bidSideLimits);
-            
+ 
             await Task.Delay(200);
 
             return new OrderResponse

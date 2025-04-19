@@ -12,6 +12,15 @@ namespace TradingServer.Tests
         {
             FIFOrderbook orders = new FIFOrderbook(new Security("AAPL"));
 
+            IOrderCore orderCore1 = new OrderCore(100, "Dylan", "037833100", OrderTypes.GoodTillCancel);
+            ModifyOrder modify1 = new ModifyOrder(orderCore1, 50, 100, true);
+
+            IOrderCore orderCore2 = new OrderCore(200, "Dylan", "037833100", OrderTypes.GoodForDay);
+            ModifyOrder modify2 = new ModifyOrder(orderCore2, 50, 100, false);
+
+            orders.addOrder(modify1.newOrder());
+            orders.addOrder(modify2.newOrder());
+
             Console.WriteLine("ADD SINGLE ORDER TEST A: " + true + '\n');
             Console.WriteLine("ADD SINGLE ORDER TEST B: " + false + '\n');
         }
