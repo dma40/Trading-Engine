@@ -420,7 +420,7 @@ namespace TradingServer.OrderbookCS
                                 if (askPtr.next != null)
                                 {
                                     askPtr = askPtr.next;
-                                    removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr, _orders);    
+                                    removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);    
                                 }
 
                                 else 
