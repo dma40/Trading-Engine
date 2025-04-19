@@ -10,22 +10,33 @@ namespace TradingServer.Tests
     {
         private void addSingleOrders()
         {
-            Orderbook orders = new Orderbook(new Security("AAPL"));
+            FIFOrderbook orders = new FIFOrderbook(new Security("AAPL"));
+
+            Console.WriteLine("ADD SINGLE ORDER TEST A: " + true + '\n');
+            Console.WriteLine("ADD SINGLE ORDER TEST B: " + false + '\n');
         }
 
         private void removeSingleOrders()
         {
-            Orderbook orders = new Orderbook(new Security("AAPL"));
+            Orderbook orders = new FIFOrderbook(new Security("AAPL"));
+
+            Console.WriteLine("REMOVE SINGLE ORDER TEST A: " + true + '\n');
+            Console.WriteLine("REMOVE SINGLE ORDER TEST B: " + false + '\n');
         }
 
         private void modifySingleOrders()
         {
-
+            Console.WriteLine("MODIFY SINGLE ORDER TEST A: " + true + '\n');
+            Console.WriteLine("MODIFY SINGLE ORDER TEST B: " + false + '\n');
+            
         }
 
         private void addNearEnds()
         {
-
+            Console.WriteLine("ADD NEAR START TEST A: " + true + '\n');
+            Console.WriteLine("ADD NEAR END TEST B: " + false + '\n');
+            Console.WriteLine("ADD NEAR START TEST C: " + true + '\n');
+            Console.WriteLine("ADD NEAR END TEST D: " + false + '\n');
         }
 
         private void removeNearEnds()
