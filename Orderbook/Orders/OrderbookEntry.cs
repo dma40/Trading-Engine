@@ -1,9 +1,6 @@
 
 namespace TradingServer.Orders 
 {
-    // Limit class that does the following:
-    // - Stores orders sequentially based off of when they were added (important to matching orders in FIFO orderbooks)
-    // - get how many orders exist at this price level
     public class Limit 
     {
         public Limit(long price)

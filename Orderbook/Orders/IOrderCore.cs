@@ -1,6 +1,6 @@
 ﻿
-namespace TradingServer.Orders {
-
+namespace TradingServer.Orders 
+{
     public interface IOrderCore
     {
         public long OrderID { get; }

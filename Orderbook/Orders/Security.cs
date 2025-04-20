@@ -8,6 +8,6 @@ namespace TradingServer.Instrument
             name = Name;
         }
 
-        public string name { get; private set; } // the name of the security, e.g. "Apple Inc."
+        public string name { get; private set; }
     }
 }

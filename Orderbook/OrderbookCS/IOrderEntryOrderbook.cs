@@ -2,8 +2,6 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    // This adds a level of permission in that we can change the orderbook, 
-    // adding a level of permission from the IReadOnlyOrderbook
     public interface IOrderEntryOrderbook: IReadOnlyOrderbook
     {
         void addOrder(Order order);

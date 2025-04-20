@@ -28,7 +28,6 @@ namespace TradingServer.Orders
 
         public Order newOrder() 
         {
-            // return new Order(_orderCore, ModifyPrice, ModifyQuantity, isBuySide);
             return new Order(this);
         }
     }

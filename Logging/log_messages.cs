@@ -1,7 +1,5 @@
 ﻿using System;
 
-// Extra: DBLogger, ConsoleLogger
-
 namespace TradingServer.Logging 
 {
 
@@ -16,7 +14,8 @@ namespace TradingServer.Logging
     public enum LoggerType 
     {
         Text,
-        Database
-        // Trace
+        Database,
+        Console,
+        Trace
     }
 }

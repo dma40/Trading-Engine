@@ -1,7 +1,6 @@
 
 namespace TradingServer.Orders 
 {
-    // we should also probably store when a order came into the orderbook
     public class Order: IOrderCore 
     {
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
@@ -14,7 +13,7 @@ namespace TradingServer.Orders
             _orderCore = orderCore;
             Price = price;
             Quantity = quantity;
-            CurrentQuantity = quantity; // this seems to be creating a error; should be amount of order filled
+            CurrentQuantity = quantity;
             isBuySide = isBuy;
             OrderType = orderType;
         }
@@ -90,16 +89,6 @@ namespace TradingServer.Orders
 
         public void DecreaseQuantity(uint decrease) 
         {
-            // Removes the number of securities exchanged by this order. In the LimitOrderbook, we will
-            // use this frequently because we will need to match orders, which decreases the amount of 
-            // quantity available for a given order.
-
-            // Careful! When dealing with uints, if we decrease
-            // by more than the existing quantity, it "loops over" to the 
-            // maximum value of a unsigned int and subtracts from that resultant quantity,
-            // meaning that we need to prevent negative prices from occurring - this can 
-            // lead to serious consequences. 
-            
             if (decrease > CurrentQuantity) 
             {
                 throw new InvalidOperationException("You cannot take away more orders than are currently open!");

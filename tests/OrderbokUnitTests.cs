@@ -8,7 +8,6 @@ namespace TradingServer.Tests
 {
     public sealed class OrderbookUnitTests
     {
-        // just check each of the limits, and then check if each of the orders has the same reference - this should do the trick
         private static void addSingleOrders()
         {
             Orderbook orders = new Orderbook(new Security("test_security"));
@@ -24,7 +23,7 @@ namespace TradingServer.Tests
             Order order2 = modify2.newOrder();
 
             orders.addOrder(order1);
-            orders.addOrder(order2); // add method to get ids, check if the IDs are correct and/or references correct
+            orders.addOrder(order2); 
 
             Console.WriteLine("ADD SINGLE ORDER TEST A: " + true + '\n');
             Console.WriteLine("ADD SINGLE ORDER TEST B: " + false + '\n');
