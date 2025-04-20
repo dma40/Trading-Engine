@@ -1,9 +1,4 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-FROM mysql:8.0.34-slim
-
-RUN apt-get update && apt-get upgrade -y && apt-get clean
-
-USER mysql
 
 WORKDIR /TradingEngine
 

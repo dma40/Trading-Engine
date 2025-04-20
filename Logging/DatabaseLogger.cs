@@ -36,8 +36,8 @@ namespace TradingServer.Logging
             string password = Environment.GetEnvironmentVariable("MYSQL_PASS");
             string db = $"CREATE DATABASE IF NOT EXISTS {_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
             string dbname = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
-            string dblink = $"Server=localhost;Database={dbname};User={user};Password={password}";
-            string link = $"Server=localhost;User ID={user};Password={password}";
+            string dblink = $"Server=host.docker.internal;Database={dbname};User={user};Password={password}";
+            string link = $"Server=host.docker.internal;User ID={user};Password={password}";
 
             string createTableRequest = @"
             CREATE TABLE IF NOT EXISTS LogInformation (
