@@ -19,7 +19,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
-    <ProjectReference Include="../Logging/Logging.csproj" />
+    <ProjectReference Include="..\Logging\Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-  <ProjectReference Include="../Logging/Logging.csproj" />
+  <ProjectReference Include="..\Logging\Logging.csproj" />
   <ProjectReference Include="..\Orderbook\OrderbookCS\OrderbookCS.csproj" />
   <ProjectReference Include="..\OrderHandlers\OrderHandlers.csproj" />
   <ProjectReference Include="..\TradingServices\TradingServices.csproj" />

@@ -10,19 +10,6 @@ namespace TradingServer.Logging
 
         public TextLogger(IOptions<LoggerConfiguration> logConfig): base() 
         {
-            /* have the hard-coded initialization on hand if necessary
-            var log = new LoggerConfiguration 
-            {
-                LoggerType = LoggerType.Text,
-                TextLoggerConfiguration = new TextLoggerConfiguration 
-                {
-                    Directory = "/Users/dylan.ma/Documents/Trading-Engine",
-                    Filename = "TradingLogFile",
-                    FileExtension = ".log"
-                }
-            };
-            */
-
             _logConfig = logConfig.Value ?? throw new ArgumentNullException();
             if (_logConfig.LoggerType != LoggerType.Text) 
             {
