@@ -2,9 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TradingServer.Core.Configuration;
 using TradingServer.Logging;
+using TradingServer.Logging.LoggingConfiguration;
 using TradingServer.Handlers;
 
 using Trading;
+using Microsoft.Extensions.Configuration;
 
 namespace TradingServer.Core;
 
@@ -16,12 +18,10 @@ public class TradingHostBuilder
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
 
         services.AddSingleton<TradingClient>(); 
-        // This works because of how ITradingServer is resolved at runtime
-
         services.AddSingleton<ITextLogger, TextLogger>();
         services.AddSingleton<ITradingServer, TradingServer>();
 
-        services.AddHostedService<TradingServer>(); // this is because TradingServer is a hosted service
+        services.AddHostedService<TradingServer>();
 
         services.AddGrpc();
     })

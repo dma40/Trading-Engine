@@ -32,8 +32,8 @@ namespace TradingServer.Logging
 
             DateTime now = DateTime.UtcNow;
 
-            string user = Environment.GetEnvironmentVariable("MYSQL_USER");
-            string password = Environment.GetEnvironmentVariable("MYSQL_PASS");
+            string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
+            string? password = Environment.GetEnvironmentVariable("MYSQL_PASS");
             string db = $"CREATE DATABASE IF NOT EXISTS {_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
             string dbname = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
             string dblink = $"Server=host.docker.internal;Database={dbname};User={user};Password={password}";
