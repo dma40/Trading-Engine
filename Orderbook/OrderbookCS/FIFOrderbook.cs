@@ -36,6 +36,11 @@ namespace TradingServer.OrderbookCS
                     result = fill(order);
                 }
 
+                else if (order.OrderType == OrderTypes.PostOnly)
+                {
+                    addOrder(order);
+                }
+
                 else 
                 {
                     result = fill(order);
@@ -50,7 +55,6 @@ namespace TradingServer.OrderbookCS
             }
         }
     
-
         private readonly Security _security;
     }
 }
