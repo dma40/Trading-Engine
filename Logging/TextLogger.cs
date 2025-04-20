@@ -10,6 +10,7 @@ namespace TradingServer.Logging
 
         public TextLogger(IOptions<LoggerConfiguration> logConfig): base() 
         {
+            /* have the hard-coded initialization on hand if necessary
             var log = new LoggerConfiguration 
             {
                 LoggerType = LoggerType.Text,
@@ -20,8 +21,9 @@ namespace TradingServer.Logging
                     FileExtension = ".log"
                 }
             };
+            */
 
-            _logConfig = log ?? throw new ArgumentNullException();
+            _logConfig = logConfig.Value ?? throw new ArgumentNullException();
             if (_logConfig.LoggerType != LoggerType.Text) 
             {
                 throw new InvalidOperationException("You can't initialize a TextLogger in this way. That is the wrong type");

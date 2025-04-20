@@ -1,6 +1,7 @@
 using System;
 
-namespace TradingServer.Logging.LoggingConfiguration {
+namespace TradingServer.Logging.LoggingConfiguration 
+{
     public class LoggerConfiguration 
     {
         public LoggerType LoggerType { get; set; }

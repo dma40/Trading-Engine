@@ -12,18 +12,7 @@ namespace TradingServer.Logging
 
         public DatabaseLogger(IOptions<LoggerConfiguration> logConfig)
         {
-            var log = new LoggerConfiguration 
-            {
-                LoggerType = LoggerType.Database,
-                TextLoggerConfiguration = new TextLoggerConfiguration 
-                {
-                    Directory = "/Users/dylan.ma/Documents/Trading-Engine",
-                    Filename = "TradingLogDatabase",
-                    FileExtension = ".log"
-                }
-            };
-
-            _logConfig = log ?? throw new ArgumentNullException();
+            _logConfig = logConfig.Value ?? throw new ArgumentNullException();
             
             if (_logConfig.LoggerType != LoggerType.Database) 
             {
