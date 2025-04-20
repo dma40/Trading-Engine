@@ -15,10 +15,11 @@ public class TradingHostBuilder
     public static IHost BuildTradingServer() => Host.CreateDefaultBuilder().ConfigureServices((context, services) =>
     {
         services.AddOptions();
+        
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
         services.Configure<LoggerConfiguration>(context.Configuration.GetSection(nameof(LoggerConfiguration)));
 
-        LoggerConfiguration logConfig = context.Configuration.GetSection(nameof(LoggerConfiguration)).Get<LoggerConfiguration>();
+        // LoggerConfiguration logConfig = context.Configuration.GetSection(nameof(LoggerConfiguration)).Get<LoggerConfiguration>();
 
         //if (logConfig.LoggerType == LoggerType.Text)
         //{
