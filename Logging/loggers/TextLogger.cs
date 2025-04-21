@@ -17,6 +17,10 @@ namespace TradingServer.Logging
             }
             
             var now = DateTime.Now;
+            if (_logConfig.TextLoggerConfiguration == null || string.IsNullOrEmpty(_logConfig.TextLoggerConfiguration.Directory))
+            {
+                throw new InvalidOperationException("TextLoggerConfiguration or its Directory is not properly configured.");
+            }
             string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory, $"{now:yyyy-MM-dd}");
             string filename = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:HH-mm-ss}";
             string logbase = Path.ChangeExtension(filename, _logConfig.TextLoggerConfiguration.FileExtension);
@@ -52,7 +56,7 @@ namespace TradingServer.Logging
         protected override void Log(message_types type, string module, string message)
         {
             _logQueue.Post(new LogInformation(type, module, message, DateTime.Now, 
-            Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name));
+            Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name ?? "UnnamedThread"));
         }
 
         private static string FormatLogItem(LogInformation log) 
