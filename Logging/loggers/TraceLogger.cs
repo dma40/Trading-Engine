@@ -61,7 +61,7 @@ namespace TradingServer.Logging
             }
         }
 
-        protected async Task monitorThreadChanges()
+        private async Task monitorThreadChanges()
         {
             while (true)
             {
@@ -71,7 +71,8 @@ namespace TradingServer.Logging
 
                     foreach (ProcessThread thread in currentProcess.Threads)
                     {
-                        try {
+                        try 
+                        {
                             if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsFreeBSD())
                             {
                                 Log(message_types.LogInformation, $"{thread.PriorityLevel}", $"{thread.ThreadState}");
