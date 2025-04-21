@@ -11,6 +11,7 @@ namespace TradingServer.Logging
         {
 
         }
+        
         public void Debug(string module, string message) => Log(message_types.Debug, module, message);
         public void Debug(string module, Exception e) => Log(message_types.Debug, module, $"{e}");
         public void LogInformation(string module, string message) => Log(message_types.LogInformation, module, message);

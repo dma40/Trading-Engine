@@ -19,7 +19,20 @@ public class TradingHostBuilder
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
         services.Configure<LoggerConfiguration>(context.Configuration.GetSection(nameof(LoggerConfiguration)));
 
-        LoggerConfiguration logConfig = context.Configuration.GetSection(nameof(LoggerConfiguration)).Get<LoggerConfiguration>();
+        var defaultConfig = new LoggerConfiguration
+        {
+            LoggerType = LoggerType.Text,
+
+            TextLoggerConfiguration = new TextLoggerConfiguration
+            {
+                Directory = "../Trading-Engine",
+                Filename = "TradingLogFile",
+                FileExtension = ".log",
+            }
+        };
+
+        LoggerConfiguration logConfig = context.Configuration.GetSection(nameof(LoggerConfiguration)).
+                                        Get<LoggerConfiguration>() ?? defaultConfig;
 
         if (logConfig.LoggerType == LoggerType.Text)
         {

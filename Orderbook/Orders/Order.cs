@@ -83,7 +83,6 @@ namespace TradingServer.Orders
 
         public void IncreaseQuantity(uint additional) 
         {
-            // Add some more to your order. 
             CurrentQuantity += additional;
         }
 
