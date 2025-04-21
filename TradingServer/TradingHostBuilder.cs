@@ -51,7 +51,7 @@ public class TradingHostBuilder
 
         if (logConfig.LoggerType == LoggerType.Trace)
         {
-            
+            services.AddSingleton<ITextLogger, TraceLogger>();
         }
 
         services.AddSingleton<TradingClient>(); 

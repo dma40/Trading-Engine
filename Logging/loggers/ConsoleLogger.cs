@@ -46,10 +46,8 @@ namespace TradingServer.Logging
 
         protected override void Log(message_types type, string module, string message)
         {
-#pragma warning disable CS8604 // Possible null reference argument.
             _logQueue.Post(new LogInformation(type, module, message, DateTime.Now, 
             Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name));
-#pragma warning restore CS8604 // Possible null reference argument.
         }
 
         ~ConsoleLogger() 
