@@ -8,6 +8,7 @@ namespace TradingServer.Logging
     public class ConsoleLogger: AbstractLogger, ITextLogger
     {
         private readonly LoggerConfiguration _logConfig;
+        
         public ConsoleLogger(IOptions<LoggerConfiguration> logConfig): base()
         {
             _logConfig = logConfig.Value ?? throw new ArgumentNullException("This cannot be null");
