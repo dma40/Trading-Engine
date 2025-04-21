@@ -1,4 +1,3 @@
-
 namespace TradingServer.Rejects 
 {
     public enum RejectionReason 
@@ -7,6 +6,7 @@ namespace TradingServer.Rejects
         OrderNotFound,
         ModifyWrongSide,
         OperationNotFound,
-        InvalidOrEmptyArgument
+        InvalidOrUnknownArgument,
+        EmptyOrNullArgument
     }
 }

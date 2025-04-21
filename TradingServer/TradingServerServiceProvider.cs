@@ -1,4 +1,3 @@
-
 namespace TradingServer.Core 
 {
     public static class TradingServerServiceProvider 

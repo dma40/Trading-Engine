@@ -1,4 +1,3 @@
-
 namespace TradingServer.Orders 
 {
     public class ModifyOrder: IOrderCore 

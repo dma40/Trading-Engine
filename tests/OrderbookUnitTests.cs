@@ -1,5 +1,4 @@
-﻿
-using TradingServer.OrderbookCS;
+﻿using TradingServer.OrderbookCS;
 using TradingServer.Orders;
 
 using TradingServer.Instrument;

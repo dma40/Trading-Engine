@@ -60,7 +60,7 @@ namespace TradingServer.Core
                  || !string.IsNullOrWhiteSpace(request.Operation)))
             {
                 isInvalid = true;
-                reason = RejectionReason.InvalidOrEmptyArgument;
+                reason = RejectionReason.EmptyOrNullArgument;
             }
 
             if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill 
@@ -75,7 +75,7 @@ namespace TradingServer.Core
                 || string.IsNullOrWhiteSpace(request.Username))
             {
                 isInvalid = true;
-                reason = RejectionReason.InvalidOrEmptyArgument;
+                reason = RejectionReason.EmptyOrNullArgument;
             }
 
             else if (request.Operation == "Add" && _orderbook.containsOrder(request.Id))
@@ -94,7 +94,7 @@ namespace TradingServer.Core
             else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
             {
                 isInvalid = true;
-                reason = RejectionReason.InvalidOrEmptyArgument;
+                reason = RejectionReason.InvalidOrUnknownArgument;
             }
 
             Reject reject = RejectCreator.GenerateRejection(orderCore, reason);

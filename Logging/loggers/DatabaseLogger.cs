@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 
 namespace TradingServer.Logging
 {
-    public class DatabaseLogger: AbstractLogger, ITextLogger
+    public class DatabaseLogger: AbstractLogger, ITextLogger, IDisposable
     {
         private readonly LoggerConfiguration _logConfig;
 
@@ -16,7 +16,7 @@ namespace TradingServer.Logging
             
             if (_logConfig.LoggerType != LoggerType.Database) 
             {
-                throw new InvalidOperationException("You can't initialize a DatabaseLogger in this way. That is the wrong type");
+                throw new InvalidOperationException("You can't initialize a DatabaseLogger in this way");
             }
 
             DateTime now = DateTime.UtcNow;

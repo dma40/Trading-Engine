@@ -1,5 +1,4 @@
-﻿
-using Trading;
+﻿using Trading;
 
 namespace TradingServer.Handlers
 {

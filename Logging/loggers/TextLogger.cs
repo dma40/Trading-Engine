@@ -11,16 +11,19 @@ namespace TradingServer.Logging
         public TextLogger(IOptions<LoggerConfiguration> logConfig): base() 
         {
             _logConfig = logConfig.Value ?? throw new ArgumentNullException();
+
             if (_logConfig.LoggerType != LoggerType.Text) 
             {
                 throw new InvalidOperationException("You can't initialize a TextLogger in this way. That is the wrong type");
             }
             
             var now = DateTime.Now;
+
             if (_logConfig.TextLoggerConfiguration == null || string.IsNullOrEmpty(_logConfig.TextLoggerConfiguration.Directory))
             {
                 throw new InvalidOperationException("TextLoggerConfiguration or its Directory is not properly configured.");
             }
+
             string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory, $"{now:yyyy-MM-dd}");
             string filename = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:HH-mm-ss}";
             string logbase = Path.ChangeExtension(filename, _logConfig.TextLoggerConfiguration.FileExtension);
@@ -66,7 +69,7 @@ namespace TradingServer.Logging
 
         ~TextLogger() 
         {
-            Dispose(false);
+            Dispose();
         }
 
         public void Dispose() 

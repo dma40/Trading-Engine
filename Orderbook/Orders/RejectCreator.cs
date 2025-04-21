@@ -1,4 +1,3 @@
-
 using TradingServer.Orders;
 
 namespace TradingServer.Rejects 
@@ -17,9 +16,9 @@ namespace TradingServer.Rejects
                 return "Unknown";
             }
 
-            else if (reject == RejectionReason.InvalidOrEmptyArgument)
+            else if (reject == RejectionReason.EmptyOrNullArgument)
             {
-                return "InvalidOrEmptyArgument";
+                return "EmptyOrNullArgument";
             }
 
             else if (reject == RejectionReason.ModifyWrongSide)
@@ -32,9 +31,14 @@ namespace TradingServer.Rejects
                 return "OrderNotFound";
             }
 
+            else if (reject == RejectionReason.InvalidOrUnknownArgument)
+            {
+                return "InvalidOrUnknownArgument";
+            }
+
             else 
             {
-                return "OrderNotFound";
+                return "Unknown";
             }
         }
     }

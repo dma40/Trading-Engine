@@ -1,5 +1,4 @@
-﻿
-namespace TradingServer.Orders 
+﻿namespace TradingServer.Orders 
 {
     public interface IOrderCore
     {

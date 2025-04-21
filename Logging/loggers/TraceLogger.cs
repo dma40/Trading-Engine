@@ -5,7 +5,7 @@ using TradingServer.Logging.LoggingConfiguration;
 
 namespace TradingServer.Logging
 {
-    public class TraceLogger: AbstractLogger, ITextLogger
+    public class TraceLogger: AbstractLogger, ITextLogger, IDisposable
     {
         private readonly LoggerConfiguration _logConfig;
 
@@ -24,7 +24,6 @@ namespace TradingServer.Logging
             }
 
             DateTime now = DateTime.UtcNow;
-
 
             string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory 
                             ?? throw new NullReferenceException(), $"{now:yyyy-MM-dd}");
@@ -113,7 +112,7 @@ namespace TradingServer.Logging
 
         ~TraceLogger() 
         {
-            Dispose(false);
+            Dispose();
         }
 
         public void Dispose() 

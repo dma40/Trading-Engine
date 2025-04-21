@@ -1,5 +1,4 @@
-﻿
-namespace TradingServer.OrderbookCS
+﻿namespace TradingServer.OrderbookCS
 {
     public interface IReadOnlyOrderbook 
     {

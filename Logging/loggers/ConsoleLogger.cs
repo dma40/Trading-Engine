@@ -5,7 +5,7 @@ using TradingServer.Logging.LoggingConfiguration;
 
 namespace TradingServer.Logging
 {
-    public class ConsoleLogger: AbstractLogger, ITextLogger
+    public class ConsoleLogger: AbstractLogger, ITextLogger, IDisposable
     {
         private readonly LoggerConfiguration _logConfig;
 

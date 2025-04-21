@@ -10,9 +10,7 @@ namespace TradingServer.Logging.LoggingConfiguration
     public class TextLoggerConfiguration 
     {
         public string? Directory { get; set; }
-
         public string? Filename { get; set; }
-
         public string? FileExtension { get; set; }
     }
 }

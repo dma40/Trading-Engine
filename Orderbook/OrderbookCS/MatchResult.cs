@@ -14,6 +14,6 @@ namespace TradingServer.OrderbookCS
             result.Add(trade);
         }
 
-        public List<Trade> result;
+        public List<Trade> result { get; }
     }
 }
