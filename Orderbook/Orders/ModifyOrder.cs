@@ -9,8 +9,8 @@ namespace TradingServer.Orders
             ModifyPrice = price;
             ModifyQuantity = quantity;
             isBuySide = isBuy;
-
         }
+        
         public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
         public long OrderID => _orderCore.OrderID;

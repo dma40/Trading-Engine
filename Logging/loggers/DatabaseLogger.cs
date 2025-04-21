@@ -76,7 +76,6 @@ namespace TradingServer.Logging
             {
                 Console.WriteLine("Something went wrong!");
             }
-
         }
 
         protected override void Log(message_types type, string module, string message)

@@ -1,6 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
 
 namespace TradingServer.Logging 
 {

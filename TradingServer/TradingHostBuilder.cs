@@ -12,12 +12,15 @@ namespace TradingServer.Core;
 
 public class TradingHostBuilder 
 {
-    public static IHost BuildTradingServer() => Host.CreateDefaultBuilder().ConfigureServices((context, services) =>
+    public static IHost BuildTradingServer() => Host.CreateDefaultBuilder().
+    ConfigureServices((context, services) =>
     {
         services.AddOptions();
         
-        services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
-        services.Configure<LoggerConfiguration>(context.Configuration.GetSection(nameof(LoggerConfiguration)));
+        services.Configure<TradingServerConfiguration>(context.Configuration.
+                                                    GetSection(nameof(TradingServerConfiguration)));
+        services.Configure<LoggerConfiguration>(context.Configuration.
+                                                    GetSection(nameof(LoggerConfiguration)));
 
         var defaultConfig = new LoggerConfiguration
         {

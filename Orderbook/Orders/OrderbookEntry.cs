@@ -22,8 +22,10 @@ namespace TradingServer.Orders
                 {
                     count++;
                 }
+
                 headPointer = headPointer.next; 
             }
+
             return count;
         }
 
@@ -60,6 +62,7 @@ namespace TradingServer.Orders
                 queuePosition++;
                 headPointer = headPointer.next;
             }
+            
             return records;
         }
 

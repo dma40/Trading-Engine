@@ -10,7 +10,6 @@ using Trading;
 using TradingServer.Orders;
 using TradingServer.Instrument;
 using TradingServer.Rejects;
-using Org.BouncyCastle.Asn1;
 
 namespace TradingServer.Core 
 {
@@ -118,7 +117,8 @@ namespace TradingServer.Core
                 {
                     Id = request.Id,
                     Status = 403,
-                    Message = "You cannot submit orders now, the exchange is closed. Please try again when the market reopens"
+                    Message = "You cannot submit orders now, the exchange is closed.\n" + 
+                    "Please try again when the market reopens at 9:30 AM"
                 };
             }
 
@@ -139,7 +139,8 @@ namespace TradingServer.Core
                 Order newOrder = modify.newOrder();
                 _orderbook.match(newOrder);
                 
-                _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side} side by {request.Username} at {DateTime.UtcNow}");
+                _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
+                " side by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Cancel")
@@ -147,7 +148,8 @@ namespace TradingServer.Core
                 CancelOrder cancelOrder = modify.cancelOrder();
                 _orderbook.removeOrder(cancelOrder);
 
-                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id} by {request.Username} at {DateTime.UtcNow}");
+                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
+                " by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Modify")
@@ -155,7 +157,8 @@ namespace TradingServer.Core
                 _orderbook.removeOrder(modify.cancelOrder());
                 _orderbook.match(modify.newOrder());
                 
-                _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side} by {request.Username} at {DateTime.UtcNow}");
+                _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
+                 " by {request.Username} at {DateTime.UtcNow}");
             }
  
             await Task.Delay(200);
