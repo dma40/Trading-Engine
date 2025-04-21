@@ -27,7 +27,8 @@ namespace TradingServer.Logging
             DateTime now = DateTime.UtcNow;
 
 
-            string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory, $"{now:yyyy-MM-dd}");
+            string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory 
+                            ?? throw new NullReferenceException(), $"{now:yyyy-MM-dd}");
             string filename = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:HH-mm-ss}";
             string logbase = Path.ChangeExtension(filename, _logConfig.TextLoggerConfiguration.FileExtension);
 
