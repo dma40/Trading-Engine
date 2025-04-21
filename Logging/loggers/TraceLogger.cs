@@ -40,33 +40,6 @@ namespace TradingServer.Logging
             _ = Task.Run(() => LogAsync(filepath, _logQueue, _ts.Token));
         }
 
-        ~TraceLogger() 
-        {
-            Dispose(false);
-        }
-
-        public void Dispose() 
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool dispose) 
-        {
-            if (_disposed) 
-            {
-                return;
-            }
-
-            _disposed = true;
-
-            if (dispose) 
-            {
-                _ts.Cancel();
-                _ts.Dispose();
-            }
-        }
-
         private async Task LogAsync(string filepath, BufferBlock<LogInformation> logs, CancellationToken token)
         {
             using var filestream = new FileStream(filepath, FileMode.Append, FileAccess.Write, FileShare.Read);
@@ -92,7 +65,7 @@ namespace TradingServer.Logging
         {
             while (true)
             {
-                while (_ts.IsCancellationRequested)
+                while (!_ts.IsCancellationRequested)
                 {
                     Process currentProcess = Process.GetCurrentProcess();
 
@@ -122,7 +95,7 @@ namespace TradingServer.Logging
                         }
                     }
 
-                    await Task.Delay(10000);
+                    await Task.Delay(200, _ts.Token);
                 }
             }
         }
@@ -136,6 +109,33 @@ namespace TradingServer.Logging
         private static string FormatLogItem(LogInformation log) 
         {
             return $"[{log.now:HH-mm-ss.ffffff yyyy-MM-dd} {log.type} - {log.module}: {log.message}]\n";
+        }
+
+        ~TraceLogger() 
+        {
+            Dispose(false);
+        }
+
+        public void Dispose() 
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool dispose) 
+        {
+            if (_disposed) 
+            {
+                return;
+            }
+
+            _disposed = true;
+
+            if (dispose) 
+            {
+                _ts.Cancel();
+                _ts.Dispose();
+            }
         }
 
         private readonly BufferBlock<LogInformation> _logQueue = new BufferBlock<LogInformation>();
