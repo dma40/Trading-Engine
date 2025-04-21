@@ -19,20 +19,29 @@ public class TradingHostBuilder
         services.Configure<TradingServerConfiguration>(context.Configuration.GetSection(nameof(TradingServerConfiguration)));
         services.Configure<LoggerConfiguration>(context.Configuration.GetSection(nameof(LoggerConfiguration)));
 
-        // LoggerConfiguration logConfig = context.Configuration.GetSection(nameof(LoggerConfiguration)).Get<LoggerConfiguration>();
+        LoggerConfiguration logConfig = context.Configuration.GetSection(nameof(LoggerConfiguration)).Get<LoggerConfiguration>();
 
-        //if (logConfig.LoggerType == LoggerType.Text)
-        //{
-        //   services.AddSingleton<ITextLogger, TextLogger>();
-        //}
+        if (logConfig.LoggerType == LoggerType.Text)
+        {
+            services.AddSingleton<ITextLogger, TextLogger>();
+        }
 
-        // if (logConfig.LoggerType == LoggerType.Database)
-        // {
-        //   services.AddSingleton<ITextLogger, DatabaseLogger>();
-        // }
+        if (logConfig.LoggerType == LoggerType.Database)
+        {
+           services.AddSingleton<ITextLogger, DatabaseLogger>();
+        }
+
+        if (logConfig.LoggerType == LoggerType.Console)
+        {
+            services.AddSingleton<ITextLogger, ConsoleLogger>();
+        }
+
+        if (logConfig.LoggerType == LoggerType.Trace)
+        {
+            
+        }
 
         services.AddSingleton<TradingClient>(); 
-        services.AddSingleton<ITextLogger, TextLogger>();
         services.AddSingleton<ITradingServer, TradingServer>();
 
         services.AddHostedService<TradingServer>();
