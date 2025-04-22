@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using TradingServer.Tests;
+﻿using TradingServer.Tests;
 
 using TradingServer.Core;
 
@@ -11,9 +9,13 @@ Console.WriteLine("Starting trading server...\n");
 using var engine = TradingHostBuilder.BuildTradingServer();
 TradingServerServiceProvider.serviceProvider = engine.Services;
 
-using (var scope = TradingServerServiceProvider.serviceProvider.CreateScope())
+_ = Task.Run(() => processInputs());
+
+await engine.StartAsync().ConfigureAwait(false);
+
+static void processInputs()
 {
-    await engine.RunAsync().ConfigureAwait(false);
+    // A starting point for any user interface for this trading platform.
 }
 
 
