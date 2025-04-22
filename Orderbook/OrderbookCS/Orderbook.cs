@@ -112,7 +112,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void removeOrders(List<CancelOrder> cancels)
+        private void removeOrders(List<CancelOrder> cancels)
         {
             lock (_ordersLock)
             {
@@ -121,6 +121,7 @@ namespace TradingServer.OrderbookCS
                     if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
                     {
                         removeOrder(cancel.OrderID, orderbookentry, _orders);
+                        orderbookentry.Dispose();
                     }
                 }
             }
@@ -133,6 +134,7 @@ namespace TradingServer.OrderbookCS
                 if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
                 {
                     removeOrder(cancel.OrderID, orderbookentry, _orders);
+                    orderbookentry.Dispose();
                 }
             }
         }
@@ -250,6 +252,7 @@ namespace TradingServer.OrderbookCS
                     try
                     {
                         removeOrders(_goodForDay.Values.ToList());
+
                         DeleteExpiredGoodTillCancel();
                         ProcessOnMarketEndOrders(); 
 
@@ -323,11 +326,14 @@ namespace TradingServer.OrderbookCS
 
         private void ProcessOnMarketEndOrders()
         {
-            while (true)
+            foreach (var order in _onMarketClose)
             {
+                var current = order.Value;
+                fill(current.CurrentOrder);
 
+                _onMarketClose.Remove(current.CurrentOrder.OrderID);
+                current.Dispose();
             }
-            // await Task.Delay(200);
             // process these at the end of the day; we should specify somewhere
             // that they need to be placed before 3:50 PM or throw a error otherwise
         }
@@ -340,6 +346,18 @@ namespace TradingServer.OrderbookCS
                 if (_ts.IsCancellationRequested)
                 {
                     return;
+                }
+
+                DateTime now = DateTime.Now;
+                TimeSpan currentTime = now.TimeOfDay;
+                TimeSpan marketOpen = new TimeSpan(9, 30, 0);
+                TimeSpan marketEnd = new TimeSpan(4, 0, 0);
+
+                if (currentTime >= marketOpen && currentTime <= marketEnd)
+                {
+                    // do something
+                    // maybe use a type of order that inherits off of the original order?
+                    // we need new functionalities for orders
                 }
 
                 if (_ts.IsCancellationRequested)
@@ -361,6 +379,16 @@ namespace TradingServer.OrderbookCS
                 if (_ts.IsCancellationRequested)
                 {
                     return;
+                }
+
+                DateTime now = DateTime.Now;
+                TimeSpan currentTime = now.TimeOfDay;
+                TimeSpan marketOpen = new TimeSpan(9, 30, 0);
+                TimeSpan marketEnd = new TimeSpan(4, 0, 0);
+
+                if (currentTime >= marketOpen && currentTime <= marketEnd)
+                {
+                    // do something
                 }
 
                 if (_ts.IsCancellationRequested)
@@ -481,7 +509,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public Trades fill(Order order)
+        public Trades fill(Order order) // redesign the whole thing
         {
             Trades result = new Trades();
 
@@ -491,62 +519,8 @@ namespace TradingServer.OrderbookCS
                 {
                     if (ask.Price <= order.Price)
                     {
-                        OrderbookEntry askPtr = ask.head;
-
-                        while (askPtr != null)
-                        {
-                            if (askPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
-                            {
-                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, 0, 
-                                                                    order.Price, order.Price, true, 
-                                                                    order.Username, order.SecurityID, 0, 0);
-                                OrderRecord resting = new OrderRecord(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.CurrentQuantity, 
-                                                                    askPtr.CurrentOrder.CurrentQuantity - order.CurrentQuantity, 
-                                                                    askPtr.CurrentOrder.Price, order.Price, false, 
-                                                                    askPtr.CurrentOrder.Username, askPtr.CurrentOrder.SecurityID, 
-                                                                    askPtr.queuePosition(), askPtr.queuePosition());
-
-                                askPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
-                                order.DecreaseQuantity(order.CurrentQuantity); 
-
-                                Trade transaction = new Trade(incoming, resting);
-
-                                result.addTransaction(transaction);
-                                break;
-                            }
-
-                            else 
-                            {
-                                uint quantity = askPtr.CurrentOrder.CurrentQuantity;
-
-                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, 
-                                                                    order.CurrentQuantity - askPtr.CurrentOrder.CurrentQuantity,
-                                                                    order.Price, askPtr.CurrentOrder.Price, 
-                                                                    true, order.Username, order.SecurityID, 0, 0);
-                                OrderRecord resting = new OrderRecord(askPtr.CurrentOrder.OrderID, askPtr.CurrentOrder.CurrentQuantity, 0, 
-                                                                askPtr.CurrentOrder.Price, askPtr.CurrentOrder.Price, false, 
-                                                                askPtr.CurrentOrder.Username, 
-                                                                askPtr.CurrentOrder.SecurityID, askPtr.queuePosition(), 0);
-
-                                askPtr.CurrentOrder.DecreaseQuantity(quantity); 
-                                order.DecreaseQuantity(quantity);
-
-                                Trade transaction = new Trade(incoming, resting);
-
-                                result.addTransaction(transaction);
-
-                                if (askPtr.next != null)
-                                {
-                                    askPtr = askPtr.next;
-                                    removeOrder(askPtr.previous.CurrentOrder.OrderID, askPtr.previous, _orders);    
-                                }
-
-                                else 
-                                {
-                                    askPtr = askPtr.next;
-                                }
-                            }
-                        }
+                        // work out new logic here, this needs to be fixed
+                        // needs to check for duplicated/corrupted refs
                     }
                 }
             }
@@ -557,61 +531,8 @@ namespace TradingServer.OrderbookCS
                 {
                     if (bid.Price >= order.Price)
                     {
-                        OrderbookEntry bidPtr = bid.head;
-
-                        while (bidPtr != null)
-                        {
-                            if (bidPtr.CurrentOrder.CurrentQuantity > order.CurrentQuantity)
-                            {
-                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, 0, 
-                                                                    order.Price, bidPtr.CurrentOrder.Price, true, 
-                                                                    order.Username, order.SecurityID, 0, 0);
-                                OrderRecord resting = new OrderRecord(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.CurrentQuantity, 
-                                                                    bidPtr.CurrentOrder.CurrentQuantity - order.CurrentQuantity, 
-                                                                    bidPtr.CurrentOrder.Price, order.Price, true, 
-                                                                    bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID, 
-                                                                    bidPtr.queuePosition(), bidPtr.queuePosition());
-
-                                bidPtr.CurrentOrder.DecreaseQuantity(order.CurrentQuantity);
-                                order.DecreaseQuantity(order.CurrentQuantity); 
-
-                                Trade transaction = new Trade(incoming, resting);
-                                _trades.addTransaction(transaction);
-                                
-
-                                break;
-                            }
-
-                            else 
-                            {
-                                OrderRecord incoming = new OrderRecord(order.OrderID, order.CurrentQuantity, order.CurrentQuantity - bidPtr.CurrentOrder.CurrentQuantity, 
-                                                                        order.Price, bidPtr.CurrentOrder.Price, true, 
-                                                                        order.Username, order.SecurityID, 0, 0);
-                                OrderRecord resting = new OrderRecord(bidPtr.CurrentOrder.OrderID, bidPtr.CurrentOrder.CurrentQuantity, 0, 
-                                                                        bidPtr.CurrentOrder.Price, bidPtr.CurrentOrder.Price, true, 
-                                                                        bidPtr.CurrentOrder.Username, bidPtr.CurrentOrder.SecurityID, 
-                                                                        bidPtr.queuePosition(), 0);
-
-                                uint quantity = bidPtr.CurrentOrder.CurrentQuantity;
-
-                                bidPtr.CurrentOrder.DecreaseQuantity(quantity); 
-                                order.DecreaseQuantity(quantity);
-
-                                Trade transaction = new Trade(incoming, resting);
-                                _trades.addTransaction(transaction);
-
-                                if (bidPtr.next != null)
-                                {
-                                    bidPtr = bidPtr.next;
-                                    removeOrder(bidPtr.previous.CurrentOrder.OrderID, bidPtr.previous, _orders);
-                                }
-
-                                else 
-                                {
-                                    bidPtr = bidPtr.next;
-                                }
-                            }
-                        }
+                        // work out new logic here, this needs to be fixed
+                        // need to ensure safety against duplicated/corrupted refs
                     }
                 }
             }
