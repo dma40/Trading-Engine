@@ -15,7 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderbookCS", "Orderbook\Or
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingServices", "TradingServices\TradingServices.csproj", "{52206DF1-909A-4A88-B393-FCAD62130FF4}"
 EndProject
-
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderHandlers", "OrderHandlers\OrderHandlers.csproj", "{8893BF99-5105-4A66-9FC1-B7C7A95DC5A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +70,10 @@ Global
 		{E47CC62D-7789-4BAC-8B54-58AD2E6334B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E47CC62D-7789-4BAC-8B54-58AD2E6334B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E47CC62D-7789-4BAC-8B54-58AD2E6334B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8893BF99-5105-4A66-9FC1-B7C7A95DC5A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8893BF99-5105-4A66-9FC1-B7C7A95DC5A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8893BF99-5105-4A66-9FC1-B7C7A95DC5A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8893BF99-5105-4A66-9FC1-B7C7A95DC5A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{48946076-849A-4D18-8CA9-FAE72EFDA5B3} = {FB970A46-515A-4E9A-B8F5-C3CE01A70BDF}
