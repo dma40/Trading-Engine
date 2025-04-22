@@ -21,7 +21,6 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _trailingStop = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _stopLimit = new Dictionary<long, OrderbookEntry>();
         
-
         private readonly Mutex _orderMutex = new Mutex();
         private readonly Mutex _goodForDayMutex = new Mutex();
         private readonly Mutex _goodTillCancelMutex = new Mutex();
@@ -32,7 +31,6 @@ namespace TradingServer.OrderbookCS
 
         private DateTime now; 
         private Trades _trades;
-
         private long _lastTradedPrice; // use this later; fix this each time we finish a trade
 
         private bool _disposed = false;
