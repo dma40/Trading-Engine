@@ -36,6 +36,7 @@ namespace TradingServer.OrderbookCS
             _ = Task.Run(() => ProcessAtMarketOpen());
             _ = Task.Run(() => ProcessAtMarketEnd());
             _ = Task.Run(() => ProcessStopOrders());
+            _ = Task.Run(() => ProcessTrailingStopOrders());
         }
 
         public void addOrder(Order order)
@@ -275,24 +276,18 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private async Task ProcessAtMarketStart()
-        {
-            while (true)
-            {
-                await Task.Delay(200);
-            }
-        }
-
         private async Task ProcessAtMarketOpen()
         {
             await Task.Delay(200);
-            // process at the start of the day (9:30 local time)
+            // process at the start of the day (9:30 local time), 
+            // must be in before 9:28 AM local time (or throw a error otherwise)
         }
 
         private void ProcessOnMarketEndOrders()
         {
             // await Task.Delay(200);
-            // process these at the end of the day
+            // process these at the end of the day; we should specify somewhere
+            // that they need to be placed before 3:50 PM or throw a error otherwise
         }
 
         private async Task ProcessStopOrders()
@@ -301,6 +296,17 @@ namespace TradingServer.OrderbookCS
             await Task.Delay(200);
             // this method should check all existing stop loss orders 
             // and see if one of them can match
+        }
+
+        private async Task ProcessTrailingStopOrders()
+        {
+            await Task.Delay(200);
+            // this relies on all of the references being right when we 
+            // add/remove orders; if not, when we modify ordres in the trailing stop 
+            // list, it will fail to function correctly if we modify a order there, but
+            // the change is not reflected in the corresponding limit.
+            // we need to get what the maximum price is at a given time;
+            // for this we need to use the getSpread method we used earlier
         }
 
         public int count => _orders.Count;

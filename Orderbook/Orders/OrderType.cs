@@ -11,6 +11,7 @@ namespace TradingServer.Orders
 
         Stop,
         StopLimit,
+        TrailingStop,
 
         MarketOnClose,
         LimitOnClose,
