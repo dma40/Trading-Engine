@@ -93,7 +93,7 @@ namespace TradingServer.Orders
         }
     }
 
-    public class OrderbookEntry
+    public class OrderbookEntry: IDisposable
     {
         public OrderbookEntry(Order currentOrder, Limit parentLimit)
         {
@@ -121,5 +121,35 @@ namespace TradingServer.Orders
         public Limit ParentLimit { get; private set; }
         public OrderbookEntry? next { get; set; }
         public OrderbookEntry? previous { get; set; }
+
+        ~OrderbookEntry()
+        {
+            Dispose();
+        }
+
+        public void Dispose() 
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool dispose) 
+        {
+            if (_disposed) 
+            { 
+                return;
+            }
+
+            _disposed = true;
+
+            if (dispose) 
+            {
+                _ts.Cancel();
+                _ts.Dispose();
+            }
+        }
+
+        private bool _disposed = false;
+        CancellationTokenSource _ts = new CancellationTokenSource();
     }
 }
