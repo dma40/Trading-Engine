@@ -3,7 +3,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public class Orderbook: IRetrievalOrderbook
+    public class Orderbook: IRetrievalOrderbook, IDisposable
     {
         private readonly Security _instrument;
         
@@ -37,7 +37,7 @@ namespace TradingServer.OrderbookCS
         {
             lock (_ordersLock) 
             {
-                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry orderbookentry)) 
+                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null) 
                 {
                     var baseLimit = new Limit(order.Price);
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
@@ -66,7 +66,7 @@ namespace TradingServer.OrderbookCS
             }
 
             {
-                if (levels.TryGetValue(baseLimit, out Limit limit))
+                if (levels.TryGetValue(baseLimit, out Limit? limit) && limit != null)
                 {
                     if (limit.head == null)
                     {
@@ -76,10 +76,13 @@ namespace TradingServer.OrderbookCS
 
                     else
                     {
-                        OrderbookEntry tailPointer = limit.tail;
-                        tailPointer.next = orderbookEntry;
-                        orderbookEntry.previous = tailPointer;
-                        limit.tail = orderbookEntry;
+                        if (limit.tail != null)
+                        {
+                            OrderbookEntry tailPointer = limit.tail;
+                            tailPointer.next = orderbookEntry;
+                            orderbookEntry.previous = tailPointer;
+                            limit.tail = orderbookEntry;
+                        }
                     }
                 }
 
@@ -101,7 +104,7 @@ namespace TradingServer.OrderbookCS
             {
                 foreach (CancelOrder cancel in cancels)
                 {
-                    if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
+                    if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
                     {
                         removeOrder(cancel.OrderID, orderbookentry, _orders);
                     }
@@ -113,7 +116,7 @@ namespace TradingServer.OrderbookCS
         {
             lock (_ordersLock)
             {
-                if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry orderbookentry))
+                if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
                 {
                     removeOrder(cancel.OrderID, orderbookentry, _orders);
                 }
@@ -189,7 +192,7 @@ namespace TradingServer.OrderbookCS
         {   
             lock (_ordersLock)
             {
-                if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry orderentry))
+                if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
                 {
                     removeOrder(modify.OrderID, orderentry, _orders);
                     addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
@@ -504,12 +507,12 @@ namespace TradingServer.OrderbookCS
         public OrderbookSpread spread()
         {
             long? bestAsk = null, bestBid = null;
-            if (_askLimits.Any() && ! _askLimits.Min.isEmpty)
+            if (_askLimits.Any() && !_askLimits.Min.isEmpty)
             {
                 bestAsk = _askLimits.Min.Price;
             }
 
-            if (_bidLimits.Any() && ! _askLimits.Min.isEmpty)
+            if (_bidLimits.Any() && !_bidLimits.Min.isEmpty)
             {
                 bestBid = _askLimits.Max.Price;
             }

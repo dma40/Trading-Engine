@@ -102,7 +102,7 @@ namespace TradingServer.Logging
         protected override void Log(message_types type, string module, string message)
         {
             _logQueue.Post(new LogInformation(type, module, message, DateTime.Now, 
-            Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name ?? "UnnamedThread"));
+            Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name ?? "UnknownThread"));
         }
 
         private static string FormatLogItem(LogInformation log) 

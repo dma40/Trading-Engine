@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TradingServer.Core;
 
-public class TradingHostBuilder 
+internal static class TradingHostBuilder 
 {
     public static IHost BuildTradingServer() => Host.CreateDefaultBuilder().
     ConfigureServices((context, services) =>

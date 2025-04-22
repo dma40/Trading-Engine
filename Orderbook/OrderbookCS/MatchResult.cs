@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public class Trades
+    public sealed class Trades
     {
         public Trades() 
         {

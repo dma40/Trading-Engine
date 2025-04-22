@@ -1,6 +1,6 @@
 namespace TradingServer.Orders 
 {
-    public class ModifyOrder: IOrderCore 
+    public struct ModifyOrder: IOrderCore 
     {
         public ModifyOrder(IOrderCore orderCore, long price, uint quantity, bool isBuy) 
         {

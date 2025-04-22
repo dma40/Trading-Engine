@@ -1,6 +1,6 @@
 namespace TradingServer.OrderbookCS
 {
-    public class OrderbookSpread
+    public struct OrderbookSpread
     {
         public OrderbookSpread(long? Bid, long ?Ask)
         {

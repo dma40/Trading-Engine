@@ -1,6 +1,6 @@
 namespace TradingServer.Orders 
 {
-    public class Order: IOrderCore 
+    public sealed class Order: IOrderCore 
     {
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
         {
@@ -70,6 +70,11 @@ namespace TradingServer.Orders
             else if (input == "IntermediateOrCancel")
             {
                 return OrderTypes.FillAndKill;
+            }
+
+            else if (input == "PostOnly")
+            {
+                return OrderTypes.PostOnly;
             }
 
             else 

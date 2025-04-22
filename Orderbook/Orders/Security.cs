@@ -1,6 +1,6 @@
 namespace TradingServer.Instrument
 {
-    public class Security 
+    public sealed class Security 
     {
         public Security(string Name)
         {

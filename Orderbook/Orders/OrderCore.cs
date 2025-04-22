@@ -1,6 +1,6 @@
 namespace TradingServer.Orders 
 {
-    public class OrderCore: IOrderCore
+    public sealed class OrderCore: IOrderCore
     {
         public OrderCore(long orderID, string username, string securityID, OrderTypes _orderType) 
         {

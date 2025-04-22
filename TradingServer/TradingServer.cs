@@ -12,7 +12,7 @@ using TradingServer.Rejects;
 
 namespace TradingServer.Core 
 {
-    class TradingServer: BackgroundService, ITradingServer 
+    sealed class TradingServer: BackgroundService, ITradingServer 
     {
         private readonly ITextLogger _logger;
         private readonly IMatchingOrderbook _orderbook;

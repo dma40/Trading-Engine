@@ -7,13 +7,13 @@ namespace TradingServer.Orders
             Price = price;
         }
         public long Price { get; private set; }
-        public OrderbookEntry head { get; set; }
-        public OrderbookEntry tail { get; set; }
+        public OrderbookEntry? head { get; set; }
+        public OrderbookEntry? tail { get; set; }
 
         public uint getLevelOrderCount() 
         {
             uint count = 0;
-            OrderbookEntry headPointer = head;
+            OrderbookEntry? headPointer = head;
 
             while (headPointer != null)
             {
@@ -31,7 +31,7 @@ namespace TradingServer.Orders
         public uint getLevelOrderQuantity() 
         {
             uint count = 0;
-            OrderbookEntry headPointer = head;
+            OrderbookEntry? headPointer = head;
 
             while (headPointer != null)
             {
@@ -48,7 +48,7 @@ namespace TradingServer.Orders
         public List<OrderRecord> getOrderRecords() 
         {
             List<OrderRecord> records = new List<OrderRecord>();
-            OrderbookEntry headPointer = head;
+            OrderbookEntry? headPointer = head;
             uint queuePosition = 0;
 
             while (headPointer != null)
@@ -81,10 +81,14 @@ namespace TradingServer.Orders
                 {
                     return Side.Unknown;
                 }
+
                 else 
                 {
-                    return head.CurrentOrder.isBuySide ? Side.Bid : Side.Ask;
+                    if (head != null)
+                        return head.CurrentOrder.isBuySide ? Side.Bid : Side.Ask;
                 }
+
+                return Side.Unknown;
             }
         }
     }
@@ -101,7 +105,7 @@ namespace TradingServer.Orders
         public uint queuePosition()
         {
             uint count = 0;
-            OrderbookEntry orderPtr = previous;
+            OrderbookEntry? orderPtr = previous;
             
             while (orderPtr != null)
             {
@@ -115,7 +119,7 @@ namespace TradingServer.Orders
         public DateTime CreationTime { get; private set; }      
         public Order CurrentOrder { get; private set; }
         public Limit ParentLimit { get; private set; }
-        public OrderbookEntry next { get; set; }
-        public OrderbookEntry previous { get; set; }
+        public OrderbookEntry? next { get; set; }
+        public OrderbookEntry? previous { get; set; }
     }
 }

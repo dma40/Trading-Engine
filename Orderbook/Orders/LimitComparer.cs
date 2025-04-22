@@ -3,8 +3,14 @@ namespace TradingServer.Orders
     public class BidLimitComparer: IComparer<Limit>
     {
         public static IComparer<Limit> comparer { get; } = new BidLimitComparer();
-        public int Compare(Limit limit, Limit other)
+        
+        public int Compare(Limit? limit, Limit? other)
         {
+            if (limit == null || other == null)
+            {
+                throw new ArgumentNullException("Cannot compare null limits");
+            }
+
             if (limit.Price == other.Price)
                 return 0;
             
@@ -19,8 +25,14 @@ namespace TradingServer.Orders
     public class AskLimitComparer: IComparer<Limit>
     {
         public static IComparer<Limit> comparer { get; } = new AskLimitComparer();
-        public int Compare(Limit limit, Limit other)
+
+        public int Compare(Limit? limit, Limit? other)
         {
+            if (limit == null || other == null)
+            {
+                throw new ArgumentNullException("Cannot compare null limits");
+            }
+
             if (limit.Price == other.Price)
                 return 0;
             

@@ -1,11 +1,11 @@
 namespace TradingServer.Core.Configuration 
 {
-    class TradingServerConfiguration 
+    internal sealed class TradingServerConfiguration 
     {
         public TradingServerSettings? TradingServerSettings { get; set; }
     }
 
-    class TradingServerSettings 
+    internal sealed class TradingServerSettings 
     {
         public int Port { get; set; }
         public string? SecurityName { get; set; } 

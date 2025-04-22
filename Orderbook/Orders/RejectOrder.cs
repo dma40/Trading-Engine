@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.Rejects 
 {
-    public class Reject: IOrderCore 
+    public sealed class Reject: IOrderCore 
     {
         public Reject(IOrderCore orderCore, RejectionReason rejectionReason) 
         {

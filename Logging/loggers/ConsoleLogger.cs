@@ -46,7 +46,7 @@ namespace TradingServer.Logging
         protected override void Log(message_types type, string module, string message)
         {
             _logQueue.Post(new LogInformation(type, module, message, DateTime.Now, 
-            Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name));
+            Thread.CurrentThread.ManagedThreadId, Thread.CurrentThread.Name ?? "UnknownThread"));
         }
 
         ~ConsoleLogger() 

@@ -5,7 +5,7 @@ using TradingServer.Instrument;
 
 namespace TradingServer.Tests
 {
-    public sealed class OrderbookUnitTests
+    internal static class OrderbookUnitTests
     {
         private static void addSingleOrders()
         {
@@ -24,9 +24,12 @@ namespace TradingServer.Tests
             orders.addOrder(order1);
             orders.addOrder(order2); 
 
-            Console.WriteLine("ADD SINGLE ORDER TEST A: " + true + '\n');
-            Console.WriteLine("ADD SINGLE ORDER TEST B: " + false + '\n');
-            Console.WriteLine("ADD SINGLE ORDER TEST C" + true + "\n");
+            bool test_one_success = true;
+            bool test_two_success = true;
+
+            Console.WriteLine("ADD SINGLE ORDER TEST A: " + test_one_success + '\n');
+            Console.WriteLine("ADD SINGLE ORDER TEST B: " + test_two_success + '\n');
+            Console.WriteLine("ADD SINGLE ORDER TEST C: " + true + "\n");
         }
 
         private static void removeSingleOrders()
