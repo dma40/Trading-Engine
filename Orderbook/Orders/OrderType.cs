@@ -7,6 +7,14 @@ namespace TradingServer.Orders
         FillAndKill, 
         GoodTillCancel, 
         Market, 
-        PostOnly
+        PostOnly,
+
+        Stop,
+        StopLimit,
+
+        MarketOnClose,
+        LimitOnClose,
+        MarketOnOpen,
+        LimitOnOpen
     }
 }

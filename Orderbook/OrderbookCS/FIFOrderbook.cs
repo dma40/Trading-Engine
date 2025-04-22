@@ -38,7 +38,8 @@ namespace TradingServer.OrderbookCS
 
                 else if (order.OrderType == OrderTypes.PostOnly)
                 {
-                    addOrder(order);
+                    if (!canFill(order))
+                        addOrder(order);
                 }
 
                 else 

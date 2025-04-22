@@ -30,7 +30,11 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
+            
             _ = Task.Run(() => ProcessGoodForDay());
+            _ = Task.Run(() => ProcessStopLossOrders());
+            _ = Task.Run(() => ProcessOnMarketEnd());
+            _ = Task.Run(() => ProcessOnMarketOpen());
         }
 
         public void addOrder(Order order)
@@ -267,6 +271,25 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
             }
+        }
+
+        private async Task ProcessOnMarketOpen()
+        {
+            await Task.Delay(200);
+            // process at the start of the day (9:30 local time)
+        }
+
+        private async Task ProcessOnMarketEnd()
+        {
+            await Task.Delay(200);
+            // process these at the end of the day
+        }
+
+        private async Task ProcessStopLossOrders()
+        {
+            await Task.Delay(200);
+            // this method should check all existing stop loss orders 
+            // and see if one of them can match
         }
 
         public int count => _orders.Count;

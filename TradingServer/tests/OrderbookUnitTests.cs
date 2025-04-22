@@ -34,7 +34,7 @@ namespace TradingServer.Tests
 
         private static void removeSingleOrders()
         {
-            Orderbook orders = new Orderbook(new Security("AAPL"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
 
             Console.WriteLine("REMOVE SINGLE ORDER TEST A: " + true + '\n');
             Console.WriteLine("REMOVE SINGLE ORDER TEST B: " + false + '\n');
