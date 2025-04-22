@@ -112,7 +112,7 @@ namespace TradingServer.Logging
 
         ~TraceLogger() 
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose() 

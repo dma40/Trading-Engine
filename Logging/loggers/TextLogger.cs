@@ -69,7 +69,7 @@ namespace TradingServer.Logging
 
         ~TextLogger() 
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose() 

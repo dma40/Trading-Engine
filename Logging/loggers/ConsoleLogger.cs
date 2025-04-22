@@ -51,7 +51,7 @@ namespace TradingServer.Logging
 
         ~ConsoleLogger() 
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose() 
