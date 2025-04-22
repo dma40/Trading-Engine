@@ -11,10 +11,16 @@ namespace TradingServer.OrderbookCS
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
 
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
+
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
         private readonly Dictionary<long, OrderbookEntry> _onMarketOpen = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _onMarketClose = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
+
+        private readonly Dictionary<long, OrderbookEntry> _stop = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _trailingStop = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _stopLimit = new Dictionary<long, OrderbookEntry>();
+        
 
         private readonly Mutex _orderMutex = new Mutex();
         private readonly Mutex _goodForDayMutex = new Mutex();
@@ -25,6 +31,9 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _goodTillCancelLock = new();
 
         private DateTime now; 
+        private Trades _trades;
+
+        private long _lastTradedPrice; // use this later
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
@@ -502,7 +511,8 @@ namespace TradingServer.OrderbookCS
                                 order.DecreaseQuantity(order.CurrentQuantity); 
 
                                 Trade transaction = new Trade(incoming, resting);
-                                result.addTransaction(transaction);
+                                _trades.addTransaction(transaction);
+                                
 
                                 break;
                             }
@@ -523,7 +533,7 @@ namespace TradingServer.OrderbookCS
                                 order.DecreaseQuantity(quantity);
 
                                 Trade transaction = new Trade(incoming, resting);
-                                result.addTransaction(transaction);
+                                _trades.addTransaction(transaction);
 
                                 if (bidPtr.next != null)
                                 {
