@@ -33,7 +33,7 @@ namespace TradingServer.OrderbookCS
         private DateTime now; 
         private Trades _trades;
 
-        private long _lastTradedPrice; // use this later
+        private long _lastTradedPrice; // use this later; fix this each time we finish a trade
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
@@ -41,6 +41,7 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
+            _trades = new Trades();
 
             _ = Task.Run(() => ProcessAtMarketOpen());
             _ = Task.Run(() => ProcessAtMarketEnd());

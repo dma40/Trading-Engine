@@ -49,57 +49,57 @@ namespace TradingServer.Tests
 
         private static void removeNearEnds()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void modifyNearEnds()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void removeNearMiddle()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void modifyNearMiddle()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchBasic()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithResting()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithFillOrKill()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithFillAndKill()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithMarket()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchAndRemove()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchAndAdd()
         {
-
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         public static void runTests()
