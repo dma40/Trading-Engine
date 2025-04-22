@@ -12,6 +12,8 @@ namespace TradingServer.OrderbookCS
 
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
+        private readonly Dictionary<long, OrderbookEntry> _onMarketOpen = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _onMarketClose = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
         private readonly Mutex _orderMutex = new Mutex();
@@ -30,11 +32,10 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
-            
-            _ = Task.Run(() => ProcessGoodForDay());
-            _ = Task.Run(() => ProcessStopLossOrders());
-            _ = Task.Run(() => ProcessOnMarketEnd());
-            _ = Task.Run(() => ProcessOnMarketOpen());
+
+            _ = Task.Run(() => ProcessAtMarketOpen());
+            _ = Task.Run(() => ProcessAtMarketEnd());
+            _ = Task.Run(() => ProcessStopOrders());
         }
 
         public void addOrder(Order order)
@@ -218,7 +219,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private async Task ProcessGoodForDay()
+        private async Task ProcessAtMarketEnd()
         {
             while (true)
             {
@@ -240,7 +241,8 @@ namespace TradingServer.OrderbookCS
                     try
                     {
                         removeOrders(_goodForDay.Values.ToList());
-                        DeleteExpiredGoodTillCancel(); 
+                        DeleteExpiredGoodTillCancel();
+                        ProcessOnMarketEndOrders(); 
 
                         _orderMutex.WaitOne();
 
@@ -273,20 +275,29 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private async Task ProcessOnMarketOpen()
+        private async Task ProcessAtMarketStart()
+        {
+            while (true)
+            {
+                await Task.Delay(200);
+            }
+        }
+
+        private async Task ProcessAtMarketOpen()
         {
             await Task.Delay(200);
             // process at the start of the day (9:30 local time)
         }
 
-        private async Task ProcessOnMarketEnd()
+        private void ProcessOnMarketEndOrders()
         {
-            await Task.Delay(200);
+            // await Task.Delay(200);
             // process these at the end of the day
         }
 
-        private async Task ProcessStopLossOrders()
+        private async Task ProcessStopOrders()
         {
+            // only do this one while the market is open
             await Task.Delay(200);
             // this method should check all existing stop loss orders 
             // and see if one of them can match
