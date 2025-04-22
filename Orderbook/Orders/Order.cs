@@ -1,6 +1,6 @@
 namespace TradingServer.Orders 
 {
-    public sealed class Order: IOrderCore 
+    public sealed class Order: IOrderCore, IDisposable
     {
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
         {
@@ -103,5 +103,35 @@ namespace TradingServer.Orders
         {
             return Quantity - CurrentQuantity;
         }
+
+        ~Order()
+        {
+            Dispose();
+        }
+
+        public void Dispose() 
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool dispose) 
+        {
+            if (_disposed) 
+            { 
+                return;
+            }
+
+            _disposed = true;
+
+            if (dispose) 
+            {
+                _ts.Cancel();
+                _ts.Dispose();
+            }
+        }
+
+        private bool _disposed = false;
+        CancellationTokenSource _ts = new CancellationTokenSource();
     }
 }

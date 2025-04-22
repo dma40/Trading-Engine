@@ -371,6 +371,11 @@ namespace TradingServer.OrderbookCS
             return _instrument.name;
         }
 
+        public long currentPrice()
+        {
+            return _lastTradedPrice;
+        }
+
         public bool canFill(Order order)
         {
             if (order.isBuySide)

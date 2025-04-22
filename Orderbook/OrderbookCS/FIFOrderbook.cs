@@ -23,17 +23,20 @@ namespace TradingServer.OrderbookCS
                     if (canFill(order))
                     {
                         result = fill(order);
+                        order.Dispose();
                     }
                 }
 
                 else if (order.OrderType == OrderTypes.FillAndKill)
                 {
                     result = fill(order);
+                    order.Dispose();
                 } 
 
                 else if (order.OrderType == OrderTypes.Market)
                 {
                     result = fill(order);
+                    order.Dispose();
                 }
 
                 else if (order.OrderType == OrderTypes.PostOnly)
@@ -49,6 +52,11 @@ namespace TradingServer.OrderbookCS
                     if (order.CurrentQuantity > 0)
                     {
                         addOrder(order);
+                    }
+
+                    else 
+                    {
+                        order.Dispose();
                     }
                 }
 
