@@ -229,6 +229,7 @@ namespace TradingServer.OrderbookCS
                 {
                     goodTillCancelOrders.Add(new CancelOrder(order.Value.CurrentOrder));
                 }
+
                 removeOrders(goodTillCancelOrders);
             }
         }
@@ -320,7 +321,7 @@ namespace TradingServer.OrderbookCS
                 {
                     return;
                 }
-
+                
                 await Task.Delay(200, _ts.Token);
             }
             // process at the start of the day (9:30 local time), 
@@ -426,6 +427,7 @@ namespace TradingServer.OrderbookCS
                 {
                     return;
                 }
+
                 await Task.Delay(200, _ts.Token);
             }
         }
@@ -446,7 +448,10 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime >= marketOpen && currentTime <= marketEnd)
                 {
+                    lock (_ordersLock) 
+                    {
                     // do something
+                    }
                 }
 
                 if (_ts.IsCancellationRequested)
