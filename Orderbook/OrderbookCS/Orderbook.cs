@@ -1,3 +1,4 @@
+using System.Formats.Asn1;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -27,12 +28,12 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _ordersLock = new();
         private readonly Lock _goodForDayLock = new();
         private readonly Lock _goodTillCancelLock = new();
+        private readonly Lock _stopLock = new();
 
         private DateTime now; 
-        private Trades _trades; // OrderRecord also needs to know the price at which the trade was executed
+        private Trades _trades;
         private long _greatestTradedPrice = Int32.MinValue;
-        private long _lastTradedPrice; // use this later; fix this each time we finish a trade
-        // also for the trailing stop orders we need to find the maximum price the stock has reached in the entire trading day
+        private long _lastTradedPrice;
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
@@ -46,7 +47,6 @@ namespace TradingServer.OrderbookCS
             _ = Task.Run(() => ProcessAtMarketEnd());
             _ = Task.Run(() => ProcessStopOrders());
             _ = Task.Run(() => ProcessTrailingStopOrders());
-
             _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
@@ -66,7 +66,43 @@ namespace TradingServer.OrderbookCS
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
+            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.LimitOnClose
+                || orderbookEntry.CurrentOrder.OrderType == OrderTypes.MarketOnClose)
+            {
+                lock (_stopLock)
+                {
+                    _onMarketClose.Add(order.OrderID, orderbookEntry);
+                }
+            }
+
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.LimitOnOpen 
+                || orderbookEntry.CurrentOrder.OrderType == OrderTypes.MarketOnOpen)
+            {
+                lock (_stopLock)
+                {
+                    _onMarketOpen.Add(order.OrderID, orderbookEntry);
+                }
+            }
+
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.StopLimit
+                || orderbookEntry.CurrentOrder.OrderType == OrderTypes.StopMarket)
+            {
+                lock (_stopLock)
+                {
+                    _stop.Add(order.OrderID, (StopOrder) order);
+                    
+                }
+            }
+
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.TrailingStop)
+            {
+                lock (_stopLock)
+                {
+                    _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
+                }
+            }
+
+            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
                 lock (_goodForDayLock)
                 {
@@ -139,6 +175,18 @@ namespace TradingServer.OrderbookCS
                     removeOrder(cancel.OrderID, orderbookentry, _orders);
                     orderbookentry.Dispose();
                 }
+
+                if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
+                {
+                    _stop.Remove(cancel.OrderID);
+                    stop.Dispose();
+                }
+
+                if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? trailing_stop) && trailing_stop != null)
+                {
+                    _trailingStop.Remove(cancel.OrderID);
+                    trailing_stop.Dispose();
+                }
             }
         }
 
@@ -204,6 +252,7 @@ namespace TradingServer.OrderbookCS
                 }
 
                 _orders.Remove(id);
+                orderentry.Dispose();
             }
         }
 
@@ -367,12 +416,20 @@ namespace TradingServer.OrderbookCS
                         {
                             if (_lastTradedPrice <= order.Value.Price)
                             {
-                                Order match = tempOrder.activate();
+                                Order match = order.Value.activate();
                                 fill(match);
 
-                                order.Value.Dispose(); // check if this is doing something wacky
-                                _stop.Remove(tempOrder.OrderID);
+                                if (order.Value.CurrentQuantity > 0)
+                                {
+                                    addOrder(order.Value);
+                                }
 
+                                else
+                                {
+                                    order.Value.Dispose(); // check if this is doing something wacky
+                                }
+
+                                _stop.Remove(tempOrder.OrderID);
                             }
                         }
 
@@ -380,17 +437,23 @@ namespace TradingServer.OrderbookCS
                         {
                             if (_lastTradedPrice >= order.Value.Price)
                             {
-                                Order match = tempOrder.activate();
+                                Order match = order.Value.activate();
                                 fill(match);
 
-                                order.Value.Dispose(); // check if this is doing something wacky
+                                if (order.Value.CurrentQuantity > 0) // also check that this is ok
+                                {
+                                    addOrder(order.Value);
+                                }
+                                
+                                else 
+                                {
+                                    order.Value.Dispose(); // check if this is doing something wacky
+                                }
+
                                 _stop.Remove(tempOrder.OrderID);
                             }     
                         }
                     }
-                    // do something
-                    // maybe use a type of order that inherits off of the original order?
-                    // we need new functionalities for orders
                 }
 
                 if (_ts.IsCancellationRequested)
@@ -400,9 +463,6 @@ namespace TradingServer.OrderbookCS
 
                 await Task.Delay(200, _ts.Token);
             }
-  
-            // this method should check all existing stop loss orders 
-            // and see if one of them can match
         }
 
         private async Task UpdateGreatestTradedPrice()
