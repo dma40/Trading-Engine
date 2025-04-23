@@ -9,7 +9,7 @@ namespace TradingServer.Orders
         Market, 
         PostOnly,
 
-        Stop,
+        StopMarket,
         StopLimit,
         TrailingStop,
 

@@ -1,6 +1,7 @@
 namespace TradingServer.Orders 
 {
-    public sealed class Order: IOrderCore, IDisposable
+    // maybe make a new order type
+    public class Order: IOrderCore, IDisposable
     {
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
         {
@@ -41,7 +42,10 @@ namespace TradingServer.Orders
         }
 
         public Order(ModifyOrder modify): this(modify, 
-        modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide, modify.OrderType) {}
+            modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide, modify.OrderType) {}
+
+        public Order(StopOrder stop): this(stop, stop.limitPrice, stop.Quantity, 
+            stop.isBuySide, stop.OrderType) {}
 
         private readonly IOrderCore _orderCore;
         

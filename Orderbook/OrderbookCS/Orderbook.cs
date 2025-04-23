@@ -12,14 +12,13 @@ namespace TradingServer.OrderbookCS
 
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
 
-        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
+        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); // can consider making these just orders, uses less heap memory
         private readonly Dictionary<long, OrderbookEntry> _onMarketOpen = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _onMarketClose = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
-        private readonly Dictionary<long, OrderbookEntry> _stop = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _trailingStop = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _stopLimit = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
+        private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
         
         private readonly Mutex _orderMutex = new Mutex();
         private readonly Mutex _goodForDayMutex = new Mutex();
@@ -30,8 +29,10 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _goodTillCancelLock = new();
 
         private DateTime now; 
-        private Trades _trades;
+        private Trades _trades; // OrderRecord also needs to know the price at which the trade was executed
+        private long _greatestTradedPrice = Int32.MinValue;
         private long _lastTradedPrice; // use this later; fix this each time we finish a trade
+        // also for the trailing stop orders we need to find the maximum price the stock has reached in the entire trading day
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
@@ -45,6 +46,8 @@ namespace TradingServer.OrderbookCS
             _ = Task.Run(() => ProcessAtMarketEnd());
             _ = Task.Run(() => ProcessStopOrders());
             _ = Task.Run(() => ProcessTrailingStopOrders());
+
+            _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
         public void addOrder(Order order)
@@ -318,7 +321,7 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
 
-                await Task.Delay(200);
+                await Task.Delay(200, _ts.Token);
             }
             // process at the start of the day (9:30 local time), 
             // must be in before 9:28 AM local time (or throw a error otherwise)
@@ -355,6 +358,35 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime >= marketOpen && currentTime <= marketEnd)
                 {
+                    foreach (var order in _stop)
+                    {
+                        var tempOrder = order.Value;
+
+                        if (tempOrder.isBuySide)
+                        {
+                            if (_lastTradedPrice <= order.Value.Price)
+                            {
+                                Order match = tempOrder.activate();
+                                fill(match);
+
+                                order.Value.Dispose(); // check if this is doing something wacky
+                                _stop.Remove(tempOrder.OrderID);
+
+                            }
+                        }
+
+                        else
+                        {
+                            if (_lastTradedPrice >= order.Value.Price)
+                            {
+                                Order match = tempOrder.activate();
+                                fill(match);
+
+                                order.Value.Dispose(); // check if this is doing something wacky
+                                _stop.Remove(tempOrder.OrderID);
+                            }     
+                        }
+                    }
                     // do something
                     // maybe use a type of order that inherits off of the original order?
                     // we need new functionalities for orders
@@ -365,11 +397,37 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
 
-                await Task.Delay(200);
+                await Task.Delay(200, _ts.Token);
             }
   
             // this method should check all existing stop loss orders 
             // and see if one of them can match
+        }
+
+        private async Task UpdateGreatestTradedPrice()
+        {
+            while (true) // though we should only do this at appropriate times in the day
+            {
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (_trades.result.Count > 0)
+                {
+                    var lastTrade = _trades.result[_trades.result.Count - 1];
+                    if (lastTrade.tradedPrice > _greatestTradedPrice)
+                    {
+                        _greatestTradedPrice = lastTrade.tradedPrice;
+                    }
+                }
+
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
+                await Task.Delay(200, _ts.Token);
+            }
         }
 
         private async Task ProcessTrailingStopOrders()
