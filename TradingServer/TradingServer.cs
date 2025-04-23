@@ -22,7 +22,7 @@ namespace TradingServer.Core
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
-            _orderbook = new FIFOrderbook(new Security(_tradingConfig.TradingServerSettings.SecurityName));
+            _orderbook = new Orderbook(new Security(_tradingConfig.TradingServerSettings.SecurityName));
         }
 
         public Task Run(CancellationToken token) => ExecuteAsync(token);
@@ -136,7 +136,7 @@ namespace TradingServer.Core
             else if (request.Operation == "Add")
             {
                 Order newOrder = modify.newOrder();
-                _orderbook.match(newOrder);
+                _orderbook.matchIncoming(newOrder);
                 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
                 " side by {request.Username} at {DateTime.UtcNow}");
@@ -154,7 +154,7 @@ namespace TradingServer.Core
             else if (request.Operation == "Modify")
             {
                 _orderbook.removeOrder(modify.cancelOrder());
-                _orderbook.match(modify.newOrder());
+                _orderbook.matchIncoming(modify.newOrder());
                 
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
                  " by {request.Username} at {DateTime.UtcNow}");

@@ -1,10 +1,9 @@
-using System.Formats.Asn1;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public class Orderbook: IRetrievalOrderbook, IDisposable
+    public class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
     {
         private readonly Security _instrument;
         
@@ -54,10 +53,35 @@ namespace TradingServer.OrderbookCS
         {
             lock (_ordersLock) 
             {
-                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null) 
+                var baseLimit = new Limit(order.Price);
+
+                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
                 {
-                    var baseLimit = new Limit(order.Price);
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+                }
+
+                else if (!_stop.TryGetValue(order.OrderID, out StopOrder? stop) 
+                        && order.OrderType == OrderTypes.StopMarket || order.OrderType == OrderTypes.StopLimit)
+                {
+                    _stop.Add(order.OrderID, (StopOrder) order);
+                }
+
+                else if (!_trailingStop.TryGetValue(order.OrderID, out TrailingStopOrder? trailing) && 
+                    order.OrderType == OrderTypes.TrailingStop)
+                {
+                    _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
+                }
+
+                else if (!_onMarketOpen.TryGetValue(order.OrderID, out OrderbookEntry? moo) && 
+                    order.OrderType == OrderTypes.MarketOnOpen || order.OrderType == OrderTypes.LimitOnOpen)
+                {
+                    _onMarketOpen.Add(order.OrderID, new OrderbookEntry(order, baseLimit));
+                }
+
+                else if (!_onMarketClose.TryGetValue(order.OrderID, out OrderbookEntry? coo) && 
+                    order.OrderType == OrderTypes.MarketOnClose || order.OrderType == OrderTypes.LimitOnClose)
+                {
+                    _onMarketClose.Add(order.OrderID, new OrderbookEntry(order, baseLimit));
                 }
             }
         }
@@ -66,43 +90,7 @@ namespace TradingServer.OrderbookCS
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.LimitOnClose
-                || orderbookEntry.CurrentOrder.OrderType == OrderTypes.MarketOnClose)
-            {
-                lock (_stopLock)
-                {
-                    _onMarketClose.Add(order.OrderID, orderbookEntry);
-                }
-            }
-
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.LimitOnOpen 
-                || orderbookEntry.CurrentOrder.OrderType == OrderTypes.MarketOnOpen)
-            {
-                lock (_stopLock)
-                {
-                    _onMarketOpen.Add(order.OrderID, orderbookEntry);
-                }
-            }
-
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.StopLimit
-                || orderbookEntry.CurrentOrder.OrderType == OrderTypes.StopMarket)
-            {
-                lock (_stopLock)
-                {
-                    _stop.Add(order.OrderID, (StopOrder) order);
-                    
-                }
-            }
-
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.TrailingStop)
-            {
-                lock (_stopLock)
-                {
-                    _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
-                }
-            }
-
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
+            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
             {
                 lock (_goodForDayLock)
                 {
@@ -176,16 +164,28 @@ namespace TradingServer.OrderbookCS
                     orderbookentry.Dispose();
                 }
 
-                if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
+                else if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
                 {
                     _stop.Remove(cancel.OrderID);
                     stop.Dispose();
                 }
 
-                if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? trailing_stop) && trailing_stop != null)
+                else if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? trailing_stop) && trailing_stop != null)
                 {
                     _trailingStop.Remove(cancel.OrderID);
                     trailing_stop.Dispose();
+                }
+
+                else if (_onMarketOpen.TryGetValue(cancel.OrderID, out OrderbookEntry? omo) && omo != null)
+                {
+                    _onMarketOpen.Remove(cancel.OrderID);
+                    omo.Dispose();
+                }
+
+                else if (_onMarketClose.TryGetValue(cancel.OrderID, out OrderbookEntry? omc) && omc != null)
+                {
+                    _onMarketClose.Remove(cancel.OrderID);
+                    omc.Dispose();
                 }
             }
         }
@@ -263,7 +263,8 @@ namespace TradingServer.OrderbookCS
                 if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
                 {
                     removeOrder(modify.OrderID, orderentry, _orders);
-                    addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+                    //addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+                    matchIncoming(modify.newOrder());
                 }
             }
         }
@@ -358,7 +359,7 @@ namespace TradingServer.OrderbookCS
                             var orderEntry = order.Value;
                             var id = order.Value.CurrentOrder.OrderID;
 
-                            fill(order.Value.CurrentOrder);
+                            match(order.Value.CurrentOrder);
                             _onMarketOpen.Remove(id);
 
                             orderEntry.Dispose();
@@ -382,7 +383,7 @@ namespace TradingServer.OrderbookCS
             foreach (var order in _onMarketClose)
             {
                 var current = order.Value;
-                fill(current.CurrentOrder);
+                match(current.CurrentOrder);
 
                 _onMarketClose.Remove(current.CurrentOrder.OrderID);
                 current.Dispose();
@@ -416,8 +417,8 @@ namespace TradingServer.OrderbookCS
                         {
                             if (_lastTradedPrice <= order.Value.Price)
                             {
-                                Order match = order.Value.activate();
-                                fill(match);
+                                Order activate = order.Value.activate();
+                                match(activate);
 
                                 if (order.Value.CurrentQuantity > 0)
                                 {
@@ -437,8 +438,8 @@ namespace TradingServer.OrderbookCS
                         {
                             if (_lastTradedPrice >= order.Value.Price)
                             {
-                                Order match = order.Value.activate();
-                                fill(match);
+                                Order activated = order.Value.activate();
+                                match(activated);
 
                                 if (order.Value.CurrentQuantity > 0) // also check that this is ok
                                 {
@@ -469,12 +470,17 @@ namespace TradingServer.OrderbookCS
         {
             while (true) // though we should only do this at appropriate times in the day
             {
+                DateTime now = DateTime.Now;
+                TimeSpan currentTime = now.TimeOfDay;
+                TimeSpan marketOpen = new TimeSpan(9, 30, 0);
+                TimeSpan marketEnd = new TimeSpan(4, 0, 0);
+
                 if (_ts.IsCancellationRequested)
                 {
                     return;
                 }
 
-                if (_trades.result.Count > 0)
+                if (_trades.result.Count > 0 && currentTime <= marketEnd && currentTime >= marketOpen)
                 {
                     var lastTrade = _trades.result[_trades.result.Count - 1];
                     if (lastTrade.tradedPrice > _greatestTradedPrice)
@@ -632,7 +638,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public Trades fill(Order order) // redesign the whole thing
+        public Trades match(Order order) // redesign the whole thing
         {
             Trades result = new Trades();
 
@@ -661,6 +667,80 @@ namespace TradingServer.OrderbookCS
             }
 
             return result;
+        }
+
+        public Trades matchIncoming(Order order) 
+        {   
+            Lock _orderLock = new(); 
+
+            Trades result = new Trades();
+
+            lock (_orderLock)
+            {
+                if (order.OrderType == OrderTypes.FillOrKill)
+                {
+                    if (canFill(order))
+                    {
+                        result = match(order);
+                        order.Dispose();
+                    }
+                }
+
+                else if (order.OrderType == OrderTypes.FillAndKill)
+                {
+                    result = match(order);
+                    order.Dispose();
+                } 
+
+                else if (order.OrderType == OrderTypes.Market)
+                {
+                    result = match(order);
+                    order.Dispose();
+                }
+
+                else if (order.OrderType == OrderTypes.PostOnly)
+                {
+                    if (!canFill(order))
+                        addOrder(order);
+                }
+
+                else if (order.OrderType == OrderTypes.StopMarket || order.OrderType == OrderTypes.StopLimit)
+                {
+                    addOrder(order);
+                }
+
+                else if (order.OrderType == OrderTypes.TrailingStop)
+                {
+                    addOrder(order);
+                }
+
+                else if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
+                {
+                    addOrder(order);
+                }
+
+                else if (order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
+                {
+                    addOrder(order); // add to internal order queue
+                }
+
+                else 
+                {
+                    result = match(order);
+                
+                    if (order.CurrentQuantity > 0)
+                    {
+                        addOrder(order);
+                    }
+
+                    else 
+                    {
+                        order.Dispose();
+                    }
+                }
+
+                return result;
+            }
         }
 
         public OrderbookSpread spread()
