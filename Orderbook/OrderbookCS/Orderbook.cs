@@ -3,7 +3,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
+    public partial class Orderbook: IRetrievalOrderbook, IDisposable
     {
         private readonly Lock _ordersLock = new();
         private readonly Lock _goodForDayLock = new();
