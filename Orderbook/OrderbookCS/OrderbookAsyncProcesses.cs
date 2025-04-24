@@ -9,6 +9,9 @@ namespace TradingServer.OrderbookCS
         private long _greatestTradedPrice = Int32.MinValue;
         private long _lastTradedPrice;
 
+        private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
+        private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
+
         private async Task ProcessAtMarketEnd()
         {
             while (true)
@@ -119,7 +122,6 @@ namespace TradingServer.OrderbookCS
 
         private async Task ProcessStopOrders()
         {
-            // only do this one while the market is open
             while (true)
             {
                 if (_ts.IsCancellationRequested)
@@ -208,7 +210,7 @@ namespace TradingServer.OrderbookCS
 
         private async Task UpdateGreatestTradedPrice()
         {
-            while (true) // though we should only do this at appropriate times in the day
+            while (true)
             {
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
