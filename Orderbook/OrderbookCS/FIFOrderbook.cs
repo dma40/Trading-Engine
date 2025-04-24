@@ -3,14 +3,14 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public class FIFOrderbook: Orderbook, IMatchingOrderbook
+    public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook
     {
-        public FIFOrderbook(Security security): base(security)
+        public MatchingOrderbook(Security security): base(security)
         {
             _security = security;
         }
 
-        public Trades match(Order order) 
+        public override Trades match(Order order) 
         {   
             Lock _orderLock = new(); 
 

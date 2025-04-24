@@ -3,7 +3,7 @@ using TradingServer.Instrument;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
+    public partial class Orderbook: IRetrievalOrderbook, IDisposable
     {
         private readonly Security _instrument;
         

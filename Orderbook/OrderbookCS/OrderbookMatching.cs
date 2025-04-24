@@ -2,9 +2,9 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
+    public partial class Orderbook: IRetrievalOrderbook, IDisposable
     {
-           public bool canFill(Order order)
+        public virtual bool canFill(Order order)
         {
             if (order.isBuySide)
             {
@@ -48,7 +48,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public Trades match(Order order) // redesign the whole thing
+        public virtual Trades match(Order order) // redesign the whole thing
         {
             Trades result = new Trades();
 

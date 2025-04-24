@@ -2,13 +2,16 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
+    public partial class Orderbook: IRetrievalOrderbook, IDisposable
     {
         private readonly Mutex _orderMutex = new Mutex();
         private readonly Mutex _goodForDayMutex = new Mutex();
         private readonly Mutex _goodTillCancelMutex = new Mutex();
 
-        private DateTime now; 
+        private DateTime now;
+        private static readonly TimeSpan marketOpen = new TimeSpan(9, 30, 0);
+        private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
+        
         private Trades _trades;
         private long _greatestTradedPrice = Int32.MinValue;
         private long _lastTradedPrice;
@@ -16,7 +19,7 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
         private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
 
-        private async Task ProcessAtMarketEnd()
+        protected async Task ProcessAtMarketEnd()
         {
             while (true)
             {
@@ -27,23 +30,19 @@ namespace TradingServer.OrderbookCS
 
                 DateTime currentTime = DateTime.Now;
 
-                if (currentTime.Hour >= 16)
+                if (currentTime.TimeOfDay >= marketEnd)
                 {
                     DateTime tomorrow = currentTime.AddDays(1);
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
-                    now = nextTradingDayStart;
-
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
                     try
                     {
                         removeOrders(_goodForDay.Values.ToList());
-
                         DeleteExpiredGoodTillCancel();
                         ProcessOnMarketEndOrders(); 
 
                         _orderMutex.WaitOne();
-
                         _goodForDayMutex.WaitOne();
                         _goodTillCancelMutex.WaitOne();
 
@@ -53,15 +52,9 @@ namespace TradingServer.OrderbookCS
                     finally
                     {
                         _orderMutex.ReleaseMutex();
-
                         _goodForDayMutex.ReleaseMutex();
                         _goodTillCancelMutex.ReleaseMutex();
                     }
-                }
-                
-                else 
-                {
-                    now = currentTime;
                 }
 
                 await Task.Delay(200, _ts.Token);
@@ -73,7 +66,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private async Task ProcessAtMarketOpen()
+        protected async Task ProcessAtMarketOpen()
         {
             while (true)
             {
@@ -82,7 +75,7 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
 
-                if (now.Hour == 9 && now.Minute == 30)
+                if (now.TimeOfDay == marketOpen)
                 {
                     lock (_ordersLock)
                     {
@@ -106,11 +99,10 @@ namespace TradingServer.OrderbookCS
                 
                 await Task.Delay(200, _ts.Token);
             }
-            // process at the start of the day (9:30 local time), 
             // must be in before 9:28 AM local time (or throw a error otherwise)
         }
 
-        private void ProcessOnMarketEndOrders()
+        protected void ProcessOnMarketEndOrders()
         {
             foreach (var order in _onMarketClose)
             {
@@ -120,11 +112,10 @@ namespace TradingServer.OrderbookCS
                 _onMarketClose.Remove(current.CurrentOrder.OrderID);
                 current.Dispose();
             }
-            // process these at the end of the day; we should specify somewhere
             // that they need to be placed before 3:50 PM or throw a error otherwise
         }
 
-        private async Task ProcessStopOrders()
+        protected async Task ProcessStopOrders()
         {
             while (true)
             {
@@ -133,10 +124,7 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
 
-                DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
-                TimeSpan marketOpen = new TimeSpan(9, 30, 0);
-                TimeSpan marketEnd = new TimeSpan(4, 0, 0);
 
                 if (currentTime >= marketOpen && currentTime <= marketEnd)
                 {
@@ -197,7 +185,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private void DeleteExpiredGoodTillCancel()
+        protected void DeleteExpiredGoodTillCancel()
         {
             List<CancelOrder> goodTillCancelOrders = new List<CancelOrder>();
 
@@ -212,14 +200,11 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private async Task UpdateGreatestTradedPrice()
+        protected async Task UpdateGreatestTradedPrice()
         {
             while (true)
             {
-                DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
-                TimeSpan marketOpen = new TimeSpan(9, 30, 0);
-                TimeSpan marketEnd = new TimeSpan(4, 0, 0);
 
                 if (_ts.IsCancellationRequested)
                 {
@@ -244,7 +229,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private async Task ProcessTrailingStopOrders()
+        protected async Task ProcessTrailingStopOrders()
         {
             while (true)
             {
@@ -253,10 +238,7 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
 
-                DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
-                TimeSpan marketOpen = new TimeSpan(9, 30, 0);
-                TimeSpan marketEnd = new TimeSpan(4, 0, 0);
 
                 if (currentTime >= marketOpen && currentTime <= marketEnd)
                 {
@@ -303,7 +285,7 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
 
-                await Task.Delay(200);
+                await Task.Delay(200, _ts.Token);
             }
         }
 

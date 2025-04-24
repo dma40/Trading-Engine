@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public interface IMatchingOrderbook: IRetrievalOrderbook
     {
-        Trades matchIncoming(Order order);
+        Trades match(Order order);
         public bool canFill(Order order);
         public SortedSet<Limit> getAskLimits();
         public SortedSet<Limit> getBidLimits();
