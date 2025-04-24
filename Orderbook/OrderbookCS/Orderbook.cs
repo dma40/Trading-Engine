@@ -49,11 +49,16 @@ namespace TradingServer.OrderbookCS
             _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
-        public void addOrder(Order order)
+        public void addOrder(Order order) // make this public for unit tests to make sure it works ok - otherwise this may be private
         {
             lock (_ordersLock) 
             {
                 var baseLimit = new Limit(order.Price);
+
+                if (order.OrderType != OrderTypes.StopLimit || order.OrderType != OrderTypes.StopMarket)
+                {
+                    throw new InvalidOperationException();
+                }
 
                 if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
                 {
@@ -516,7 +521,39 @@ namespace TradingServer.OrderbookCS
                 {
                     lock (_ordersLock) 
                     {
-                    // do something
+                        foreach (var trail in _trailingStop)
+                        {
+                            var trailstop = trail.Value;
+
+                            if (trailstop.isBuySide)
+                            {
+                                if (_lastTradedPrice <= trailstop.StopPrice)
+                                {
+                                    Order activated = trailstop.activate();
+                                    matchIncoming(activated);
+
+                                    trail.Value.Dispose();
+                                    _trailingStop.Remove(trailstop.OrderID);
+                                }
+
+                                else if (_greatestTradedPrice > trailstop.currentMaxPrice)
+                                {
+                                    trail.Value.currentMaxPrice = _greatestTradedPrice;
+                                }
+                            }
+
+                            else 
+                            {
+                                if (_lastTradedPrice >= trailstop.StopPrice)
+                                {
+                                   Order activated = trailstop.activate();
+                                   matchIncoming(activated);
+
+                                    trail.Value.Dispose();
+                                    _trailingStop.Remove(trailstop.OrderID);
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -527,12 +564,6 @@ namespace TradingServer.OrderbookCS
 
                 await Task.Delay(200);
             }
-            // this relies on all of the references being right when we 
-            // add/remove orders; if not, when we modify ordres in the trailing stop 
-            // list, it will fail to function correctly if we modify a order there, but
-            // the change is not reflected in the corresponding limit.
-            // we need to get what the maximum price is at a given time;
-            // for this we need to use the getSpread method we used earlier
         }
 
         public int count => _orders.Count;
@@ -677,6 +708,12 @@ namespace TradingServer.OrderbookCS
 
             lock (_orderLock)
             {
+                if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)
+                {
+                    throw new InvalidOperationException("In general, we attempt to match non-stop orders when they come in "
+                    + "- we add them to internal queues instead with addOrder.");
+                }
+
                 if (order.OrderType == OrderTypes.FillOrKill)
                 {
                     if (canFill(order))
@@ -740,6 +777,19 @@ namespace TradingServer.OrderbookCS
                 }
 
                 return result;
+            }
+        }
+
+        public void processIncoming(Order order) // review this later, is this necessary?
+        {
+            if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)
+            {
+                addOrder(order);
+            }
+
+            else 
+            {
+                matchIncoming(order);
             }
         }
 

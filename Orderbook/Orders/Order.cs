@@ -47,6 +47,9 @@ namespace TradingServer.Orders
         public Order(StopOrder stop): this(stop, stop.limitPrice, stop.Quantity, 
             stop.isBuySide, stop.OrderType) {}
 
+        public Order(TrailingStopOrder trail): this(trail, trail.StopPrice, trail.Quantity, 
+            trail.isBuySide, trail.OrderType) {}
+
         private readonly IOrderCore _orderCore;
         
         public long OrderID => _orderCore.OrderID; 
