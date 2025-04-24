@@ -11,16 +11,18 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _onMarketClose = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
-        public void addOrder(Order order) // make this public for unit tests to make sure it works ok - otherwise this may be private
+        public void addOrder(Order order)
         {
             lock (_ordersLock) 
             {
                 var baseLimit = new Limit(order.Price);
 
+                /*
                 if (order.OrderType != OrderTypes.StopLimit || order.OrderType != OrderTypes.StopMarket)
                 {
                     throw new InvalidOperationException();
                 }
+                */
 
                 if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
                 {
