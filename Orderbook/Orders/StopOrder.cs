@@ -34,7 +34,7 @@ namespace TradingServer.Orders
 
         public long limitPrice { get; private set; }
 
-        public long stopPrice => Price;
+        public long StopPrice => Price;
 
         public Order activate()
         {

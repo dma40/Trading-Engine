@@ -4,6 +4,11 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
     {
+        private DateTime now; 
+        private Trades _trades;
+        private long _greatestTradedPrice = Int32.MinValue;
+        private long _lastTradedPrice;
+
         private async Task ProcessAtMarketEnd()
         {
             while (true)
@@ -135,7 +140,7 @@ namespace TradingServer.OrderbookCS
 
                         if (tempOrder.isBuySide)
                         {
-                            if (_lastTradedPrice <= order.Value.Price)
+                            if (_lastTradedPrice <= order.Value.StopPrice)
                             {
                                 Order activate = order.Value.activate();
                                 match(activate);
@@ -156,7 +161,7 @@ namespace TradingServer.OrderbookCS
 
                         else
                         {
-                            if (_lastTradedPrice >= order.Value.Price)
+                            if (_lastTradedPrice >= order.Value.StopPrice)
                             {
                                 Order activated = order.Value.activate();
                                 match(activated);

@@ -29,11 +29,6 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _goodTillCancelLock = new();
         private readonly Lock _stopLock = new();
 
-        private DateTime now; 
-        private Trades _trades;
-        private long _greatestTradedPrice = Int32.MinValue;
-        private long _lastTradedPrice;
-
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
 
@@ -273,7 +268,7 @@ namespace TradingServer.OrderbookCS
                 }
             }
         }
-        
+
         public int count => _orders.Count;
 
         public List<OrderbookEntry> getAskOrders()
@@ -431,17 +426,11 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                else if (order.OrderType == OrderTypes.FillAndKill)
+                else if (order.OrderType == OrderTypes.FillAndKill || order.OrderType == OrderTypes.Market)
                 {
                     result = match(order);
                     order.Dispose();
                 } 
-
-                else if (order.OrderType == OrderTypes.Market)
-                {
-                    result = match(order);
-                    order.Dispose();
-                }
 
                 else if (order.OrderType == OrderTypes.PostOnly)
                 {
@@ -449,24 +438,12 @@ namespace TradingServer.OrderbookCS
                         addOrder(order);
                 }
 
-                else if (order.OrderType == OrderTypes.StopMarket || order.OrderType == OrderTypes.StopLimit)
+                else if (order.OrderType == OrderTypes.StopMarket || order.OrderType == OrderTypes.StopLimit
+                        || order.OrderType == OrderTypes.TrailingStop
+                        || order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose
+                        ||order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
                 {
                     addOrder(order);
-                }
-
-                else if (order.OrderType == OrderTypes.TrailingStop)
-                {
-                    addOrder(order);
-                }
-
-                else if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
-                {
-                    addOrder(order);
-                }
-
-                else if (order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
-                {
-                    addOrder(order); // add to internal order queue
                 }
 
                 else 
