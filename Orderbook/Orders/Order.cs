@@ -1,9 +1,8 @@
 namespace TradingServer.Orders 
 {
-    // maybe make a new order type
     public class Order: IOrderCore, IDisposable
     {
-        public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType) 
+        public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType)
         {
             if (orderType == OrderTypes.Market)
             {

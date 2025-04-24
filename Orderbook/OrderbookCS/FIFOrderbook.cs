@@ -63,6 +63,17 @@ namespace TradingServer.OrderbookCS
                 return result;
             }
         }
+
+        public override void addOrder(Order order)
+        {
+            base.addOrder(order); // do something like this; if it's a static order types
+        }
+
+        public override void modifyOrder(ModifyOrder modify)
+        {
+            removeOrder(modify.cancelOrder());
+            match(modify.newOrder()); // something like this
+        }
     
         private readonly Security _security;
     }

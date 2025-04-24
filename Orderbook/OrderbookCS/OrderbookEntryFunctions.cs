@@ -11,7 +11,7 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _onMarketClose = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
-        public void addOrder(Order order)
+        public virtual void addOrder(Order order)
         {
             lock (_ordersLock) 
             {
@@ -123,7 +123,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void removeOrder(CancelOrder cancel)
+        public virtual void removeOrder(CancelOrder cancel)
         {
             lock (_ordersLock)
             {
@@ -225,15 +225,14 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void modifyOrder(ModifyOrder modify)
+        public virtual void modifyOrder(ModifyOrder modify)
         {   
             lock (_ordersLock)
             {
                 if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
                 {
                     removeOrder(modify.OrderID, orderentry, _orders);
-                    //addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
-                    matchIncoming(modify.newOrder());
+                    addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
                 }
             }
         }

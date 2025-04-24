@@ -18,11 +18,11 @@ namespace TradingServer.OrderbookCS
             _instrument = instrument;
             _trades = new Trades();
 
-            //_ = Task.Run(() => ProcessAtMarketOpen());
-            //_ = Task.Run(() => ProcessAtMarketEnd());
-            //_ = Task.Run(() => ProcessStopOrders());
-            //_ = Task.Run(() => ProcessTrailingStopOrders());
-            //_ = Task.Run(() => UpdateGreatestTradedPrice());
+            _ = Task.Run(() => ProcessAtMarketOpen());
+            _ = Task.Run(() => ProcessAtMarketEnd());
+            _ = Task.Run(() => ProcessStopOrders());
+            _ = Task.Run(() => ProcessTrailingStopOrders());
+            _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
         ~Orderbook()

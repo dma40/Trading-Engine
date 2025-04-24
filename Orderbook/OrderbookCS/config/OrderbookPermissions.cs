@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace TradingServer.OrderbookCS
 {
     public enum PermissionLevel
@@ -33,6 +31,7 @@ namespace TradingServer.OrderbookCS
 
             else 
             {
+                result = new MatchingOrderbook(new Instrument.Security(security));
                 return (IMatchingOrderbook) result;
             }
         }

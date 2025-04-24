@@ -253,7 +253,7 @@ namespace TradingServer.OrderbookCS
                                 if (_lastTradedPrice <= trailstop.StopPrice)
                                 {
                                     Order activated = trailstop.activate();
-                                    matchIncoming(activated);
+                                    match(activated);
 
                                     trail.Value.Dispose();
                                     _trailingStop.Remove(trailstop.OrderID);
@@ -270,7 +270,7 @@ namespace TradingServer.OrderbookCS
                                 if (_lastTradedPrice >= trailstop.StopPrice)
                                 {
                                    Order activated = trailstop.activate();
-                                   matchIncoming(activated);
+                                   match(activated);
 
                                     trail.Value.Dispose();
                                     _trailingStop.Remove(trailstop.OrderID);

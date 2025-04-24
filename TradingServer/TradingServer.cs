@@ -24,8 +24,8 @@ namespace TradingServer.Core
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
-            _orderbook = new MatchingOrderbook(new Security(_tradingConfig.TradingServerSettings.SecurityName));
-            //_orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig.TradingServerSettings.SecurityName, _tradingConfig.PermissionLevel);
+            //_orderbook = new MatchingOrderbook(new Security(_tradingConfig.TradingServerSettings.SecurityName));
+            _orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig.TradingServerSettings.SecurityName, _tradingConfig.PermissionLevel);
             permissionLevel = config.Value.PermissionLevel;
         }
 
@@ -108,6 +108,11 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
+            if ((int) permissionLevel < 1)
+            {
+                throw new InvalidOperationException();
+            }
+
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); 
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;

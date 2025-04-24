@@ -79,6 +79,7 @@ namespace TradingServer.OrderbookCS
             return result;
         }
 
+        /*
         public Trades matchIncoming(Order order) 
         {   
             Lock _orderLock = new(); 
@@ -153,5 +154,7 @@ namespace TradingServer.OrderbookCS
                 matchIncoming(order);
             }
         } 
+    }
+    */
     }
 }
