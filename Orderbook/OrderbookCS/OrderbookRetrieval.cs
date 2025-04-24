@@ -1,9 +1,15 @@
 using TradingServer.Orders;
+using TradingServer.Instrument;
 
 namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
     {
+        private readonly Security _instrument;
+        
+        private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
+        private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
+
         public List<OrderbookEntry> getAskOrders()
         {
             List<OrderbookEntry> entries = new List<OrderbookEntry>();

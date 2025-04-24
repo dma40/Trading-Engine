@@ -4,6 +4,10 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
     {
+        private readonly Mutex _orderMutex = new Mutex();
+        private readonly Mutex _goodForDayMutex = new Mutex();
+        private readonly Mutex _goodTillCancelMutex = new Mutex();
+
         private DateTime now; 
         private Trades _trades;
         private long _greatestTradedPrice = Int32.MinValue;

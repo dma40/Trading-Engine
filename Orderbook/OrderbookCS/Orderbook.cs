@@ -5,15 +5,6 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IRetrievalOrderbook, IMatchingOrderbook, IDisposable
     {
-        private readonly Security _instrument;
-        
-        private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
-        private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
-
-        private readonly Mutex _orderMutex = new Mutex();
-        private readonly Mutex _goodForDayMutex = new Mutex();
-        private readonly Mutex _goodTillCancelMutex = new Mutex();
-
         private readonly Lock _ordersLock = new();
         private readonly Lock _goodForDayLock = new();
         private readonly Lock _goodTillCancelLock = new();
