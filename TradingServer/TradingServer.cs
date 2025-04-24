@@ -7,7 +7,6 @@ using TradingServer.OrderbookCS;
 using TradingServer.Handlers;
 using Trading;
 using TradingServer.Orders;
-using TradingServer.Instrument;
 using TradingServer.Rejects;
 
 namespace TradingServer.Core 

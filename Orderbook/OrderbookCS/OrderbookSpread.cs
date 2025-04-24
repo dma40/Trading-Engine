@@ -15,7 +15,7 @@ namespace TradingServer.OrderbookCS
             get
             {
                 if (bid.HasValue && ask.HasValue)
-                    return (ask.Value - bid.Value);
+                    return ask.Value - bid.Value;
                 
                 else
                     return null;

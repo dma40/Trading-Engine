@@ -48,7 +48,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public virtual Trades match(Order order) // redesign the whole thing
+        public virtual Trades match(Order order) 
         {
             Trades result = new Trades();
 

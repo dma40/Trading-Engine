@@ -66,7 +66,7 @@ namespace TradingServer.OrderbookCS
 
         public override void addOrder(Order order)
         {
-            base.addOrder(order); // do something like this; if it's a static order types
+            base.addOrder(order); // do something like this; if it's a static order type
         }
 
         public override void modifyOrder(ModifyOrder modify)

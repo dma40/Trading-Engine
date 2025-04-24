@@ -133,6 +133,8 @@ namespace TradingServer.OrderbookCS
                     orderbookentry.Dispose();
                 }
 
+                /*
+
                 else if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
                 {
                     _stop.Remove(cancel.OrderID);
@@ -156,6 +158,7 @@ namespace TradingServer.OrderbookCS
                     _onMarketClose.Remove(cancel.OrderID);
                     omc.Dispose();
                 }
+                */
             }
         }
 
