@@ -32,5 +32,10 @@ namespace TradingServer.OrderbookCS
         {
             throw new UnauthorizedAccessException();
         }
+
+        Trades match(Order order)
+        {
+            throw new UnauthorizedAccessException();
+        }
     }
 }

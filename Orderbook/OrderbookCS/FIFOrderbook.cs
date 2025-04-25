@@ -40,7 +40,7 @@ namespace TradingServer.OrderbookCS
            _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
-        public override Trades match(Order order) 
+        public sealed override Trades match(Order order) 
         {   
             Lock _orderLock = new(); 
 
@@ -373,6 +373,34 @@ namespace TradingServer.OrderbookCS
             return _lastTradedPrice;
         }
 
+        ~MatchingOrderbook()
+        {
+            Dispose();
+        }
+
+        public new void Dispose() 
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected sealed override void Dispose(bool dispose) 
+        {
+            if (_disposed) 
+            { 
+                return;
+            }
+
+            _disposed = true;
+
+            if (dispose) 
+            {
+                _ts.Cancel();
+                _ts.Dispose();
+            }
+        }
+
         private readonly CancellationTokenSource _ts = new CancellationTokenSource();
+        private bool _disposed = false;
     }
 }

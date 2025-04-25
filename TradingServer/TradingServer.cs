@@ -23,7 +23,6 @@ namespace TradingServer.Core
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
-            //_orderbook = new MatchingOrderbook(new Security(_tradingConfig.TradingServerSettings.SecurityName));
             _orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig.TradingServerSettings.SecurityName, _tradingConfig.PermissionLevel);
             permissionLevel = config.Value.PermissionLevel;
         }
@@ -143,11 +142,9 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Add")
             {
-                if (_orderbook is IMatchingOrderbook)
-                {
-                    Order newOrder = modify.newOrder();
-                    _orderbook.addOrder(newOrder);
-                }
+                Order newOrder = modify.newOrder();
+                _orderbook.addOrder(newOrder);
+                
                 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
                 " side by {request.Username} at {DateTime.UtcNow}");
