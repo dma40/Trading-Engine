@@ -5,10 +5,7 @@ namespace TradingServer.OrderbookCS
     public partial class Orderbook: IRetrievalOrderbook, IDisposable
     {
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
-
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); // can consider making these just orders, uses less heap memory
-        private readonly Dictionary<long, OrderbookEntry> _onMarketOpen = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _onMarketClose = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
         public virtual void addOrder(Order order)
@@ -17,40 +14,9 @@ namespace TradingServer.OrderbookCS
             {
                 var baseLimit = new Limit(order.Price);
 
-                /*
-                if (order.OrderType != OrderTypes.StopLimit || order.OrderType != OrderTypes.StopMarket)
-                {
-                    throw new InvalidOperationException();
-                }
-                */
-
                 if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
                 {
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
-                }
-
-                else if (!_stop.TryGetValue(order.OrderID, out StopOrder? stop) 
-                        && order.OrderType == OrderTypes.StopMarket || order.OrderType == OrderTypes.StopLimit)
-                {
-                    _stop.Add(order.OrderID, (StopOrder) order);
-                }
-
-                else if (!_trailingStop.TryGetValue(order.OrderID, out TrailingStopOrder? trailing) && 
-                    order.OrderType == OrderTypes.TrailingStop)
-                {
-                    _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
-                }
-
-                else if (!_onMarketOpen.TryGetValue(order.OrderID, out OrderbookEntry? moo) && 
-                    order.OrderType == OrderTypes.MarketOnOpen || order.OrderType == OrderTypes.LimitOnOpen)
-                {
-                    _onMarketOpen.Add(order.OrderID, new OrderbookEntry(order, baseLimit));
-                }
-
-                else if (!_onMarketClose.TryGetValue(order.OrderID, out OrderbookEntry? coo) && 
-                    order.OrderType == OrderTypes.MarketOnClose || order.OrderType == OrderTypes.LimitOnClose)
-                {
-                    _onMarketClose.Add(order.OrderID, new OrderbookEntry(order, baseLimit));
                 }
             }
         }
@@ -108,7 +74,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private void removeOrders(List<CancelOrder> cancels)
+        protected void removeOrders(List<CancelOrder> cancels)
         {
             lock (_ordersLock)
             {
@@ -132,33 +98,6 @@ namespace TradingServer.OrderbookCS
                     removeOrder(cancel.OrderID, orderbookentry, _orders);
                     orderbookentry.Dispose();
                 }
-
-                /*
-
-                else if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
-                {
-                    _stop.Remove(cancel.OrderID);
-                    stop.Dispose();
-                }
-
-                else if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? trailing_stop) && trailing_stop != null)
-                {
-                    _trailingStop.Remove(cancel.OrderID);
-                    trailing_stop.Dispose();
-                }
-
-                else if (_onMarketOpen.TryGetValue(cancel.OrderID, out OrderbookEntry? omo) && omo != null)
-                {
-                    _onMarketOpen.Remove(cancel.OrderID);
-                    omo.Dispose();
-                }
-
-                else if (_onMarketClose.TryGetValue(cancel.OrderID, out OrderbookEntry? omc) && omc != null)
-                {
-                    _onMarketClose.Remove(cancel.OrderID);
-                    omc.Dispose();
-                }
-                */
             }
         }
 

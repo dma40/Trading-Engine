@@ -62,11 +62,6 @@ namespace TradingServer.OrderbookCS
             return _instrument.name;
         }
 
-        public long currentPrice()
-        {
-            return _lastTradedPrice;
-        }
-
         public OrderbookSpread spread()
         {
             long? bestAsk = null, bestBid = null;

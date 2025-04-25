@@ -8,7 +8,6 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _ordersLock = new();
         private readonly Lock _goodForDayLock = new();
         private readonly Lock _goodTillCancelLock = new();
-        private readonly Lock _stopLock = new();
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
@@ -16,13 +15,8 @@ namespace TradingServer.OrderbookCS
         public Orderbook(Security instrument) 
         {
             _instrument = instrument;
-            _trades = new Trades();
 
-            _ = Task.Run(() => ProcessAtMarketOpen());
             _ = Task.Run(() => ProcessAtMarketEnd());
-            _ = Task.Run(() => ProcessStopOrders());
-            _ = Task.Run(() => ProcessTrailingStopOrders());
-            _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
         ~Orderbook()
