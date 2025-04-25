@@ -30,7 +30,7 @@ namespace TradingServer.OrderbookCS
 
                     try
                     {
-                        removeOrders(_goodForDay.Values.ToList());
+                        DeleteGoodForDayOrders();
                         DeleteExpiredGoodTillCancel();
 
                         _orderMutex.WaitOne();
@@ -55,6 +55,11 @@ namespace TradingServer.OrderbookCS
                     return;
                 }
             }
+        }
+
+        protected void DeleteGoodForDayOrders()
+        {
+            removeOrders(_goodForDay.Values.ToList());
         }
 
         protected void DeleteExpiredGoodTillCancel()

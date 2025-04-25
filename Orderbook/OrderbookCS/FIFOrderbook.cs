@@ -27,7 +27,6 @@ namespace TradingServer.OrderbookCS
 
         private readonly Dictionary<long, Order> _onMarketOpen = new Dictionary<long, Order>();
         private readonly Dictionary<long, Order> _onMarketClose = new Dictionary<long, Order>();
-        private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
         public MatchingOrderbook(Security security): base(security)
         {
@@ -336,7 +335,7 @@ namespace TradingServer.OrderbookCS
 
                     try
                     {
-                        removeOrders(_goodForDay.Values.ToList());
+                        DeleteGoodForDayOrders();
                         DeleteExpiredGoodTillCancel();
                         ProcessOnMarketEndOrders(); 
 
@@ -409,7 +408,6 @@ namespace TradingServer.OrderbookCS
                 _onMarketClose.Remove(current.OrderID);
                 current.Dispose();
             }
-            // that they need to be placed before 3:50 PM or throw a error otherwise
         }
 
         public long currentPrice()
