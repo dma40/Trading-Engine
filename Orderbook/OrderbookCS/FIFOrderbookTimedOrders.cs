@@ -1,0 +1,101 @@
+using TradingServer.Orders;
+
+namespace TradingServer.OrderbookCS
+{
+    public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
+    {
+        protected sealed override async Task ProcessAtMarketEnd()
+        {
+            while (true)
+            {
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                DateTime currentTime = DateTime.Now;
+
+                if (currentTime.TimeOfDay >= marketEnd)
+                {
+                    DateTime tomorrow = currentTime.AddDays(1);
+                    DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
+                    TimeSpan closed = nextTradingDayStart - DateTime.Now;
+
+                    try
+                    {
+                        DeleteGoodForDayOrders();
+                        DeleteExpiredGoodTillCancel();
+                        ProcessOnMarketEndOrders(); 
+
+                        _orderMutex.WaitOne();
+                        _goodForDayMutex.WaitOne();
+                        _goodTillCancelMutex.WaitOne();
+
+                        Thread.Sleep(closed);
+                    }
+
+                    finally
+                    {
+                        _orderMutex.ReleaseMutex();
+                        _goodForDayMutex.ReleaseMutex();
+                        _goodTillCancelMutex.ReleaseMutex();
+                    }
+                }
+
+                await Task.Delay(200, _ts.Token);
+
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
+            }
+        }
+
+        protected async Task ProcessAtMarketOpen()
+        {
+            while (true)
+            {
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (now.TimeOfDay == marketOpen)
+                {
+                    lock (_ordersLock)
+                    {
+                        foreach (var order in _onMarketOpen)
+                        {
+                            var orderEntry = order.Value;
+                            var id = order.Value.OrderID;
+
+                            match(order.Value);
+                            _onMarketOpen.Remove(id);
+
+                            orderEntry.Dispose();
+                        }
+                    }
+                }
+
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
+                }
+                
+                await Task.Delay(200, _ts.Token);
+            }
+        }
+
+        protected void ProcessOnMarketEndOrders()
+        {
+            foreach (var order in _onMarketClose)
+            {
+                var current = order.Value;
+                match(current);
+
+                _onMarketClose.Remove(current.OrderID);
+                current.Dispose();
+            }
+        }
+    }
+}
