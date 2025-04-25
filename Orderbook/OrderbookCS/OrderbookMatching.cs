@@ -58,6 +58,26 @@ namespace TradingServer.OrderbookCS
                 {
                     if (ask.Price <= order.Price)
                     {
+                        OrderbookEntry head = ask.head;
+
+                        while (head != null)
+                        {
+                            var entry = head.CurrentOrder;
+
+                            //if (some condition)
+                            //{
+                            // (make a new cancel order, cancel one of the orders)
+                            // executeTrade(order1, order2)
+
+                            // head = head.next;
+                            // remove the other order if necessary
+                            //}
+
+                            // else
+                            // {
+                            //  advance the order pointer + keep trying to fill; if filled up, break
+                            // }
+                        }
                         // work out new logic here, this needs to be fixed
                         // needs to check for duplicated/corrupted refs
                     }
@@ -78,83 +98,5 @@ namespace TradingServer.OrderbookCS
 
             return result;
         }
-
-        /*
-        public Trades matchIncoming(Order order) 
-        {   
-            Lock _orderLock = new(); 
-
-            Trades result = new Trades();
-
-            lock (_orderLock)
-            {
-                if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)
-                {
-                    throw new InvalidOperationException("In general, we attempt to match non-stop orders when they come in "
-                    + "- we add them to internal queues instead with addOrder.");
-                }
-
-                if (order.OrderType == OrderTypes.FillOrKill)
-                {
-                    if (canFill(order))
-                    {
-                        result = match(order);
-                        order.Dispose();
-                    }
-                }
-
-                else if (order.OrderType == OrderTypes.FillAndKill || order.OrderType == OrderTypes.Market)
-                {
-                    result = match(order);
-                    order.Dispose();
-                } 
-
-                else if (order.OrderType == OrderTypes.PostOnly)
-                {
-                    if (!canFill(order))
-                        addOrder(order);
-                }
-
-                else if (order.OrderType == OrderTypes.StopMarket || order.OrderType == OrderTypes.StopLimit
-                        || order.OrderType == OrderTypes.TrailingStop
-                        || order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose
-                        ||order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
-                {
-                    addOrder(order);
-                }
-
-                else 
-                {
-                    result = match(order);
-                
-                    if (order.CurrentQuantity > 0)
-                    {
-                        addOrder(order);
-                    }
-
-                    else 
-                    {
-                        order.Dispose();
-                    }
-                }
-
-                return result;
-            }
-        }
-
-        public void processIncoming(Order order) // review this later, is this necessary?
-        {
-            if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)
-            {
-                addOrder(order);
-            }
-
-            else 
-            {
-                matchIncoming(order);
-            }
-        } 
-    }
-    */
     }
 }

@@ -36,6 +36,11 @@ namespace TradingServer.Rejects
                 return "InvalidOrUnknownArgument";
             }
 
+            else if (reject == RejectionReason.SubmittedAfterDeadline)
+            {
+                return "SubmittedAfterDeadline";
+            }
+
             else 
             {
                 return "Unknown";

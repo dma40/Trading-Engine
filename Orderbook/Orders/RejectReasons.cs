@@ -7,6 +7,7 @@ namespace TradingServer.Rejects
         ModifyWrongSide,
         OperationNotFound,
         InvalidOrUnknownArgument,
-        EmptyOrNullArgument
+        EmptyOrNullArgument,
+        SubmittedAfterDeadline
     }
 }

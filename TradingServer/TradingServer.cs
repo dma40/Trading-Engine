@@ -50,6 +50,10 @@ namespace TradingServer.Core
 
         private Tuple<bool, Reject> checkIfOrderIsInvalid(OrderRequest request)
         {
+            TimeSpan now = DateTime.Now.TimeOfDay;
+            TimeSpan onOpenDeadline = new TimeSpan(9, 28, 0);
+            TimeSpan onCloseDeadline = new TimeSpan(15, 50, 0);
+
             RejectCreator creator = new RejectCreator(); 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, 
                                                 _tradingConfig.TradingServerSettings.SecurityID, 
@@ -58,7 +62,21 @@ namespace TradingServer.Core
             bool isInvalid = false;
             RejectionReason reason = RejectionReason.Unknown;
 
-            if (Order.StringToOrderType(request.Type) == OrderTypes.Market && 
+            if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnClose || 
+            Order.StringToOrderType(request.Type) == OrderTypes.LimitOnClose && now >= onCloseDeadline)
+            {
+                isInvalid = true;
+                reason = RejectionReason.SubmittedAfterDeadline;
+            }
+
+            else if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnOpen ||
+            Order.StringToOrderType(request.Type) == OrderTypes.LimitOnOpen && now >= onOpenDeadline)
+            {
+                isInvalid = true;
+                reason = RejectionReason.SubmittedAfterDeadline;
+            }
+
+            else if (Order.StringToOrderType(request.Type) == OrderTypes.Market && 
                 (!string.IsNullOrWhiteSpace(request.Price.ToString())
                  || !string.IsNullOrWhiteSpace(request.Operation)))
             {
@@ -66,7 +84,7 @@ namespace TradingServer.Core
                 reason = RejectionReason.EmptyOrNullArgument;
             }
 
-            if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill 
+            else if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill 
                 || (Order.StringToOrderType(request.Type) == OrderTypes.FillOrKill)) 
                 && (!string.IsNullOrEmpty(request.Operation)))
             {
