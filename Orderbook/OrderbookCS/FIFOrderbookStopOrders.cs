@@ -4,6 +4,8 @@ namespace TradingServer.OrderbookCS
 {
     public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
     {
+        
+
         protected async Task ProcessStopOrders()
         {
             while (true)
@@ -76,35 +78,6 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        protected async Task UpdateGreatestTradedPrice()
-        {
-            while (true)
-            {
-                TimeSpan currentTime = now.TimeOfDay;
-
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                if (_trades.result.Count > 0 && currentTime <= marketEnd && currentTime >= marketOpen)
-                {
-                    var lastTrade = _trades.result[_trades.result.Count - 1];
-                    if (lastTrade.tradedPrice > _greatestTradedPrice)
-                    {
-                        _greatestTradedPrice = lastTrade.tradedPrice;
-                    }
-                }
-
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                await Task.Delay(200, _ts.Token);
-            }
-        }
-
         protected async Task ProcessTrailingStopOrders()
         {
             while (true)
@@ -164,11 +137,5 @@ namespace TradingServer.OrderbookCS
                 await Task.Delay(200, _ts.Token);
             }
         }
-
-        public long currentPrice()
-        {
-            return _lastTradedPrice;
-        }
-
     }
 }

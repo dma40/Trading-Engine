@@ -4,6 +4,12 @@ namespace TradingServer.OrderbookCS
 {
     public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
     {
+
+        
+
+        private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
+        private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
+
         public sealed override void addOrder(Order order)
         { 
             if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)

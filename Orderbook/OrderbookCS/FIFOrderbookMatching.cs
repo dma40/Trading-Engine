@@ -4,6 +4,8 @@ namespace TradingServer.OrderbookCS
 {
     public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
     {
+        private Trades _trades;
+
         public new Trades match(Order order) 
         {   
             Lock _orderLock = new(); 

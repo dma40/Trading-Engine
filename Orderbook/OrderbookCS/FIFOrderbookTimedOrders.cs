@@ -4,6 +4,13 @@ namespace TradingServer.OrderbookCS
 {
     public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
     {
+        private DateTime now;
+        private static readonly TimeSpan marketOpen = new TimeSpan(9, 30, 0);
+        private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
+
+        private readonly Dictionary<long, Order> _onMarketOpen = new Dictionary<long, Order>();
+        private readonly Dictionary<long, Order> _onMarketClose = new Dictionary<long, Order>();
+
         protected sealed override async Task ProcessAtMarketEnd()
         {
             while (true)
