@@ -25,8 +25,8 @@ namespace TradingServer.OrderbookCS
         private readonly Mutex _goodForDayMutex = new Mutex();
         private readonly Mutex _goodTillCancelMutex = new Mutex();
 
-        private readonly Dictionary<long, OrderbookEntry> _onMarketOpen = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _onMarketClose = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, Order> _onMarketOpen = new Dictionary<long, Order>();
+        private readonly Dictionary<long, Order> _onMarketClose = new Dictionary<long, Order>();
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
         public MatchingOrderbook(Security security): base(security)
@@ -40,7 +40,7 @@ namespace TradingServer.OrderbookCS
            _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
-        public sealed override Trades match(Order order) 
+        public new Trades match(Order order) 
         {   
             Lock _orderLock = new(); 
 
@@ -72,7 +72,7 @@ namespace TradingServer.OrderbookCS
                 else if (order.OrderType == OrderTypes.PostOnly)
                 {
                     if (!canFill(order))
-                        addOrder(order);
+                        base.addOrder(order);
                 }
 
                 else 
@@ -81,7 +81,7 @@ namespace TradingServer.OrderbookCS
                 
                     if (order.CurrentQuantity > 0)
                     {
-                        addOrder(order);
+                        base.addOrder(order);
                     }
 
                     else 
@@ -95,21 +95,31 @@ namespace TradingServer.OrderbookCS
         }
 
         public sealed override void addOrder(Order order)
-        {
-            base.addOrder(order);
-            /* 
-            Pseudocode:
-
-            if (is some non-static, special order type like FillOrKill)
+        { 
+            if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)
             {
-                match(the order) or do nothing accordingly
+                _stop.Add(order.OrderID, (StopOrder) order);
             }
 
-            if (is other special order type)
+            else if (order.OrderType == OrderTypes.TrailingStop)
             {
-                do a special behavior (such as add to a seperate internal queue)
+                _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
             }
-            */
+
+            else if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
+            {
+                _onMarketClose.Add(order.OrderID, order);
+            }
+
+            else if (order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
+            {
+                _onMarketOpen.Add(order.OrderID, order);
+            }
+
+            else 
+            {
+                match(order);
+            }
         }
 
         public sealed override void modifyOrder(ModifyOrder modify)
@@ -120,8 +130,30 @@ namespace TradingServer.OrderbookCS
 
         public sealed override void removeOrder(CancelOrder cancel)
         {
-            // check if it's one of the static types (base remove applies)
-            // and then check if a seperate order queue needs to be handled
+            if (cancel.OrderType == OrderTypes.StopLimit || cancel.OrderType == OrderTypes.StopMarket)
+            {
+                _stop.Remove(cancel.OrderID);
+            }
+
+            else if (cancel.OrderType == OrderTypes.TrailingStop)
+            {
+                _trailingStop.Remove(cancel.OrderID);
+            }
+
+            else if (cancel.OrderType == OrderTypes.LimitOnClose || cancel.OrderType == OrderTypes.MarketOnClose)
+            {
+                _onMarketClose.Remove(cancel.OrderID);
+            }
+
+            else if (cancel.OrderType == OrderTypes.LimitOnOpen || cancel.OrderType == OrderTypes.MarketOnOpen)
+            {
+                _onMarketOpen.Remove(cancel.OrderID);
+            }
+
+            else 
+            {
+                base.removeOrder(cancel);
+            }
         }
 
         protected async Task ProcessStopOrders()
@@ -348,9 +380,9 @@ namespace TradingServer.OrderbookCS
                         foreach (var order in _onMarketOpen)
                         {
                             var orderEntry = order.Value;
-                            var id = order.Value.CurrentOrder.OrderID;
+                            var id = order.Value.OrderID;
 
-                            match(order.Value.CurrentOrder);
+                            match(order.Value);
                             _onMarketOpen.Remove(id);
 
                             orderEntry.Dispose();
@@ -365,7 +397,6 @@ namespace TradingServer.OrderbookCS
                 
                 await Task.Delay(200, _ts.Token);
             }
-            // must be in before 9:28 AM local time (or throw a error otherwise)
         }
 
         protected void ProcessOnMarketEndOrders()
@@ -373,9 +404,9 @@ namespace TradingServer.OrderbookCS
             foreach (var order in _onMarketClose)
             {
                 var current = order.Value;
-                match(current.CurrentOrder);
+                match(current);
 
-                _onMarketClose.Remove(current.CurrentOrder.OrderID);
+                _onMarketClose.Remove(current.OrderID);
                 current.Dispose();
             }
             // that they need to be placed before 3:50 PM or throw a error otherwise

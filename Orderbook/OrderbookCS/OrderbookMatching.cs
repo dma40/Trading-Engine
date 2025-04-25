@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IRetrievalOrderbook, IDisposable
     {
-        public virtual bool canFill(Order order)
+        protected virtual bool canFill(Order order)
         {
             if (order.isBuySide)
             {
@@ -48,7 +48,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public virtual Trades match(Order order) 
+        protected virtual Trades match(Order order) 
         {
             Trades result = new Trades();
 
