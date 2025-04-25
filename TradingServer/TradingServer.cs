@@ -14,7 +14,7 @@ namespace TradingServer.Core
     sealed class TradingServer: BackgroundService, ITradingServer 
     {
         private readonly ITextLogger _logger;
-        private readonly IReadOnlyOrderbook _orderbook; // maybe do this 
+        private readonly IReadOnlyOrderbook _orderbook; 
         private readonly TradingServerConfiguration _tradingConfig;
 
         public PermissionLevel permissionLevel;
@@ -109,7 +109,7 @@ namespace TradingServer.Core
         {
             if ((int) permissionLevel < 1)
             {
-                throw new InvalidOperationException();
+                throw new UnauthorizedAccessException("You do not have permission for this operation");
             }
 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); 
@@ -117,8 +117,6 @@ namespace TradingServer.Core
             DateTime now = DateTime.Now;
 
             Tuple<bool, Reject> result = checkIfOrderIsInvalid(request);
-
-            // first check if the permission level is appropriate
 
             if (now.Hour >= 16)
             {
@@ -145,10 +143,10 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Add")
             {
-                if ((int) permissionLevel >= 1)
+                if (_orderbook is IMatchingOrderbook)
                 {
                     Order newOrder = modify.newOrder();
-                    //_orderbook.matchIncoming(newOrder);
+                    _orderbook.addOrder(newOrder);
                 }
                 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
@@ -157,9 +155,8 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Cancel")
             {
-                // if ((int) permissionLevel >= 1) or maybe check if it's the right type of orderbook
                 CancelOrder cancelOrder = modify.cancelOrder();
-                //_orderbook.removeOrder(cancelOrder);
+                _orderbook.removeOrder(cancelOrder);
 
                 _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
                 " by {request.Username} at {DateTime.UtcNow}");
@@ -167,9 +164,7 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Modify")
             {
-                // if ((int) permissionLevel >= 1)
-                //_orderbook.removeOrder(modify.cancelOrder());
-                //_orderbook.matchIncoming(modify.newOrder());
+                _orderbook.modifyOrder(modify);
                 
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
                  " by {request.Username} at {DateTime.UtcNow}");

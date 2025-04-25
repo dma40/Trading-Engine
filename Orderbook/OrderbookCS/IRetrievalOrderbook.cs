@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public interface IRetrievalOrderbook: IOrderEntryOrderbook
     {
-        List<OrderbookEntry> getAskOrders();
-        List<OrderbookEntry> getBidOrders();
+        new List<OrderbookEntry> getAskOrders();
+        new List<OrderbookEntry> getBidOrders();
     }
 }
