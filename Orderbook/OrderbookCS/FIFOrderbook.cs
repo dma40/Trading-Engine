@@ -51,20 +51,20 @@ namespace TradingServer.OrderbookCS
                 {
                     if (canFill(order))
                     {
-                        result = match(order);
+                        result = base.match(order);
                         order.Dispose();
                     }
                 }
 
                 else if (order.OrderType == OrderTypes.FillAndKill)
                 {
-                    result = match(order);
+                    result = base.match(order);
                     order.Dispose();
                 } 
 
                 else if (order.OrderType == OrderTypes.Market)
                 {
-                    result = match(order);
+                    result = base.match(order);
                     order.Dispose();
                 }
 
@@ -76,7 +76,7 @@ namespace TradingServer.OrderbookCS
 
                 else 
                 {
-                    result = match(order);
+                    result = base.match(order);
                 
                     if (order.CurrentQuantity > 0)
                     {
