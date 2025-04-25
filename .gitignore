@@ -76,3 +76,4 @@ TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
 /.vscode
 /TradingServer/Users
 /tests/bin
+TradingServer/appsettings.json
