@@ -5,7 +5,7 @@ namespace TradingServer.OrderbookCS
     public partial class Orderbook: IRetrievalOrderbook, IDisposable
     {
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); // can consider making these just orders, uses less heap memory
+        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
         private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
 
         public virtual void addOrder(Order order)

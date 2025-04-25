@@ -96,9 +96,20 @@ namespace TradingServer.OrderbookCS
 
         public sealed override void addOrder(Order order)
         {
-            base.addOrder(order); // do something like this; if it's a static order type;
-                                // figure use if/else checks to find out whether it's an alternate
-                                // order type that needs special handling
+            base.addOrder(order);
+            /* 
+            Pseudocode:
+
+            if (is some non-static, special order type like FillOrKill)
+            {
+                match(the order) or do nothing accordingly
+            }
+
+            if (is other special order type)
+            {
+                do a special behavior (such as add to a seperate internal queue)
+            }
+            */
         }
 
         public sealed override void modifyOrder(ModifyOrder modify)
@@ -139,12 +150,13 @@ namespace TradingServer.OrderbookCS
 
                                 if (order.Value.CurrentQuantity > 0)
                                 {
-                                    addOrder(order.Value);
+                                    addOrder(activate);
                                 }
 
                                 else
                                 {
-                                    order.Value.Dispose(); // check if this is doing something wacky
+                                    activate.Dispose();
+                                    order.Value.Dispose(); 
                                 }
 
                                 _stop.Remove(tempOrder.OrderID);
@@ -158,14 +170,15 @@ namespace TradingServer.OrderbookCS
                                 Order activated = order.Value.activate();
                                 match(activated);
 
-                                if (order.Value.CurrentQuantity > 0) // also check that this is ok
+                                if (order.Value.CurrentQuantity > 0)
                                 {
-                                    addOrder(order.Value);
+                                    addOrder(activated);
                                 }
                                 
                                 else 
                                 {
-                                    order.Value.Dispose(); // check if this is doing something wacky
+                                    order.Value.Dispose();
+                                    activated.Dispose();
                                 }
 
                                 _stop.Remove(tempOrder.OrderID);
@@ -355,7 +368,7 @@ namespace TradingServer.OrderbookCS
             // must be in before 9:28 AM local time (or throw a error otherwise)
         }
 
-        protected void ProcessOnMarketEndOrders() // investigate performance improvements of new vs sealed override
+        protected void ProcessOnMarketEndOrders()
         {
             foreach (var order in _onMarketClose)
             {

@@ -8,7 +8,6 @@ namespace TradingServer.OrderbookCS
         private readonly Mutex _goodForDayMutex = new Mutex();
         private readonly Mutex _goodTillCancelMutex = new Mutex();
 
-        private DateTime now;
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
 

@@ -44,6 +44,8 @@ namespace TradingServer.Core
 
             _logger.LogInformation(nameof(TradingServer), $"Ending process {nameof(TradingServer)}");
             return Task.CompletedTask;
+
+            // For extra fun: add something that sends a email once the trading session concludes/trading server terminates
         }
 
         private Tuple<bool, Reject> checkIfOrderIsInvalid(OrderRequest request)
