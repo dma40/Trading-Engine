@@ -4,8 +4,6 @@ namespace TradingServer.OrderbookCS
 {
     public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
     {
-        
-
         protected async Task ProcessStopOrders()
         {
             while (true)
