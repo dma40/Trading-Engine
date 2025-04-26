@@ -17,7 +17,7 @@ namespace TradingServer.OrderbookCS
 
             if (permission == PermissionLevel.ReadOnly)
             {
-                ReadOnlyOrderbook result = new ReadOnlyOrderbook(new Instrument.Security(security));
+                IReadOnlyOrderbook result = new ReadOnlyOrderbook(new Instrument.Security(security));
                 return result;
             }
 
