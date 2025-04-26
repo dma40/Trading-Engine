@@ -63,23 +63,21 @@ namespace TradingServer.OrderbookCS
                         while (head != null)
                         {
                             var entry = head.CurrentOrder;
+                            executeTrade(order, head.CurrentOrder);
 
-                            //if (some condition)
-                            //{
-                            // (make a new cancel order, cancel one of the orders)
-                            // executeTrade(order1, order2)
+                            if (head.CurrentOrder.Quantity > order.Quantity)
+                            {
+                                // executeTrade(order, head.CurrentOrder);
+                                break;
+                            }
 
-                            // head = head.next;
-                            // remove the other order if necessary
-                            //}
-
-                            // else
-                            // {
-                            //  advance the order pointer + keep trying to fill; if filled up, break
-                            // }
+                            else 
+                            {
+                                // executeTrade(order, head.CurrentOrder);
+                                head = head.next;
+                                removeOrder(entry.cancelOrder());
+                            }
                         }
-                        // work out new logic here, this needs to be fixed
-                        // needs to check for duplicated/corrupted refs
                     }
                 }
             }
@@ -90,13 +88,36 @@ namespace TradingServer.OrderbookCS
                 {
                     if (bid.Price >= order.Price)
                     {
-                        // work out new logic here, this needs to be fixed
-                        // need to ensure safety against duplicated/corrupted refs
+                        OrderbookEntry head = bid.head;
+
+                        while (head != null)
+                        {
+                            var entry = head.CurrentOrder;
+                            executeTrade(order, head.CurrentOrder);
+
+                            if (head.CurrentOrder.CurrentQuantity > entry.Quantity)
+                            {
+                                // executeTrade(order, head.CurrentOrder);
+                                break;
+                            }
+
+                            else 
+                            {
+                                // executeTrade(order, head.CurrentOrder);
+                                head = head.next;
+                                removeOrder(entry.cancelOrder());
+                            }
+                        }
                     }
                 }
             }
 
             return result;
-        }
+    }
+
+    protected virtual void executeTrade(Order incoming, Order resting)
+    {
+        // this is the helper function
+    }
     }
 }

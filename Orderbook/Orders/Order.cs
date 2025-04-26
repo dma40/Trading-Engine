@@ -49,6 +49,11 @@ namespace TradingServer.Orders
         public Order(TrailingStopOrder trail): this(trail, trail.StopPrice, trail.Quantity, 
             trail.isBuySide, trail.OrderType) {}
 
+        public CancelOrder cancelOrder()
+        {
+            return new CancelOrder(_orderCore);
+        }
+
         private readonly IOrderCore _orderCore;
         
         public long OrderID => _orderCore.OrderID; 
