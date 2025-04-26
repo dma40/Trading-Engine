@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: IRetrievalOrderbook, IDisposable
+    public partial class Orderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
     {
         protected virtual bool canFill(Order order)
         {

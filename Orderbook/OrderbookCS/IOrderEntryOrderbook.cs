@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public interface IOrderEntryOrderbook: IReadOnlyOrderbook
+    public interface IOrderEntryOrderbook: IRetrievalOrderbook
     {
         new void addOrder(Order order);
         new void modifyOrder(ModifyOrder modify);
