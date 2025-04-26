@@ -1,5 +1,4 @@
 ﻿using TradingServer.Tests;
-
 using TradingServer.Core;
 
 using var engine = TradingHostBuilder.BuildTradingServer();
