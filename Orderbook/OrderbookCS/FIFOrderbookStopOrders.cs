@@ -23,7 +23,7 @@ namespace TradingServer.OrderbookCS
 
                         if (tempOrder.isBuySide)
                         {
-                            if (_lastTradedPrice <= order.Value.StopPrice)
+                            if (lastTradedPrice <= order.Value.StopPrice)
                             {
                                 Order activate = order.Value.activate();
                                 match(activate);
@@ -45,7 +45,7 @@ namespace TradingServer.OrderbookCS
 
                         else
                         {
-                            if (_lastTradedPrice >= order.Value.StopPrice)
+                            if (lastTradedPrice >= order.Value.StopPrice)
                             {
                                 Order activated = order.Value.activate();
                                 match(activated);
@@ -97,7 +97,7 @@ namespace TradingServer.OrderbookCS
 
                             if (trailstop.isBuySide)
                             {
-                                if (_lastTradedPrice <= trailstop.StopPrice)
+                                if (lastTradedPrice <= trailstop.StopPrice)
                                 {
                                     Order activated = trailstop.activate();
                                     match(activated);
@@ -114,7 +114,7 @@ namespace TradingServer.OrderbookCS
 
                             else 
                             {
-                                if (_lastTradedPrice >= trailstop.StopPrice)
+                                if (lastTradedPrice >= trailstop.StopPrice)
                                 {
                                    Order activated = trailstop.activate();
                                    match(activated);
