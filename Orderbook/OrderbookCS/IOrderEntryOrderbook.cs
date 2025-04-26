@@ -10,17 +10,17 @@ namespace TradingServer.OrderbookCS
 
         new List<OrderbookEntry> getAskOrders()
         {
-            throw new UnauthorizedAccessException();
+            throw new UnauthorizedAccessException("401 Unauthorized Access");
         }
 
         new List<OrderbookEntry> getBidOrders()
         {
-            throw new UnauthorizedAccessException();
+            throw new UnauthorizedAccessException("401 Unauthorized Access");
         }
 
         new Trades match(Order order)
         {
-            throw new UnauthorizedAccessException();
+            throw new UnauthorizedAccessException("401 Unauthorized Access");
         }
     }
 }

@@ -9,7 +9,7 @@ namespace TradingServer.OrderbookCS
 
         new Trades match(Order order)
         {
-            throw new InvalidOperationException();
+            throw new UnauthorizedAccessException("401 Unauthorized Access");
         }
     }
 }
