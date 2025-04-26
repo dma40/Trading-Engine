@@ -36,7 +36,6 @@ namespace TradingServer.OrderbookCS
 
         public string SecurityName => _instrument.name;
         
-
         public bool containsOrder(long orderID)
         {
             return _orders.ContainsKey(orderID);        
