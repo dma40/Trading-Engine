@@ -65,7 +65,7 @@ namespace TradingServer.OrderbookCS
                             var entry = head.CurrentOrder;
                             executeTrade(order, head.CurrentOrder);
 
-                            if (head.CurrentOrder.Quantity > order.Quantity)
+                            if (head.CurrentOrder.CurrentQuantity > 0)
                             {
                                 break;
                             }
@@ -93,7 +93,7 @@ namespace TradingServer.OrderbookCS
                             var entry = head.CurrentOrder;
                             executeTrade(order, head.CurrentOrder);
 
-                            if (head.CurrentOrder.CurrentQuantity > entry.Quantity)
+                            if (head.CurrentOrder.CurrentQuantity > 0)
                             {
                                 break;
                             }
