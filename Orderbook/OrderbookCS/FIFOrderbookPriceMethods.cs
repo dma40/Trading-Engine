@@ -23,7 +23,7 @@ namespace TradingServer.OrderbookCS
                     
                     if (lastTrade.tradedPrice > _greatestTradedPrice)
                     {
-                        _greatestTradedPrice = lastTrade.tradedPrice;
+                        _greatestTradedPrice = _lastTradedPrice;
                     }
                 }
 
