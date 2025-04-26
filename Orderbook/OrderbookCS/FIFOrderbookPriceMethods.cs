@@ -2,7 +2,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
     {
-        private long _greatestTradedPrice = Int32.MinValue;
+        private long _greatestTradedPrice = int.MinValue;
         public long _lastTradedPrice { get; private set; }
 
          protected async Task UpdateGreatestTradedPrice()
