@@ -113,7 +113,21 @@ namespace TradingServer.OrderbookCS
 
         protected virtual void executeTrade(Order incoming, Order resting)
         {
-            // this is the helper function
+            // this is the helper function; ideally should return a Trade object.
+
+            if (incoming.CurrentQuantity > resting.CurrentQuantity)
+            {
+                var quantity = resting.CurrentQuantity;
+                resting.DecreaseQuantity(quantity);
+                incoming.DecreaseQuantity(quantity);
+            }
+
+            else 
+            {
+                var quantity = incoming.CurrentQuantity;
+                resting.DecreaseQuantity(quantity);
+                incoming.DecreaseQuantity(quantity);
+            }
         }
     }
 }
