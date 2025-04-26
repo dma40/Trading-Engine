@@ -25,17 +25,12 @@ namespace TradingServer.OrderbookCS
                         {
                             if (lastTradedPrice <= order.Value.StopPrice)
                             {
-                                Order activate = order.Value.activate();
-                                match(activate);
+                                Order activated = order.Value.activate();
+                                match(activated);
 
-                                if (order.Value.CurrentQuantity > 0)
+                                if (activated.CurrentQuantity == 0)
                                 {
-                                    addOrder(activate);
-                                }
-
-                                else
-                                {
-                                    activate.Dispose();
+                                    activated.Dispose();
                                     order.Value.Dispose(); 
                                 }
 
@@ -49,13 +44,8 @@ namespace TradingServer.OrderbookCS
                             {
                                 Order activated = order.Value.activate();
                                 match(activated);
-
-                                if (order.Value.CurrentQuantity > 0)
-                                {
-                                    addOrder(activated);
-                                }
                                 
-                                else 
+                                if (activated.CurrentQuantity == 0)
                                 {
                                     order.Value.Dispose();
                                     activated.Dispose();
@@ -116,8 +106,8 @@ namespace TradingServer.OrderbookCS
                             {
                                 if (lastTradedPrice >= trailstop.StopPrice)
                                 {
-                                   Order activated = trailstop.activate();
-                                   match(activated);
+                                    Order activated = trailstop.activate();
+                                    match(activated);
 
                                     trail.Value.Dispose();
                                     _trailingStop.Remove(trailstop.OrderID);

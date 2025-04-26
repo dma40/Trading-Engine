@@ -4,34 +4,28 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
+        private static readonly List<int> ImmediateHandleTypes = [2, 4, 6, 8, 10, 12];
         private readonly Trades _trades;
 
         public new Trades match(Order order) 
         {   
             Lock _orderLock = new(); 
-
+            int type = (int) order.OrderType;
             Trades result = new Trades();
 
             lock (_orderLock)
             {
-                if (order.OrderType == OrderTypes.FillOrKill)
-                {
-                    if (canFill(order))
-                    {
-                        result = base.match(order);
-                        order.Dispose();
-                    }
-                }
-
-                else if (order.OrderType == OrderTypes.FillAndKill)
+                if (ImmediateHandleTypes.Contains(type))
                 {
                     result = base.match(order);
                     order.Dispose();
-                } 
+                }
 
-                else if (order.OrderType == OrderTypes.Market)
+                else if (order.OrderType == OrderTypes.FillOrKill)
                 {
-                    result = base.match(order);
+                    if (canFill(order))
+                        result = base.match(order);
+                    
                     order.Dispose();
                 }
 
@@ -39,6 +33,8 @@ namespace TradingServer.OrderbookCS
                 {
                     if (!canFill(order))
                         base.addOrder(order);
+                    else
+                        order.Dispose();
                 }
 
                 else 

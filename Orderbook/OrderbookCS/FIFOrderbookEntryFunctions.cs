@@ -17,7 +17,7 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-            else if (order.OrderType == OrderTypes.TrailingStop)
+            else if (order.OrderType == OrderTypes.TrailingStopLimit || order.OrderType == OrderTypes.TrailingStopMarket)
             {
                 lock (_stopLock)
                 {
@@ -54,7 +54,7 @@ namespace TradingServer.OrderbookCS
                 _stop.Remove(cancel.OrderID);
             }
 
-            else if (cancel.OrderType == OrderTypes.TrailingStop)
+            else if (cancel.OrderType == OrderTypes.TrailingStopLimit || cancel.OrderType == OrderTypes.TrailingStopMarket)
             {
                 _trailingStop.Remove(cancel.OrderID);
             }
