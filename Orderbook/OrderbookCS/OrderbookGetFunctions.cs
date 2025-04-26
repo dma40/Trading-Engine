@@ -1,5 +1,4 @@
 using TradingServer.Orders;
-using TradingServer.Instrument;
 
 namespace TradingServer.OrderbookCS
 {
