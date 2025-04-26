@@ -11,12 +11,18 @@ namespace TradingServer.OrderbookCS
         { 
             if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)
             {
-                _stop.Add(order.OrderID, (StopOrder) order);
+                lock (_stopLock)
+                {
+                    _stop.Add(order.OrderID, (StopOrder) order);
+                }
             }
 
             else if (order.OrderType == OrderTypes.TrailingStop)
             {
-                _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
+                lock (_stopLock)
+                {
+                    _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
+                }
             }
 
             else if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
