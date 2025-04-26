@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
-        private Trades _trades;
+        private readonly Trades _trades;
 
         public new Trades match(Order order) 
         {   
