@@ -32,7 +32,10 @@ namespace TradingServer.OrderbookCS
             return new OrderbookSpread(bestBid, bestAsk);
         }
 
-        public int count => _orders.Count;   
+        public int count => _orders.Count;
+
+        public string SecurityName => _instrument.name;
+        
 
         public bool containsOrder(long orderID)
         {

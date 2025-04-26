@@ -19,10 +19,5 @@ namespace TradingServer.OrderbookCS
         {
             return _bidLimits;
         }
-
-        public string getSecurityName()
-        {
-            return _instrument.name;
-        }
     }
 }
