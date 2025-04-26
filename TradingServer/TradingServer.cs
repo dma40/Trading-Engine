@@ -128,7 +128,7 @@ namespace TradingServer.Core
         {
             if ((int) permissionLevel < 1)
             {
-                throw new UnauthorizedAccessException("You do not have permission for this operation");
+                throw new UnauthorizedAccessException("401 Permission Error");
             }
 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); 

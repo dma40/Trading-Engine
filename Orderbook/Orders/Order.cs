@@ -31,12 +31,12 @@ namespace TradingServer.Orders
 
             if (isBuySide)
             {
-                Price = Int32.MaxValue;
+                Price = int.MaxValue;
             }
 
             else 
             {
-                Price = Int32.MinValue;
+                Price = int.MinValue;
             }
         }
 

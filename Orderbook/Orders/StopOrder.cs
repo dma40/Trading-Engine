@@ -12,12 +12,12 @@ namespace TradingServer.Orders
 
             if (isBuySide)
             { 
-                limitPrice = Int32.MaxValue; 
+                limitPrice = int.MaxValue; 
             }
 
             else
             {
-                limitPrice = Int32.MinValue;
+                limitPrice = int.MinValue;
             } 
         }
 
@@ -29,7 +29,7 @@ namespace TradingServer.Orders
                 throw new InvalidDataException();
             }
 
-            limitPrice = limitPrice;
+            limitPrice = _limitPrice;
         }
 
         public long limitPrice { get; private set; }

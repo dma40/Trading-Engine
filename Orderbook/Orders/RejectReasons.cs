@@ -8,6 +8,7 @@ namespace TradingServer.Rejects
         OperationNotFound,
         InvalidOrUnknownArgument,
         EmptyOrNullArgument,
-        SubmittedAfterDeadline
+        SubmittedAfterDeadline,
+        InsufficientPermissionError
     }
 }

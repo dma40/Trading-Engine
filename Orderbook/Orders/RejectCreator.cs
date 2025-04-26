@@ -13,37 +13,42 @@ namespace TradingServer.Rejects
         {
             if (reject == RejectionReason.Unknown)
             {
-                return "Unknown";
+                return "500: Unknown";
             }
 
             else if (reject == RejectionReason.EmptyOrNullArgument)
             {
-                return "EmptyOrNullArgument";
+                return "400: EmptyOrNullArgument";
             }
 
             else if (reject == RejectionReason.ModifyWrongSide)
             {
-                return "ModifyWrongSide";
+                return "400: ModifyWrongSide";
             }
 
             else if (reject == RejectionReason.OperationNotFound)
             {
-                return "OrderNotFound";
+                return "404: OrderNotFound";
             }
 
             else if (reject == RejectionReason.InvalidOrUnknownArgument)
             {
-                return "InvalidOrUnknownArgument";
+                return "400: InvalidOrUnknownArgument";
             }
 
             else if (reject == RejectionReason.SubmittedAfterDeadline)
             {
-                return "SubmittedAfterDeadline";
+                return "403: SubmittedAfterDeadline";
+            }
+
+            else if (reject == RejectionReason.InsufficientPermissionError)
+            {
+                return "401: InsufficientPermissionError";
             }
 
             else 
             {
-                return "Unknown";
+                return "500: Unknown";
             }
         }
     }

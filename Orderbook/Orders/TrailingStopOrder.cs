@@ -2,7 +2,7 @@ namespace TradingServer.Orders
 {
     public class TrailingStopOrder: Order
     {
-        static int val = Int32.MinValue;
+        static int val = int.MinValue;
 
         public TrailingStopOrder(IOrderCore _orderCore, long _trail, uint _quantity, bool _isBuy, OrderTypes _orderType): 
         base(_orderCore, val, _quantity, _isBuy, _orderType)
