@@ -14,8 +14,6 @@ namespace TradingServer.OrderbookCS
 
         public Orderbook(Security instrument): base(instrument) 
         {
-            _instrument = instrument;
-
             _ = Task.Run(() => ProcessAtMarketEnd());
         }
 

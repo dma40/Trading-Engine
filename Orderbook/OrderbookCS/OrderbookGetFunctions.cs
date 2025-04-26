@@ -4,9 +4,7 @@ using TradingServer.Instrument;
 namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
-    {
-        private readonly Security _instrument;
-        
+    {        
         private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
         private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
 
