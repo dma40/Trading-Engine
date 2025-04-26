@@ -67,13 +67,11 @@ namespace TradingServer.OrderbookCS
 
                             if (head.CurrentOrder.Quantity > order.Quantity)
                             {
-                                // executeTrade(order, head.CurrentOrder);
                                 break;
                             }
 
                             else 
                             {
-                                // executeTrade(order, head.CurrentOrder);
                                 head = head.next;
                                 removeOrder(entry.cancelOrder());
                             }
@@ -97,13 +95,11 @@ namespace TradingServer.OrderbookCS
 
                             if (head.CurrentOrder.CurrentQuantity > entry.Quantity)
                             {
-                                // executeTrade(order, head.CurrentOrder);
                                 break;
                             }
 
                             else 
                             {
-                                // executeTrade(order, head.CurrentOrder);
                                 head = head.next;
                                 removeOrder(entry.cancelOrder());
                             }
@@ -113,11 +109,11 @@ namespace TradingServer.OrderbookCS
             }
 
             return result;
-    }
+        }
 
-    protected virtual void executeTrade(Order incoming, Order resting)
-    {
-        // this is the helper function
-    }
+        protected virtual void executeTrade(Order incoming, Order resting)
+        {
+            // this is the helper function
+        }
     }
 }
