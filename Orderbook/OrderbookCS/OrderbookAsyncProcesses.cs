@@ -10,7 +10,6 @@ namespace TradingServer.OrderbookCS
 
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
-
         protected virtual async Task ProcessAtMarketEnd()
         {
             while (true)
