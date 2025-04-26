@@ -3,7 +3,7 @@ namespace TradingServer.OrderbookCS
     public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
     {
         private long _greatestTradedPrice = Int32.MinValue;
-        public long _lastTradedPrice { get; }
+        public long _lastTradedPrice { get; private set; }
 
          protected async Task UpdateGreatestTradedPrice()
         {
@@ -19,6 +19,8 @@ namespace TradingServer.OrderbookCS
                 if (_trades.result.Count > 0 && currentTime <= marketEnd && currentTime >= marketOpen)
                 {
                     var lastTrade = _trades.result[_trades.result.Count - 1];
+                    _lastTradedPrice = lastTrade.tradedPrice;
+                    
                     if (lastTrade.tradedPrice > _greatestTradedPrice)
                     {
                         _greatestTradedPrice = lastTrade.tradedPrice;
