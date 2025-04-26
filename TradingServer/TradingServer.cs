@@ -126,7 +126,7 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
         {
-            if ((int) permissionLevel < 1)
+            if ((int) permissionLevel < 2)
             {
                 throw new UnauthorizedAccessException("401 Permission Error");
             }

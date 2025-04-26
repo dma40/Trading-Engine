@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
+    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
         private Trades _trades;
 

@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
+    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
         private DateTime now;
         private static readonly TimeSpan marketOpen = new TimeSpan(9, 30, 0);

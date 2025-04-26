@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public interface IMatchingOrderbook: IOrderEntryOrderbook
+    public interface ITradingOrderbook: IOrderEntryOrderbook
     {
         new Trades match(Order order);
     }

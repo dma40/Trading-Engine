@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
+    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
         private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
         private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();

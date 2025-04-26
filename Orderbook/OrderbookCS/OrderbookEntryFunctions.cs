@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
+    public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
     {
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 

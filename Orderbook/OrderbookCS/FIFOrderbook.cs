@@ -2,7 +2,7 @@ using TradingServer.Instrument;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
+    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
         private readonly Lock _ordersLock = new();
         private readonly Lock _stopLock = new();
@@ -11,7 +11,7 @@ namespace TradingServer.OrderbookCS
         private readonly Mutex _goodForDayMutex = new Mutex();
         private readonly Mutex _goodTillCancelMutex = new Mutex();
 
-        public MatchingOrderbook(Security security): base(security)
+        public TradingOrderbook(Security security): base(security)
         {
            _trades = new Trades();
 
@@ -22,7 +22,7 @@ namespace TradingServer.OrderbookCS
            _ = Task.Run(() => UpdateGreatestTradedPrice());
         }
 
-        ~MatchingOrderbook()
+        ~TradingOrderbook()
         {
             Dispose();
         }

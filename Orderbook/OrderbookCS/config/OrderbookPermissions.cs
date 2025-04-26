@@ -1,38 +1,42 @@
+using System.IO.Pipelines;
+
 namespace TradingServer.OrderbookCS
 {
     public enum PermissionLevel
     {
         ReadOnly,
-        OrderEntry,
         Retrieval,
-        Matching
+        OrderEntry,
+        Trading
     }
 
     public static class OrderbookPermissions
     {
         public static IReadOnlyOrderbook createOrderbookFromConfig(string security, PermissionLevel permission)
         {
-            IReadOnlyOrderbook result = new Orderbook(new Instrument.Security(security));
 
             if (permission == PermissionLevel.ReadOnly)
             {
+                ReadOnlyOrderbook result = new ReadOnlyOrderbook(new Instrument.Security(security));
+                return result;
+            }
+
+            else if (permission == PermissionLevel.Retrieval)
+            {          
+                IRetrievalOrderbook result = new RetrievalOrderbook(new Instrument.Security(security));
                 return result;
             }
 
             else if (permission == PermissionLevel.OrderEntry)
             {
-                return (IOrderEntryOrderbook) result;
-            }
-
-            else if (permission == PermissionLevel.Retrieval)
-            {          
-                return (IRetrievalOrderbook) result;
+                IOrderEntryOrderbook result = new OrderEntryOrderbook(new Instrument.Security(security));
+                return result;
             }
 
             else 
             {
-                result = new MatchingOrderbook(new Instrument.Security(security));
-                return (IMatchingOrderbook) result;
+                ITradingOrderbook result = new TradingOrderbook(new Instrument.Security(security));
+                return result;
             }
         }
     }

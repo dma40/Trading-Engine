@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
+    public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
     {
         private readonly Mutex _orderMutex = new Mutex();
         private readonly Mutex _goodForDayMutex = new Mutex();

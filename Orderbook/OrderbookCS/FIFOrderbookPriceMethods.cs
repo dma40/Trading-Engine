@@ -1,6 +1,6 @@
 namespace TradingServer.OrderbookCS
 {
-    public partial class MatchingOrderbook: Orderbook, IMatchingOrderbook, IDisposable
+    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
         private long _greatestTradedPrice = int.MinValue;
         public long lastTradedPrice { get; private set; }
