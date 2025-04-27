@@ -51,6 +51,10 @@ namespace TradingServer.OrderbookCS
         protected virtual Trades match(Order order) 
         {
             Trades result = new Trades();
+            if (containsOrder(order.OrderID))
+            {
+                throw new InvalidOperationException();
+            }
 
             if (order.isBuySide)
             {

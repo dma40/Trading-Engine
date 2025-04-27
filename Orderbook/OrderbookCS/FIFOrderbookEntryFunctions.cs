@@ -9,37 +9,58 @@ namespace TradingServer.OrderbookCS
 
         public sealed override void addOrder(Order order)
         { 
-            if (order.OrderType == OrderTypes.StopLimit || order.OrderType == OrderTypes.StopMarket)
+            if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
             {
-                lock (_stopLock)
-                {
-                    _stop.Add(order.OrderID, (StopOrder) order);
-                }
-            }
-
-            else if (order.OrderType == OrderTypes.TrailingStopLimit || order.OrderType == OrderTypes.TrailingStopMarket)
-            {
-                lock (_stopLock)
-                {
-                    _trailingStop.Add(order.OrderID, (TrailingStopOrder) order);
-                }
-            }
-
-            else if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
-            {
-                _onMarketClose.Add(order.OrderID, order);
+                if (!_onMarketClose.TryGetValue(order.OrderID, out Order? orderentry) && orderentry != null)
+                    _onMarketClose.Add(order.OrderID, order);
+                else
+                    throw new InvalidOperationException();
             }
 
             else if (order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
             {
-                _onMarketOpen.Add(order.OrderID, order);
+                if (!_onMarketOpen.TryGetValue(order.OrderID, out Order? orderentry) && orderentry != null)
+                    _onMarketOpen.Add(order.OrderID, order);
+                else
+                    throw new InvalidOperationException(); 
             }
 
             else 
             {
-                match(order);
+                if (!containsOrder(order.OrderID))
+                    match(order);
+                else
+                    throw new InvalidOperationException();
             }
         }
+
+        public void addOrder(StopOrder stop)
+        {
+            if (stop.OrderType == OrderTypes.StopLimit || stop.OrderType == OrderTypes.StopMarket)
+            {
+                lock (_stopLock)
+                {
+                    if (!_stop.TryGetValue(stop.OrderID, out StopOrder? stoporder) && stoporder != null)
+                        _stop.Add(stop.OrderID, stop);
+                    else
+                        throw new InvalidOperationException();
+                }
+            }
+        }
+
+        public void addOrder(TrailingStopOrder trail)
+        {
+            if (trail.OrderType == OrderTypes.TrailingStopLimit || trail.OrderType == OrderTypes.TrailingStopMarket)
+            {
+                lock (_stopLock)
+                {
+                    if (!_trailingStop.TryGetValue(trail.OrderID, out TrailingStopOrder? trailstop) && trailstop != null)
+                        _trailingStop.Add(trail.OrderID, trail);
+                    else
+                        throw new InvalidOperationException();
+                }
+            }
+        } 
 
         public sealed override void modifyOrder(ModifyOrder modify)
         {
@@ -51,22 +72,34 @@ namespace TradingServer.OrderbookCS
         {
             if (cancel.OrderType == OrderTypes.StopLimit || cancel.OrderType == OrderTypes.StopMarket)
             {
-                _stop.Remove(cancel.OrderID);
+                if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
+                    _stop.Remove(cancel.OrderID);
+                else
+                    throw new InvalidOperationException();
             }
 
             else if (cancel.OrderType == OrderTypes.TrailingStopLimit || cancel.OrderType == OrderTypes.TrailingStopMarket)
             {
-                _trailingStop.Remove(cancel.OrderID);
+                if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? stop) && stop != null)
+                    _trailingStop.Remove(cancel.OrderID);
+                else
+                    throw new InvalidOperationException();
             }
 
             else if (cancel.OrderType == OrderTypes.LimitOnClose || cancel.OrderType == OrderTypes.MarketOnClose)
             {
-                _onMarketClose.Remove(cancel.OrderID);
+                if (_onMarketClose.TryGetValue(cancel.OrderID, out Order? order) && order != null)
+                    _onMarketClose.Remove(cancel.OrderID);
+                else
+                    throw new InvalidOperationException();
             }
 
             else if (cancel.OrderType == OrderTypes.LimitOnOpen || cancel.OrderType == OrderTypes.MarketOnOpen)
             {
-                _onMarketOpen.Remove(cancel.OrderID);
+                if (_onMarketOpen.TryGetValue(cancel.OrderID, out Order? order) && order != null)
+                    _onMarketOpen.Remove(cancel.OrderID);
+                else
+                    throw new InvalidOperationException();
             }
 
             else 
