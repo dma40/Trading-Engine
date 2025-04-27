@@ -24,7 +24,7 @@ namespace TradingServer.OrderbookCS
                 {
                     entries.Add(headPointer);
                     headPointer = headPointer.next;
-                }
+                }   
             }
             return entries;
         }

@@ -17,10 +17,8 @@ namespace TradingServer.OrderbookCS
                         OrderbookEntry askHead = ask.head;
 
                         while (askHead != null)
-                        {
                             askQuantity += askHead.CurrentOrder.CurrentQuantity;
-                            askHead = askHead.next;
-                        }
+                            askHead = askHead.next;     
                     }
                 }
                 return askQuantity >= order.CurrentQuantity;
@@ -37,10 +35,8 @@ namespace TradingServer.OrderbookCS
                         OrderbookEntry bidHead = bid.head;
 
                         while (bidHead != null)
-                        {
                             bidQuantity += bidHead.CurrentOrder.CurrentQuantity;
                             bidHead = bidHead.next;
-                        }
                     }
                 }
 
@@ -52,9 +48,7 @@ namespace TradingServer.OrderbookCS
         {
             Trades result = new Trades();
             if (containsOrder(order.OrderID))
-            {
                 throw new InvalidOperationException();
-            }
 
             if (order.isBuySide)
             {
@@ -70,10 +64,8 @@ namespace TradingServer.OrderbookCS
                             executeTrade(order, head.CurrentOrder);
 
                             if (head.CurrentOrder.CurrentQuantity > 0)
-                            {
                                 break;
-                            }
-
+                        
                             else 
                             {
                                 head = head.next;
@@ -98,10 +90,8 @@ namespace TradingServer.OrderbookCS
                             executeTrade(order, head.CurrentOrder);
 
                             if (head.CurrentOrder.CurrentQuantity > 0)
-                            {
                                 break;
-                            }
-
+                            
                             else 
                             {
                                 head = head.next;
