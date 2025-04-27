@@ -10,23 +10,23 @@ namespace TradingServer.OrderbookCS
 
         public virtual void addOrder(Order order)
         {
-            lock (_ordersLock) 
-            {
-                var baseLimit = new Limit(order.Price);
-                OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
+            var baseLimit = new Limit(order.Price);
+            OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
+            if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
+                lock (_ordersLock)
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
 
-                if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
+            if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
+                lock (_goodTillCancelLock)
                     _goodTillCancel.Add(order.OrderID, orderbookEntry);
 
-                if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
+            if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
+                lock (_goodForDayLock)
                     _goodForDay.Add(order.OrderID, new CancelOrder(order));
-
-                else
-                    throw new InvalidOperationException();
-            }
+                
+            else
+                throw new InvalidOperationException();
         }
         
         private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
@@ -75,21 +75,22 @@ namespace TradingServer.OrderbookCS
 
         public virtual void removeOrder(CancelOrder cancel)
         {
-            lock (_ordersLock)
-            {
-                if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
-                    removeOrder(cancel.OrderID, orderbookentry, _orders);
-                else
-                    throw new InvalidOperationException();
-
-                if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+            if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
+                lock (_ordersLock)
+                        removeOrder(cancel.OrderID, orderbookentry, _orders);
+            else
+                throw new InvalidOperationException();
+           
+            if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+                lock (_goodTillCancelLock)
                     _goodTillCancel.Remove(cancel.OrderID);
 
-                if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
+                
+            if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
+                lock (_goodForDayLock)
                     _goodForDay.Remove(day.OrderID);
 
-                orderbookentry.Dispose();
-            }
+            orderbookentry.Dispose();     
         }
 
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
