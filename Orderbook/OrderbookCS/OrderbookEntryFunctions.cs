@@ -13,9 +13,16 @@ namespace TradingServer.OrderbookCS
             lock (_ordersLock) 
             {
                 var baseLimit = new Limit(order.Price);
+                OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
                 if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null) 
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+
+                else if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+                    _goodTillCancel.Add(order.OrderID, orderbookEntry);
+
+                else if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel))
+                    _goodForDay.Add(order.OrderID, new CancelOrder(order));
                 
                 else
                     throw new InvalidOperationException();
@@ -26,53 +33,35 @@ namespace TradingServer.OrderbookCS
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodForDay)
+            if (levels.TryGetValue(baseLimit, out Limit? limit) && limit != null)
             {
-                lock (_goodForDayLock)
+                if (limit.head == null)
                 {
-                    _goodForDay.Add(order.OrderID, new CancelOrder(order));
+                    limit.head = orderbookEntry;
+                    limit.tail = orderbookEntry;
                 }
-            }
 
-            else if (orderbookEntry.CurrentOrder.OrderType == OrderTypes.GoodTillCancel)
-            {
-                lock (_goodTillCancelLock)
+                else
                 {
-                    _goodTillCancel.Add(order.OrderID, orderbookEntry);
-                }
-            }
-
-            {
-                if (levels.TryGetValue(baseLimit, out Limit? limit) && limit != null)
-                {
-                    if (limit.head == null)
+                    if (limit.tail != null)
                     {
-                        limit.head = orderbookEntry;
+                        OrderbookEntry tailPointer = limit.tail;
+                        tailPointer.next = orderbookEntry;
+                        orderbookEntry.previous = tailPointer;
                         limit.tail = orderbookEntry;
                     }
-
-                    else
-                    {
-                        if (limit.tail != null)
-                        {
-                            OrderbookEntry tailPointer = limit.tail;
-                            tailPointer.next = orderbookEntry;
-                            orderbookEntry.previous = tailPointer;
-                            limit.tail = orderbookEntry;
-                        }
-                    }
                 }
-
-                else 
-                {
-                    levels.Add(baseLimit);
-
-                    baseLimit.head = orderbookEntry;
-                    baseLimit.tail = orderbookEntry;
-                }
-
-                orders.Add(order.OrderID, orderbookEntry);
             }
+
+            else 
+            {
+                levels.Add(baseLimit);
+
+                baseLimit.head = orderbookEntry;
+                baseLimit.tail = orderbookEntry;
+            }
+
+            orders.Add(order.OrderID, orderbookEntry); 
         }
 
         protected void removeOrders(List<CancelOrder> cancels)
@@ -80,9 +69,7 @@ namespace TradingServer.OrderbookCS
             lock (_ordersLock)
             {
                 foreach (CancelOrder cancel in cancels)
-                {
                     removeOrder(cancel);
-                }
             }
         }
 
@@ -97,15 +84,11 @@ namespace TradingServer.OrderbookCS
                 }
 
                 else if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
-                {
                     _goodTillCancel.Remove(cancel.OrderID);
-                }
-
+                
                 else if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
-                {
                     _goodForDay.Remove(day.OrderID);
-                }
-
+                
                 else 
                     throw new InvalidOperationException();
             }
@@ -120,14 +103,12 @@ namespace TradingServer.OrderbookCS
             }
 
             else if (orderentry.previous != null)
-            {
                 orderentry.previous.next = null;
-            }
+            
 
             else if (orderentry.next != null)
-            {
                 orderentry.next.previous = null;
-            }
+            
 
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
             {
@@ -135,26 +116,19 @@ namespace TradingServer.OrderbookCS
                 orderentry.ParentLimit.tail = null;
                 
                 if (orderentry.CurrentOrder.isBuySide)
-                {   
                     _bidLimits.Remove(orderentry.ParentLimit);
-                }
 
                 else 
-                {
-                    _askLimits.Remove(orderentry.ParentLimit);
-                }
+                    _askLimits.Remove(orderentry.ParentLimit);    
             }
 
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
-            {
                 orderentry.ParentLimit.head = orderentry.next;
-            }
+            
 
             else if (orderentry.ParentLimit.tail == orderentry)
-            {
                 orderentry.ParentLimit.tail = orderentry.previous;
-            }
-
+            
             orders.Remove(id);
             orderentry.Dispose();
         }

@@ -103,9 +103,7 @@ namespace TradingServer.OrderbookCS
             }
 
             else 
-            {
                 base.removeOrder(cancel);
-            }
         }
     }
 }

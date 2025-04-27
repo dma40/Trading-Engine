@@ -9,10 +9,8 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
-
+                
                 TimeSpan currentTime = now.TimeOfDay;
 
                 if (currentTime >= marketOpen && currentTime <= marketEnd)
@@ -58,10 +56,8 @@ namespace TradingServer.OrderbookCS
                 }
 
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
-
+                
                 await Task.Delay(200, _ts.Token);
             }
         }
@@ -71,9 +67,7 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
 
                 TimeSpan currentTime = now.TimeOfDay;
 
@@ -97,9 +91,7 @@ namespace TradingServer.OrderbookCS
                                 }
 
                                 else if (_greatestTradedPrice > trailstop.currentMaxPrice)
-                                {
-                                    trail.Value.currentMaxPrice = _greatestTradedPrice;
-                                }
+                                    trail.Value.currentMaxPrice = _greatestTradedPrice; 
                             }
 
                             else 
@@ -117,10 +109,8 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                if (_ts.IsCancellationRequested)
-                {
+                if (_ts.IsCancellationRequested) 
                     return;
-                }
 
                 await Task.Delay(200, _ts.Token);
             }

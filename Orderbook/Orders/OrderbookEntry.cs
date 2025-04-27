@@ -135,10 +135,8 @@ namespace TradingServer.Orders
 
         protected virtual void Dispose(bool dispose) 
         {
-            if (_disposed) 
-            { 
+            if (_disposed)  
                 return;
-            }
 
             _disposed = true;
 

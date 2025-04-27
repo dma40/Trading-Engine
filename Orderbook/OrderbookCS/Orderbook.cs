@@ -31,10 +31,8 @@ namespace TradingServer.OrderbookCS
         protected virtual void Dispose(bool dispose) 
         {
             if (_disposed) 
-            { 
                 return;
-            }
-
+            
             _disposed = true;
 
             if (dispose) 

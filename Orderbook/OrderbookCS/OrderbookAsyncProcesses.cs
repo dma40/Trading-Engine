@@ -15,10 +15,8 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
-
+                
                 DateTime currentTime = DateTime.Now;
 
                 if (currentTime.TimeOfDay >= marketEnd)
@@ -50,9 +48,7 @@ namespace TradingServer.OrderbookCS
                 await Task.Delay(200, _ts.Token);
 
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
             }
         }
 
@@ -68,9 +64,7 @@ namespace TradingServer.OrderbookCS
             foreach (var order in _goodTillCancel)
             {
                 if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
-                {
                     goodTillCancelOrders.Add(new CancelOrder(order.Value.CurrentOrder));
-                }
 
                 removeOrders(goodTillCancelOrders);
             }

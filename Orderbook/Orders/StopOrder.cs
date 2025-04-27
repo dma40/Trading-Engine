@@ -6,29 +6,23 @@ namespace TradingServer.Orders
         base(_orderCore, _price, _quantity, _isBuy, _orderType)
         {
             if (OrderType != OrderTypes.StopMarket)
-            {
                 throw new InvalidDataException();
-            }
+            
 
             if (isBuySide)
-            { 
                 limitPrice = int.MaxValue; 
-            }
-
+            
             else
-            {
                 limitPrice = int.MinValue;
-            } 
+             
         }
 
         public StopOrder(IOrderCore _orderCore, long _price, long _limitPrice, uint _quantity, bool _isBuy, OrderTypes _orderType): 
         base(_orderCore, _price, _quantity, _isBuy, _orderType)
         {
             if (OrderType != OrderTypes.StopLimit)
-            {
                 throw new InvalidDataException();
-            }
-
+            
             limitPrice = _limitPrice;
         }
 
@@ -54,11 +48,9 @@ namespace TradingServer.Orders
 
         private void Dispose(bool dispose) 
         {
-            if (_disposed) 
-            { 
+            if (_disposed)  
                 return;
-            }
-
+            
             _disposed = true;
 
             if (dispose) 

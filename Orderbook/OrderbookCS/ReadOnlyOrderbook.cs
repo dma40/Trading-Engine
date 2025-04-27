@@ -21,14 +21,11 @@ namespace TradingServer.OrderbookCS
         {
             long? bestAsk = null, bestBid = null;
             if (_askLimits.Any() && !_askLimits.Min.isEmpty)
-            {
                 bestAsk = _askLimits.Min.Price;
-            }
-
+            
             if (_bidLimits.Any() && !_bidLimits.Min.isEmpty)
-            {
                 bestBid = _askLimits.Max.Price;
-            }
+            
             return new OrderbookSpread(bestBid, bestAsk);
         }
 

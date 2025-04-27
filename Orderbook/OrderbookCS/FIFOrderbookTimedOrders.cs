@@ -16,10 +16,8 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
-
+                
                 DateTime currentTime = DateTime.Now;
 
                 if (currentTime.TimeOfDay >= marketEnd)
@@ -52,9 +50,7 @@ namespace TradingServer.OrderbookCS
                 await Task.Delay(200, _ts.Token);
 
                 if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
+                    return; 
             }
         }
 
@@ -63,10 +59,8 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
-
+                
                 if (now.TimeOfDay == marketOpen)
                 {
                     lock (_ordersLock)
@@ -85,9 +79,7 @@ namespace TradingServer.OrderbookCS
                 }
 
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
                 
                 await Task.Delay(200, _ts.Token);
             }

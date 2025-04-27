@@ -9,9 +9,8 @@ namespace TradingServer.Orders
         base(_orderCore, _isBuy ? bid : ask, _quantity, _isBuy, _orderType)
         {
             if (_orderCore.OrderType != OrderTypes.TrailingStopMarket)
-            {
                 throw new InvalidDataException();
-            }
+            
 
             trail = _trail;
         }
@@ -20,9 +19,8 @@ namespace TradingServer.Orders
         base(_orderCore, _price, _quantity, _isBuy, _orderType)
         {
             if (_orderCore.OrderType != OrderTypes.TrailingStopLimit)
-            {
                 throw new InvalidDataException();
-            }
+            
 
             trail = _trail;
         }

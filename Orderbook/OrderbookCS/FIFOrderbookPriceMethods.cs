@@ -12,10 +12,8 @@ namespace TradingServer.OrderbookCS
                 TimeSpan currentTime = now.TimeOfDay;
 
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
-
+                
                 if (_trades.result.Count > 0 && currentTime <= marketEnd && currentTime >= marketOpen)
                 {
                     var lastTrade = _trades.result[_trades.result.Count - 1];
@@ -28,10 +26,8 @@ namespace TradingServer.OrderbookCS
                 }
 
                 if (_ts.IsCancellationRequested)
-                {
                     return;
-                }
-
+            
                 await Task.Delay(200, _ts.Token);
             }
         }  

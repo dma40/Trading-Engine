@@ -35,11 +35,9 @@ namespace TradingServer.OrderbookCS
 
         protected sealed override void Dispose(bool dispose) 
         {
-            if (_disposed) 
-            { 
+            if (_disposed)  
                 return;
-            }
-
+            
             _disposed = true;
 
             if (dispose) 
