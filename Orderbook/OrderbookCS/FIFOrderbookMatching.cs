@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
-        private static readonly List<int> ImmediateHandleTypes = [2, 4, 6, 8, 10, 12];
+        private static readonly List<int> ImmediateHandleTypes = [2, 4, 6, 8, 10, 11, 12, 13];
         private readonly Trades _trades;
 
         public new Trades match(Order order) 
