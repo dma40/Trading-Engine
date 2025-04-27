@@ -10,8 +10,7 @@ namespace TradingServer.Orders
             
 
             if (isBuySide)
-                limitPrice = int.MaxValue; 
-            
+                limitPrice = int.MaxValue;       
             else
                 limitPrice = int.MinValue;
              

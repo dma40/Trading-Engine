@@ -24,8 +24,7 @@ namespace TradingServer.OrderbookCS
                 else if (order.OrderType == OrderTypes.FillOrKill)
                 {
                     if (canFill(order))
-                        result = base.match(order);
-                    
+                        result = base.match(order);  
                     order.Dispose();
                 }
 
@@ -43,7 +42,6 @@ namespace TradingServer.OrderbookCS
                 
                     if (order.CurrentQuantity > 0)
                         base.addOrder(order);
-                    
                     else 
                         order.Dispose();      
                 }

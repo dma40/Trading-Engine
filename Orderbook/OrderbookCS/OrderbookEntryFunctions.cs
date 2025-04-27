@@ -15,15 +15,15 @@ namespace TradingServer.OrderbookCS
                 var baseLimit = new Limit(order.Price);
                 OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null) 
+                if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
 
-                else if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+                if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
                     _goodTillCancel.Add(order.OrderID, orderbookEntry);
 
-                else if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel))
+                if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
                     _goodForDay.Add(order.OrderID, new CancelOrder(order));
-                
+
                 else
                     throw new InvalidOperationException();
             }
@@ -78,19 +78,17 @@ namespace TradingServer.OrderbookCS
             lock (_ordersLock)
             {
                 if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
-                {
                     removeOrder(cancel.OrderID, orderbookentry, _orders);
-                    orderbookentry.Dispose();
-                }
-
-                else if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
-                    _goodTillCancel.Remove(cancel.OrderID);
-                
-                else if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
-                    _goodForDay.Remove(day.OrderID);
-                
-                else 
+                else
                     throw new InvalidOperationException();
+
+                if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+                    _goodTillCancel.Remove(cancel.OrderID);
+
+                if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
+                    _goodForDay.Remove(day.OrderID);
+
+                orderbookentry.Dispose();
             }
         }
 
