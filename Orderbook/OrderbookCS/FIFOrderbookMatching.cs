@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
     {
-        private static readonly List<int> ImmediateHandleTypes = [2, 4, 6, 8, 10, 12];
+        private static readonly List<int> ImmediateHandleTypes = [2, 4, 6, 8, 10, 11, 12, 13];
         private readonly Trades _trades;
 
         public new Trades match(Order order) 
@@ -24,8 +24,7 @@ namespace TradingServer.OrderbookCS
                 else if (order.OrderType == OrderTypes.FillOrKill)
                 {
                     if (canFill(order))
-                        result = base.match(order);
-                    
+                        result = base.match(order);  
                     order.Dispose();
                 }
 
@@ -43,7 +42,6 @@ namespace TradingServer.OrderbookCS
                 
                     if (order.CurrentQuantity > 0)
                         base.addOrder(order);
-                    
                     else 
                         order.Dispose();      
                 }
