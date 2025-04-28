@@ -50,10 +50,10 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                await Task.Delay(200, _ts.Token);
-
                 if (_ts.IsCancellationRequested)
                     return; 
+
+                await Task.Delay(200, _ts.Token);
             }
         }
 

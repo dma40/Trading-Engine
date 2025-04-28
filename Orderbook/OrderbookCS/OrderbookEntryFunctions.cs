@@ -82,7 +82,6 @@ namespace TradingServer.OrderbookCS
             if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
                 lock (_goodTillCancelLock)
                     _goodTillCancel.Remove(cancel.OrderID);
-
                 
             if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
                 lock (_goodForDayLock)
@@ -102,11 +101,9 @@ namespace TradingServer.OrderbookCS
             else if (orderentry.previous != null)
                 orderentry.previous.next = null;
             
-
             else if (orderentry.next != null)
                 orderentry.next.previous = null;
             
-
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
             {
                 orderentry.ParentLimit.head = null;
@@ -122,7 +119,6 @@ namespace TradingServer.OrderbookCS
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
                 orderentry.ParentLimit.head = orderentry.next;
             
-
             else if (orderentry.ParentLimit.tail == orderentry)
                 orderentry.ParentLimit.tail = orderentry.previous;
             

@@ -60,7 +60,7 @@ namespace TradingServer.OrderbookCS
 
                 if (_ts.IsCancellationRequested)
                     return;
-                
+
                 await Task.Delay(200, _ts.Token);
             }
         }
