@@ -20,8 +20,7 @@ namespace TradingServer.OrderbookCS
                     lastTradedPrice = lastTrade.tradedPrice;
                     
                     if (lastTrade.tradedPrice > _greatestTradedPrice)
-                        _greatestTradedPrice = lastTradedPrice;
-                    
+                        _greatestTradedPrice = lastTradedPrice;   
                 }
 
                 if (_ts.IsCancellationRequested)

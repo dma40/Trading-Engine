@@ -35,7 +35,7 @@ namespace TradingServer.OrderbookCS
                         _goodTillCancelMutex.WaitOne();
 
                         Thread.Sleep(closed);
-                    }
+                    }                
 
                     finally
                     {

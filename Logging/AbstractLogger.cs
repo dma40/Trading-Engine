@@ -2,10 +2,18 @@ namespace TradingServer.Logging
 {
     public abstract class AbstractLogger: ILogger 
     {
-        protected AbstractLogger() 
+        protected AbstractLogger()
         {
 
         }
+
+        /*
+        protected AbstractLogger(EventHandler handler = null) 
+        {
+            incoming += handler;
+            handler?.Invoke(null, EventArgs.Empty);
+        }
+        */
         
         public void Debug(string module, string message) => Log(message_types.Debug, module, message);
         public void Debug(string module, Exception exception) => Log(message_types.Debug, module, $"{exception}");
@@ -20,5 +28,7 @@ namespace TradingServer.Logging
         public void Error(string module, Exception exception) => Log(message_types.Error, module, $"{exception}");
 
         protected abstract void Log(message_types type, string module, string message);
+
+        // public event EventHandler incoming;
     }
 }

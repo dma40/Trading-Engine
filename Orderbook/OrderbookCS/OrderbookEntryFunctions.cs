@@ -60,8 +60,6 @@ namespace TradingServer.OrderbookCS
                 baseLimit.head = orderbookEntry;
                 baseLimit.tail = orderbookEntry;
             }
-
-            orders.Add(order.OrderID, orderbookEntry); 
         }
 
         protected void removeOrders(List<CancelOrder> cancels)

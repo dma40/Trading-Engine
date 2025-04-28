@@ -14,7 +14,7 @@ namespace TradingServer.OrderbookCS
                 TimeSpan currentTime = now.TimeOfDay;
 
                 if (currentTime >= marketOpen && currentTime <= marketEnd)
-                {
+                {   // apply the lock on the stop orders; this may improve access to the resource
                     foreach (var order in _stop)
                     {
                         var tempOrder = order.Value;

@@ -10,7 +10,7 @@ namespace TradingServer.Logging
     {
         private readonly LoggerConfiguration _logConfig;
 
-        public DatabaseLogger(IOptions<LoggerConfiguration> logConfig)
+        public DatabaseLogger(IOptions<LoggerConfiguration> logConfig): base()
         {
             _logConfig = logConfig.Value ?? throw new ArgumentNullException();
             
