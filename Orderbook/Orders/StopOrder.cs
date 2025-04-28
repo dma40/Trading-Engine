@@ -8,7 +8,6 @@ namespace TradingServer.Orders
             if (OrderType != OrderTypes.StopMarket)
                 throw new InvalidDataException();
             
-
             if (isBuySide)
                 limitPrice = int.MaxValue;       
             else
