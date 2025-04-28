@@ -14,14 +14,13 @@ namespace TradingServer.OrderbookCS
                 if (_ts.IsCancellationRequested)
                     return;
                 
-                if (_trades.result.Count > 0 && currentTime <= marketEnd && currentTime >= marketOpen)
+                if (_trades.count > 0 && currentTime <= marketEnd && currentTime >= marketOpen)
                 {
-                    var lastTrade = _trades.result[_trades.result.Count - 1];
+                    var lastTrade = _trades.trades[_trades.count - 1];
                     lastTradedPrice = lastTrade.tradedPrice;
                     
                     if (lastTrade.tradedPrice > _greatestTradedPrice)
-                        _greatestTradedPrice = lastTradedPrice;
-                    
+                        _greatestTradedPrice = lastTradedPrice;   
                 }
 
                 if (_ts.IsCancellationRequested)

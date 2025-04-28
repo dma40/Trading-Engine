@@ -5,15 +5,15 @@ using TradingServer.Logging.LoggingConfiguration;
 
 namespace TradingServer.Logging
 {
-    public class TraceLogger: AbstractLogger, ITextLogger, IDisposable
+    public class ThreadPollLogger: AbstractLogger, ITextLogger, IDisposable
     {
         private readonly LoggerConfiguration _logConfig;
 
-        public TraceLogger(IOptions<LoggerConfiguration> logConfig): base()
+        public ThreadPollLogger(IOptions<LoggerConfiguration> logConfig): base()
         {
             _logConfig = logConfig.Value ?? throw new ArgumentNullException();
 
-            if (_logConfig.LoggerType != LoggerType.Trace)
+            if (_logConfig.LoggerType != LoggerType.ThreadPoll)
             {
                 throw new InvalidDataException();
             }
@@ -110,7 +110,7 @@ namespace TradingServer.Logging
             return $"[{log.now:HH-mm-ss.ffffff yyyy-MM-dd} {log.type} - {log.module}: {log.message}]\n";
         }
 
-        ~TraceLogger() 
+        ~ThreadPollLogger() 
         {
             Dispose(false);
         }

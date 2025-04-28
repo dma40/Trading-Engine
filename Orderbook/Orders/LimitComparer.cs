@@ -9,11 +9,10 @@ namespace TradingServer.Orders
             if (limit == null || other == null)
                 throw new ArgumentNullException("Cannot compare null limits");
             
-
             if (limit.Price == other.Price)
                 return 0;
             
-            else if (limit.Price > other.Price)
+            else if (limit.Price < other.Price)
                 return -1;
             
             else 

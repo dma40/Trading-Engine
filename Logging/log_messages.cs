@@ -13,6 +13,7 @@
         Text,
         Database,
         Console,
+        ThreadPoll,
         Trace
     }
 }

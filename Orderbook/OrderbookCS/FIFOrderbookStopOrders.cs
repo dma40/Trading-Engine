@@ -13,51 +13,54 @@ namespace TradingServer.OrderbookCS
                 
                 TimeSpan currentTime = now.TimeOfDay;
 
-                if (currentTime >= marketOpen && currentTime <= marketEnd)
+                lock (_stopLock)
                 {
-                    foreach (var order in _stop)
-                    {
-                        var tempOrder = order.Value;
-
-                        if (tempOrder.isBuySide)
+                    if (currentTime >= marketOpen && currentTime <= marketEnd)
+                    {   
+                        foreach (var order in _stop)
                         {
-                            if (lastTradedPrice <= order.Value.StopPrice)
+                            var tempOrder = order.Value;
+
+                            if (tempOrder.isBuySide)
                             {
-                                Order activated = order.Value.activate();
-                                match(activated);
-
-                                if (activated.CurrentQuantity == 0)
+                                if (lastTradedPrice <= order.Value.StopPrice)
                                 {
-                                    activated.Dispose();
-                                    order.Value.Dispose(); 
-                                }
+                                    Order activated = order.Value.activate();
+                                    match(activated);
 
-                                _stop.Remove(tempOrder.OrderID);
+                                    if (activated.CurrentQuantity == 0)
+                                    {
+                                        activated.Dispose();
+                                        order.Value.Dispose(); 
+                                    }
+
+                                    _stop.Remove(tempOrder.OrderID);
+                                }
                             }
-                        }
 
-                        else
-                        {
-                            if (lastTradedPrice >= order.Value.StopPrice)
+                            else
                             {
-                                Order activated = order.Value.activate();
-                                match(activated);
-                                
-                                if (activated.CurrentQuantity == 0)
+                                if (lastTradedPrice >= order.Value.StopPrice)
                                 {
-                                    order.Value.Dispose();
-                                    activated.Dispose();
-                                }
+                                    Order activated = order.Value.activate();
+                                    match(activated);
+                                
+                                    if (activated.CurrentQuantity == 0)
+                                    {
+                                        order.Value.Dispose();
+                                        activated.Dispose();
+                                    }
 
-                                _stop.Remove(tempOrder.OrderID);
-                            }     
+                                    _stop.Remove(tempOrder.OrderID);
+                                }     
+                            }
                         }
                     }
                 }
 
                 if (_ts.IsCancellationRequested)
                     return;
-                
+
                 await Task.Delay(200, _ts.Token);
             }
         }

@@ -13,6 +13,5 @@ namespace TradingServer.Logging
 
         void Error(string module, string message);
         void Error(string module, Exception exception);
-
     }
 }

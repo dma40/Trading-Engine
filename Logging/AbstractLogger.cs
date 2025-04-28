@@ -2,7 +2,7 @@ namespace TradingServer.Logging
 {
     public abstract class AbstractLogger: ILogger 
     {
-        protected AbstractLogger() 
+        protected AbstractLogger()
         {
 
         }

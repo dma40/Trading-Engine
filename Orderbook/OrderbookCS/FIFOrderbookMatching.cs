@@ -45,6 +45,8 @@ namespace TradingServer.OrderbookCS
                     else 
                         order.Dispose();      
                 }
+                
+                _trades.addTransactions(result);
 
                 return result;
             }

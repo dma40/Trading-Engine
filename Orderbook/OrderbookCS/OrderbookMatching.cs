@@ -46,9 +46,9 @@ namespace TradingServer.OrderbookCS
 
         protected virtual Trades match(Order order) 
         {
-            Trades result = new Trades();
             if (containsOrder(order.OrderID))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Cannot match an order already in the orderbook");
+            Trades result = new Trades();
 
             if (order.isBuySide)
             {
@@ -108,7 +108,6 @@ namespace TradingServer.OrderbookCS
         protected virtual void executeTrade(Order incoming, Order resting)
         {
             // this is the helper function; ideally should return a Trade object.
-
             if (incoming.CurrentQuantity > resting.CurrentQuantity)
             {
                 var quantity = resting.CurrentQuantity;

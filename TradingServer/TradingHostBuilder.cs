@@ -52,9 +52,9 @@ internal static class TradingHostBuilder
             services.AddSingleton<ITextLogger, ConsoleLogger>();
         }
 
-        if (logConfig.LoggerType == LoggerType.Trace)
+        if (logConfig.LoggerType == LoggerType.ThreadPoll)
         {
-            services.AddSingleton<ITextLogger, TraceLogger>();
+            services.AddSingleton<ITextLogger, ThreadPollLogger>();
         }
 
         services.AddSingleton<TradingClient>(); 
