@@ -28,9 +28,12 @@ namespace TradingServer.OrderbookCS
 
                     try
                     {
-                        DeleteGoodForDayOrders();
-                        DeleteExpiredGoodTillCancel();
-                        ProcessOnMarketEndOrders(); 
+                        lock (_ordersLock)
+                        {
+                            DeleteGoodForDayOrders();
+                            DeleteExpiredGoodTillCancel();
+                            ProcessOnMarketEndOrders(); 
+                        }
 
                         _orderMutex.WaitOne();
                         _goodForDayMutex.WaitOne();
