@@ -13,26 +13,28 @@ namespace TradingServer.OrderbookCS
             var baseLimit = new Limit(order.Price);
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
+            if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             { 
                 lock (_ordersLock)
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
             }
 
-            if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
+            else
+            {
+                throw new InvalidOperationException("This order already exists in the orderbook, you can't add it again");
+            }
+
+            if (_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
             {
                 lock (_goodTillCancelLock)
                     _goodTillCancel.Add(order.OrderID, orderbookEntry);
             }
 
-            if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
+            if (_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
             {
                 lock (_goodForDayLock)
                     _goodForDay.Add(order.OrderID, new CancelOrder(order));
             }
-                
-            else
-                throw new InvalidOperationException("This order already exists in the orderbook, you can't add it again");
         }
         
         private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
