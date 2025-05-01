@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Grpc.Core;
+﻿using Grpc.Core;
 using TradingServer.Handlers;
 
 namespace Trading

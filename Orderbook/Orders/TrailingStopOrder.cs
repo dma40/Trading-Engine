@@ -37,6 +37,7 @@ namespace TradingServer.Orders
             {
                 if (isBuySide)
                     StopPrice = currentMaxPrice - trail;
+                    
                 else
                     StopPrice = currentMaxPrice + trail;
             } 

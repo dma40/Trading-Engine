@@ -9,7 +9,8 @@ namespace TradingServer.Orders
                 throw new InvalidDataException();
             
             if (isBuySide)
-                limitPrice = int.MaxValue;       
+                limitPrice = int.MaxValue;
+                       
             else
                 limitPrice = int.MinValue;
              
