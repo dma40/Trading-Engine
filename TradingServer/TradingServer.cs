@@ -8,6 +8,7 @@ using TradingServer.Handlers;
 using Trading;
 using TradingServer.Orders;
 using TradingServer.Rejects;
+using Grpc.Core;
 
 namespace TradingServer.Core 
 {
@@ -44,8 +45,6 @@ namespace TradingServer.Core
 
             _logger.LogInformation(nameof(TradingServer), $"Ending process {nameof(TradingServer)}");
             return Task.CompletedTask;
-
-            // For extra fun: add something that sends a email once the trading session concludes/trading server terminates
         }
 
         private Tuple<bool, Reject> checkIfOrderIsInvalid(OrderRequest request)
@@ -105,7 +104,8 @@ namespace TradingServer.Core
                 reason = RejectionReason.ModifyWrongSide;
             }
 
-            else if ((request.Operation == "Modify" || request.Operation == "Cancel") 
+            else
+             if ((request.Operation == "Modify" || request.Operation == "Cancel") 
                     && !_orderbook.containsOrder(request.Id))
             {
                 isInvalid = true;
@@ -124,11 +124,11 @@ namespace TradingServer.Core
             return result;
         }
 
-        public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
+        public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
             if ((int) permissionLevel < 2)
             {
-                throw new UnauthorizedAccessException("401 Permission Error");
+                throw new UnauthorizedAccessException("401 Permission Error: insufficient permission to edit orders");
             }
 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); 

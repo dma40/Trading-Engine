@@ -26,7 +26,7 @@ namespace TradingServer.OrderbookCS
                     _goodForDay.Add(order.OrderID, new CancelOrder(order));
                 
             else
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("This order already exists in the orderbook, you can't add it again");
         }
         
         private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
@@ -77,7 +77,7 @@ namespace TradingServer.OrderbookCS
                 lock (_ordersLock)
                         removeOrder(cancel.OrderID, orderbookentry, _orders);
             else
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("This order does not exist in the orderbook, you can't remove it");
            
             if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
                 lock (_goodTillCancelLock)
@@ -137,7 +137,7 @@ namespace TradingServer.OrderbookCS
                 }
 
                 else
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException("This order does not exist in the orderbook");
             }
         }
     }

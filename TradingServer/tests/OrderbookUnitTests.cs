@@ -5,7 +5,7 @@ using TradingServer.Instrument;
 
 namespace TradingServer.Tests
 {
-    internal static class OrderbookUnitTests
+    public static class OrderbookUnitTests
     {
         private static void addSingleOrders()
         {
