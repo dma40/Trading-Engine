@@ -33,7 +33,7 @@ namespace TradingServer.OrderbookCS
             throw new UnauthorizedAccessException("401 Unauthorized Access");
         }
 
-        Trades match(Order order)
+        public Trades match(Order order)
         {
             throw new UnauthorizedAccessException("401 UnauthorizedAccess");
         }
