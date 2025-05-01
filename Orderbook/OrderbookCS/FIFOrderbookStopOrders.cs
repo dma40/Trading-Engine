@@ -28,12 +28,6 @@ namespace TradingServer.OrderbookCS
                                     Order activated = order.Value.activate();
                                     match(activated);
 
-                                    if (activated.CurrentQuantity == 0)
-                                    {
-                                        activated.Dispose();
-                                        order.Value.Dispose(); 
-                                    }
-
                                     _stop.Remove(tempOrder.OrderID);
                                 }
                             }
@@ -44,12 +38,6 @@ namespace TradingServer.OrderbookCS
                                 {
                                     Order activated = order.Value.activate();
                                     match(activated);
-                                
-                                    if (activated.CurrentQuantity == 0)
-                                    {
-                                        order.Value.Dispose();
-                                        activated.Dispose();
-                                    }
 
                                     _stop.Remove(tempOrder.OrderID);
                                 }     
