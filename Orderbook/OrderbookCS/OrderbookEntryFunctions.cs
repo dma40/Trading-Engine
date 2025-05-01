@@ -13,17 +13,23 @@ namespace TradingServer.OrderbookCS
             var baseLimit = new Limit(order.Price);
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry)) 
+            if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
+            { 
                 lock (_ordersLock)
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+            }
 
             if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
+            {
                 lock (_goodTillCancelLock)
                     _goodTillCancel.Add(order.OrderID, orderbookEntry);
+            }
 
             if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
+            {
                 lock (_goodForDayLock)
                     _goodForDay.Add(order.OrderID, new CancelOrder(order));
+            }
                 
             else
                 throw new InvalidOperationException("This order already exists in the orderbook, you can't add it again");
@@ -74,18 +80,25 @@ namespace TradingServer.OrderbookCS
         public virtual void removeOrder(CancelOrder cancel)
         {
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
+            {
                 lock (_ordersLock)
                         removeOrder(cancel.OrderID, orderbookentry, _orders);
+            }
+
             else
                 throw new InvalidOperationException("This order does not exist in the orderbook, you can't remove it");
            
             if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+            {
                 lock (_goodTillCancelLock)
                     _goodTillCancel.Remove(cancel.OrderID);
+            }
                 
             if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
+            {
                 lock (_goodForDayLock)
                     _goodForDay.Remove(day.OrderID);
+            }
 
             orderbookentry.Dispose();     
         }
@@ -137,7 +150,7 @@ namespace TradingServer.OrderbookCS
                 }
 
                 else
-                    throw new InvalidOperationException("This order does not exist in the orderbook");
+                    throw new InvalidOperationException("This order does not exist in the orderbook, you can't modify it");
             }
         }
     }

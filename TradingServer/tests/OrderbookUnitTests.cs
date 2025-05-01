@@ -5,19 +5,19 @@ using TradingServer.Instrument;
 
 namespace TradingServer.Tests
 {
-    public static class OrderbookUnitTests
+    internal static class OrderbookUnitTests
     {
         private static void addSingleOrders()
         {
             OrderEntryOrderbook orders = new OrderEntryOrderbook(new Security("test_security"));
 
-            IOrderCore orderCore1 = new OrderCore(100, "Dylan", "037833100", OrderTypes.GoodTillCancel);
+            IOrderCore orderCore1 = new OrderCore(1000000, "Dylan", "037833100", OrderTypes.GoodTillCancel);
             ModifyOrder modify1 = new ModifyOrder(orderCore1, 50, 100, true);
 
             Order order1 = modify1.newOrder();
 
             IOrderCore orderCore2 = new OrderCore(200, "Dylan", "037833100", OrderTypes.GoodForDay);
-            ModifyOrder modify2 = new ModifyOrder(orderCore2, 50, 100, false);
+            ModifyOrder modify2 = new ModifyOrder(orderCore2, 50, 100, false); // issue with this test case?
 
             Order order2 = modify2.newOrder();
 
