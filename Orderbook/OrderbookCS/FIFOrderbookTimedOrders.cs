@@ -25,6 +25,7 @@ namespace TradingServer.OrderbookCS
                     DateTime tomorrow = currentTime.AddDays(1);
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
+                    now = nextTradingDayStart;
 
                     try
                     {

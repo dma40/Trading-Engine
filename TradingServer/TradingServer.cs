@@ -8,10 +8,11 @@ using TradingServer.Handlers;
 using Trading;
 using TradingServer.Orders;
 using TradingServer.Rejects;
+using Grpc.Core;
 
 namespace TradingServer.Core 
 {
-    sealed class TradingServer: BackgroundService, ITradingServer 
+    internal sealed class TradingServer: BackgroundService, ITradingServer 
     {
         private readonly ITextLogger _logger;
         private readonly IReadOnlyOrderbook _orderbook; 
@@ -44,8 +45,6 @@ namespace TradingServer.Core
 
             _logger.LogInformation(nameof(TradingServer), $"Ending process {nameof(TradingServer)}");
             return Task.CompletedTask;
-
-            // For extra fun: add something that sends a email once the trading session concludes/trading server terminates
         }
 
         private Tuple<bool, Reject> checkIfOrderIsInvalid(OrderRequest request)
@@ -105,13 +104,6 @@ namespace TradingServer.Core
                 reason = RejectionReason.ModifyWrongSide;
             }
 
-            else if ((request.Operation == "Modify" || request.Operation == "Cancel") 
-                    && !_orderbook.containsOrder(request.Id))
-            {
-                isInvalid = true;
-                reason = RejectionReason.OrderNotFound;
-            }
-
             else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
             {
                 isInvalid = true;
@@ -124,11 +116,11 @@ namespace TradingServer.Core
             return result;
         }
 
-        public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
+        public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
             if ((int) permissionLevel < 2)
             {
-                throw new UnauthorizedAccessException("401 Permission Error");
+                throw new UnauthorizedAccessException("401 Permission Error: insufficient permission to edit orders");
             }
 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); 
@@ -162,9 +154,16 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Add")
             {
-                Order newOrder = modify.newOrder();
-                _orderbook.addOrder(newOrder);
-                
+                try 
+                {
+                    Order newOrder = modify.newOrder();
+                    _orderbook.addOrder(newOrder);
+                }
+
+                catch (InvalidOperationException exception)
+                {
+                    _logger.Error(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
+                }
                 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
                 " side by {request.Username} at {DateTime.UtcNow}");
@@ -172,8 +171,16 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Cancel")
             {
-                CancelOrder cancelOrder = modify.cancelOrder();
-                _orderbook.removeOrder(cancelOrder);
+                try 
+                {
+                    CancelOrder cancelOrder = modify.cancelOrder();
+                    _orderbook.removeOrder(cancelOrder);
+                }
+
+                catch (InvalidOperationException exception)
+                {
+                    _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
+                }
 
                 _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
                 " by {request.Username} at {DateTime.UtcNow}");
@@ -181,7 +188,15 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Modify")
             {
-                _orderbook.modifyOrder(modify);
+                try 
+                {
+                    _orderbook.modifyOrder(modify);
+                }
+
+                catch (InvalidOperationException exception)
+                {
+                    _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.Now}");
+                }
                 
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
                  " by {request.Username} at {DateTime.UtcNow}");

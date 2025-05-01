@@ -1,4 +1,6 @@
-﻿using TradingServer.Handlers;
+﻿using System.Runtime.CompilerServices;
+using Grpc.Core;
+using TradingServer.Handlers;
 
 namespace Trading
 {
@@ -11,9 +13,9 @@ namespace Trading
             _tradingServer = tradingServer;
         }
 
-        public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request)
+        public override async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
-            var response = await _tradingServer.ProcessOrderAsync(request);
+            var response = await _tradingServer.ProcessOrderAsync(request, context);
             return response;
         }
     }
