@@ -48,6 +48,7 @@ namespace TradingServer.OrderbookCS
         {
             if (containsOrder(order.OrderID))
                 throw new InvalidOperationException("Cannot match an order already in the orderbook");
+                
             Trades result = new Trades();
 
             if (order.isBuySide)

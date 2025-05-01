@@ -11,7 +11,6 @@ namespace TradingServer.Orders
             if (_orderCore.OrderType != OrderTypes.TrailingStopMarket)
                 throw new InvalidDataException();
             
-
             trail = _trail;
         }
 
@@ -21,7 +20,6 @@ namespace TradingServer.Orders
             if (_orderCore.OrderType != OrderTypes.TrailingStopLimit)
                 throw new InvalidDataException();
             
-
             trail = _trail;
         }
 
@@ -37,7 +35,7 @@ namespace TradingServer.Orders
             {
                 if (isBuySide)
                     StopPrice = currentMaxPrice - trail;
-                    
+
                 else
                     StopPrice = currentMaxPrice + trail;
             } 
