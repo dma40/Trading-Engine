@@ -24,7 +24,8 @@ namespace TradingServer.Core
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
-            _orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig.TradingServerSettings.SecurityName, _tradingConfig.PermissionLevel);
+            _orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig.TradingServerSettings.SecurityName, 
+                                                                        _tradingConfig.PermissionLevel);
             permissionLevel = config.Value.PermissionLevel;
         }
 
