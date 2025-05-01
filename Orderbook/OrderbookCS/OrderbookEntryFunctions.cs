@@ -81,7 +81,7 @@ namespace TradingServer.OrderbookCS
 
         public virtual void removeOrder(CancelOrder cancel)
         {
-            if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry) && orderbookentry != null)
+            if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry))
             {
                 lock (_ordersLock)
                         removeOrder(cancel.OrderID, orderbookentry, _orders);
@@ -90,7 +90,7 @@ namespace TradingServer.OrderbookCS
             else
                 throw new InvalidOperationException("This order does not exist in the orderbook, you can't remove it");
            
-            if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+            if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry))
             {
                 lock (_goodTillCancelLock)
                     _goodTillCancel.Remove(cancel.OrderID);
@@ -145,7 +145,7 @@ namespace TradingServer.OrderbookCS
         {   
             lock (_ordersLock)
             {
-                if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry) && orderentry != null)
+                if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry))
                 {
                     removeOrder(modify.OrderID, orderentry, _orders);
                     addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
