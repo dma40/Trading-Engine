@@ -20,11 +20,11 @@ namespace TradingServer.OrderbookCS
         public OrderbookSpread spread()
         {
             long? bestAsk = null, bestBid = null;
-            if (_askLimits.Any() && !_askLimits.Min.isEmpty)
+            if (_askLimits.Any() && _askLimits.Min != null && !_askLimits.Min.isEmpty)
                 bestAsk = _askLimits.Min.Price;
             
-            if (_bidLimits.Any() && !_bidLimits.Min.isEmpty)
-                bestBid = _askLimits.Max.Price;
+            if (_bidLimits.Any() && _bidLimits.Max != null && !_bidLimits.Max.isEmpty)
+                bestBid = _bidLimits.Max.Price;
             
             return new OrderbookSpread(bestBid, bestAsk);
         }

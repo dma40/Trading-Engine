@@ -24,7 +24,8 @@ namespace TradingServer.Core
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
-            _orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig.TradingServerSettings.SecurityName, _tradingConfig.PermissionLevel);
+            _orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig?.TradingServerSettings?.SecurityName ?? throw new ArgumentNullException("Security name cannot be null"), 
+                                                                        _tradingConfig?.PermissionLevel ?? throw new ArgumentNullException("Permission level cannot be null"));
             permissionLevel = config.Value.PermissionLevel;
         }
 
@@ -33,8 +34,8 @@ namespace TradingServer.Core
         protected override Task ExecuteAsync(CancellationToken stoppingToken) 
         {
             _logger.LogInformation(nameof(TradingServer), "Starting Process");
-            _logger.LogInformation(nameof(TradingServer), $"Security name: {_tradingConfig.TradingServerSettings.SecurityName}");
-            _logger.LogInformation(nameof(TradingServer), $"Security ID: {_tradingConfig.TradingServerSettings.SecurityID}");
+            _logger.LogInformation(nameof(TradingServer), $"Security name: {_tradingConfig.TradingServerSettings?.SecurityName}");
+            _logger.LogInformation(nameof(TradingServer), $"Security ID: {_tradingConfig.TradingServerSettings?.SecurityID}");
             
             while (!stoppingToken.IsCancellationRequested) 
             {
@@ -55,7 +56,7 @@ namespace TradingServer.Core
 
             RejectCreator creator = new RejectCreator(); 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, 
-                                                _tradingConfig.TradingServerSettings.SecurityID, 
+                                                _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Securit ID cannot be null"), 
                                                 Order.StringToOrderType(request.Type));
 
             bool isInvalid = false;
@@ -123,7 +124,7 @@ namespace TradingServer.Core
                 throw new UnauthorizedAccessException("401 Permission Error: insufficient permission to edit orders");
             }
 
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig.TradingServerSettings.SecurityID, Order.StringToOrderType(request.Type)); 
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Security ID cannot be null"), Order.StringToOrderType(request.Type)); 
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 

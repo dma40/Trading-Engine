@@ -3,7 +3,7 @@ namespace TradingServer.Logging.LoggingConfiguration
 {
     public sealed class LoggerConfiguration 
     {
-        public LoggerType LoggerType { get; set; }
+        public LoggerType? LoggerType { get; set; }
         public TextLoggerConfiguration? TextLoggerConfiguration { get; set; }
     }
 

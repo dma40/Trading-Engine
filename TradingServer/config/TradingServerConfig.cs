@@ -10,7 +10,7 @@ namespace TradingServer.Core.Configuration
 
     internal sealed class TradingServerSettings 
     {
-        public int Port { get; set; }
+        public int? Port { get; set; }
         public string? SecurityName { get; set; } 
         public string? SecurityID { get; set; }
     }

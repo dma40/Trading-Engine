@@ -6,10 +6,5 @@ namespace TradingServer.OrderbookCS
     {
         new List<OrderbookEntry> getAskOrders();
         new List<OrderbookEntry> getBidOrders();
-
-        new Trades match(Order order)
-        {
-            throw new UnauthorizedAccessException("401 Unauthorized Access");
-        }
     }
 }

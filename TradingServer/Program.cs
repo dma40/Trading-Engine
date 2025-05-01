@@ -1,6 +1,5 @@
 ﻿using TradingServer.Tests;
 using TradingServer.Core;
-using Microsoft.AspNetCore.Components.Forms;
 
 using var engine = TradingHostBuilder.BuildTradingServer();
 TradingServerServiceProvider.serviceProvider = engine.Services;

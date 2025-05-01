@@ -14,11 +14,11 @@ namespace TradingServer.OrderbookCS
                 {
                     if (ask.Price <= order.Price)
                     {
-                        OrderbookEntry askHead = ask.head;
+                        OrderbookEntry? askHead = ask.head;
 
                         while (askHead != null)
                             askQuantity += askHead.CurrentOrder.CurrentQuantity;
-                            askHead = askHead.next;     
+                            askHead = askHead?.next;     
                     }
                 }
                 return askQuantity >= order.CurrentQuantity;
@@ -32,11 +32,11 @@ namespace TradingServer.OrderbookCS
                 {
                     if (bid.Price >= order.Price)
                     {
-                        OrderbookEntry bidHead = bid.head;
+                        OrderbookEntry? bidHead = bid.head;
 
                         while (bidHead != null)
                             bidQuantity += bidHead.CurrentOrder.CurrentQuantity;
-                            bidHead = bidHead.next;
+                            bidHead = bidHead?.next;
                     }
                 }
 
@@ -57,7 +57,7 @@ namespace TradingServer.OrderbookCS
                 {
                     if (ask.Price <= order.Price)
                     {
-                        OrderbookEntry head = ask.head;
+                        OrderbookEntry? head = ask.head;
 
                         while (head != null)
                         {
@@ -83,7 +83,7 @@ namespace TradingServer.OrderbookCS
                 {
                     if (bid.Price >= order.Price)
                     {
-                        OrderbookEntry head = bid.head;
+                        OrderbookEntry? head = bid.head;
 
                         while (head != null)
                         {
