@@ -13,13 +13,14 @@ namespace TradingServer.OrderbookCS
 
         public TradingOrderbook(Security security): base(security)
         {
-           _trades = new Trades();
+            _trades = new Trades();
 
-           _ = Task.Run(() => ProcessStopOrders());
-           _ = Task.Run(() => ProcessTrailingStopOrders());
-           _ = Task.Run(() => ProcessAtMarketOpen());
-           _ = Task.Run(() => ProcessAtMarketEnd());
-           _ = Task.Run(() => UpdateGreatestTradedPrice());
+            _ = Task.Run(() => UpdateGreatestTradedPrice());
+            _ = Task.Run(() => ProcessStopOrders());
+            _ = Task.Run(() => ProcessTrailingStopOrders());
+            _ = Task.Run(() => ProcessAtMarketOpen());
+            _ = Task.Run(() => ProcessAtMarketEnd());
+           
         }
 
         ~TradingOrderbook()
