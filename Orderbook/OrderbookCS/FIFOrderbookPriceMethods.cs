@@ -16,7 +16,7 @@ namespace TradingServer.OrderbookCS
                 
                 if (_trades.count > 0 && currentTime <= marketEnd && currentTime >= marketOpen)
                 {
-                    var lastTrade = _trades.trades[_trades.count - 1];
+                    var lastTrade = _trades.recordedTrades[_trades.count - 1];
                     lastTradedPrice = lastTrade.tradedPrice;
                     
                     if (lastTrade.tradedPrice > _greatestTradedPrice)

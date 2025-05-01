@@ -38,25 +38,17 @@ internal static class TradingHostBuilder
                                         Get<LoggerConfiguration>() ?? defaultConfig;
 
         if (logConfig.LoggerType == LoggerType.Text)
-        {
             services.AddSingleton<ITextLogger, TextLogger>();
-        }
-
+        
         if (logConfig.LoggerType == LoggerType.Database)
-        {
            services.AddSingleton<ITextLogger, DatabaseLogger>();
-        }
-
+        
         if (logConfig.LoggerType == LoggerType.Console)
-        {
             services.AddSingleton<ITextLogger, ConsoleLogger>();
-        }
 
         if (logConfig.LoggerType == LoggerType.ThreadPoll)
-        {
             services.AddSingleton<ITextLogger, ThreadPollLogger>();
-        }
-
+        
         services.AddSingleton<TradingClient>(); 
         services.AddSingleton<ITradingServer, TradingServer>();
 

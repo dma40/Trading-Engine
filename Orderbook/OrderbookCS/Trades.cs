@@ -16,12 +16,12 @@ namespace TradingServer.OrderbookCS
 
         public void addTransactions(Trades other)
         {
-            result.AddRange(other.trades);
+            result.AddRange(other.recordedTrades);
         }
 
         private List<Trade> result;
 
-        public List<Trade> trades => result;
+        public List<Trade> recordedTrades => result;
         public int count => result.Count;
     }
 }
