@@ -1,14 +1,9 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using TradingServer.Core.Configuration;
-
-using TradingServer.Logging;
-using TradingServer.OrderbookCS;
-using TradingServer.Handlers;
-using Trading;
 using TradingServer.Orders;
-using TradingServer.Rejects;
-using Grpc.Core;
+using TradingServer.OrderbookCS;
+using TradingServer.Logging;
+using TradingServer.Handlers;
+using TradingServer.Logging.LoggingConfiguration;
 
 namespace TradingServer.Core 
 {
@@ -62,6 +57,12 @@ namespace TradingServer.Core
 
             bool isInvalid = false;
             RejectionReason reason = RejectionReason.Unknown;
+
+            if (permissionLevel < 2)
+            {
+                isInvalid = true;
+                reason = RejectionReason.InsufficientPermissionError;
+            }
 
             if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnClose || 
             Order.StringToOrderType(request.Type) == OrderTypes.LimitOnClose && now >= onCloseDeadline)
@@ -120,16 +121,13 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
-            if ((int) permissionLevel < 2)
-                throw new UnauthorizedAccessException("401 Permission Error: insufficient permission to edit orders");
-        
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Security ID cannot be null"), Order.StringToOrderType(request.Type)); 
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
             Tuple<bool, Reject> result = checkIfOrderIsInvalid(request);
 
-            else if (result.Item1)
+            if (result.Item1)
             {
                 _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(result.Item2.reason));
 
@@ -159,7 +157,7 @@ namespace TradingServer.Core
 
                 if (!exception)
                     _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
-                    " side by {request.Username} at {DateTime.UtcNow}");
+                    $" side by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Cancel")
@@ -180,7 +178,7 @@ namespace TradingServer.Core
 
                 if (!exception)
                     _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
-                    " by {request.Username} at {DateTime.UtcNow}");
+                    $"by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Modify")
@@ -200,7 +198,7 @@ namespace TradingServer.Core
 
                 if (!exception)
                     _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
-                    " by {request.Username} at {DateTime.UtcNow}");
+                    $" by {request.Username} at {DateTime.UtcNow}");
             }
  
             await Task.Delay(200);

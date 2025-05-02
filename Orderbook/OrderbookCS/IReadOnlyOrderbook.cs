@@ -8,6 +8,16 @@ namespace TradingServer.OrderbookCS
         int count { get; }
         OrderbookSpread spread();
 
+        public List<OrderbookEntry> getBidOrders()
+        {
+            throw new UnauthorizedAccessException("401 Unauthorized Access");
+        }
+
+        public List<OrderbookEntry> getAskOrders()
+        {
+            throw new UnauthorizedAccessException("401 Unauthorized Access");
+        }
+
         public void addOrder(Order order)
         {
             throw new UnauthorizedAccessException("401 Unauthorized Access");
@@ -21,17 +31,7 @@ namespace TradingServer.OrderbookCS
         public void removeOrder(CancelOrder cancel)
         {
             throw new UnauthorizedAccessException("401 Unauthorized Access");
-        }
-
-        public List<OrderbookEntry> getBidOrders()
-        {
-            throw new UnauthorizedAccessException("401 Unauthorized Access");
-        }
-
-        public List<OrderbookEntry> getAskOrders()
-        {
-            throw new UnauthorizedAccessException("401 Unauthorized Access");
-        }
+        }  
 
         public Trades match(Order order)
         {
