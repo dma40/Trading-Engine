@@ -106,12 +106,6 @@ namespace TradingServer.Core
                 reason = RejectionReason.EmptyOrNullArgument;
             }
 
-            else if (request.Operation == "Add" && _orderbook.containsOrder(request.Id))
-            {
-                isInvalid = true;
-                reason = RejectionReason.ModifyWrongSide;
-            }
-
             else if (request.Side.ToString() != "Bid" && request.Side.ToString() != "Ask")
             {
                 isInvalid = true;
@@ -149,6 +143,8 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Add")
             {
+                bool exception = false;
+
                 try 
                 {
                     Order newOrder = modify.newOrder();
@@ -156,14 +152,20 @@ namespace TradingServer.Core
                 }
 
                 catch (InvalidOperationException exception)
+                {
                     _logger.Error(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
-                
-                _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
-                " side by {request.Username} at {DateTime.UtcNow}");
+                    exception = true;
+                }
+
+                if (!exception)
+                    _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
+                    " side by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Cancel")
             {
+                bool exception = false;
+
                 try 
                 {
                     CancelOrder cancelOrder = modify.cancelOrder();
@@ -171,24 +173,34 @@ namespace TradingServer.Core
                 }
 
                 catch (InvalidOperationException exception)
+                {
                     _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
-                
-                _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
-                " by {request.Username} at {DateTime.UtcNow}");
+                    exception = true;
+                }
+
+                if (!exception)
+                    _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
+                    " by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Modify")
             {
+                bool exception = false;
+
                 try
                 { 
                     _orderbook.modifyOrder(modify);
                 }
                 
                 catch (InvalidOperationException exception)
+                {
                     _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.Now}");
-                
-                _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
-                 " by {request.Username} at {DateTime.UtcNow}");
+                    exception = true;
+                }
+
+                if (!exception)
+                    _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
+                    " by {request.Username} at {DateTime.UtcNow}");
             }
  
             await Task.Delay(200);
