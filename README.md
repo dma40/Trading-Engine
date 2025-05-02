@@ -6,4 +6,7 @@ A simplified simulation of modern day exchange trading, which
 - supports text logging, trace logging, database logging, and console logging
 - uses gRPC to send order information to the trading server
 
-(Note: in order to use DatabaseLogger you need to have a MySQL server running on your computer, which will most likely be running at port 3306. Also, the trace logger is still being built, it may not function optimally!)
+Note that you also need the following to run this project successfully:
+
+- .NET 9.0 installed in your codespace 
+- A MySQL connection running (ideally on port 3306)
