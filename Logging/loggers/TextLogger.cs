@@ -20,10 +20,8 @@ namespace TradingServer.Logging
             var now = DateTime.Now;
 
             if (_logConfig.TextLoggerConfiguration == null || string.IsNullOrEmpty(_logConfig.TextLoggerConfiguration.Directory))
-            {
-                throw new InvalidOperationException("TextLoggerConfiguration or its Directory is not properly configured.");
-            }
-
+                throw new InvalidOperationException("Error: config cannot be null");
+            
             string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory, $"{now:yyyy-MM-dd}");
             string filename = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:HH-mm-ss}";
             string logbase = Path.ChangeExtension(filename, _logConfig.TextLoggerConfiguration.FileExtension);

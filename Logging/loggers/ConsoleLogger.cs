@@ -13,10 +13,8 @@ namespace TradingServer.Logging
             _logConfig = logConfig.Value ?? throw new ArgumentNullException("This cannot be null");
 
             if (_logConfig.LoggerType != LoggerType.Console)
-            {
-                throw new InvalidDataException();
-            }
-
+                throw new InvalidDataException("You cannot initialize a Console logger this way. This is the wrong type");
+            
             _ = Task.Run(() => LogAsync(_logQueue, _ts.Token));
         }
 
