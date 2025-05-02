@@ -13,10 +13,8 @@ namespace TradingServer.Logging
             _logConfig = logConfig.Value ?? throw new ArgumentNullException();
 
             if (_logConfig.LoggerType != LoggerType.Text) 
-            {
                 throw new InvalidOperationException("You can't initialize a TextLogger in this way. That is the wrong type");
-            }
-            
+        
             var now = DateTime.Now;
 
             if (_logConfig.TextLoggerConfiguration == null || string.IsNullOrEmpty(_logConfig.TextLoggerConfiguration.Directory))

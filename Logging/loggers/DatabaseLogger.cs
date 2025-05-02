@@ -15,10 +15,8 @@ namespace TradingServer.Logging
             _logConfig = logConfig.Value ?? throw new ArgumentNullException();
             
             if (_logConfig.LoggerType != LoggerType.Database) 
-            {
                 throw new InvalidOperationException("You can't initialize a DatabaseLogger in this way");
-            }
-
+            
             DateTime now = DateTime.UtcNow;
 
             string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
