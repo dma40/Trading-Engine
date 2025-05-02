@@ -2,7 +2,7 @@ namespace TradingServer.Orders
 {
     public class StopOrder: Order, IOrderCore, IDisposable
     {
-        public StopOrder(IOrderCore _orderCore, long _price, uint _quantity, bool _isBuy, OrderTypes _orderType) :
+        public StopOrder(IOrderCore _orderCore, long _price, uint _quantity, bool _isBuy, OrderTypes _orderType):
         base(_orderCore, _price, _quantity, _isBuy, _orderType)
         {
             if (OrderType != OrderTypes.StopMarket)

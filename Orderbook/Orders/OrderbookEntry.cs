@@ -6,6 +6,7 @@ namespace TradingServer.Orders
         {
             Price = price;
         }
+
         public long Price { get; private set; }
         public OrderbookEntry? head { get; set; }
         public OrderbookEntry? tail { get; set; }
@@ -31,6 +32,7 @@ namespace TradingServer.Orders
         public uint getLevelOrderQuantity() 
         {
             uint count = 0;
+            
             OrderbookEntry? headPointer = head;
 
             while (headPointer != null)

@@ -13,6 +13,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (!_onMarketClose.TryGetValue(order.OrderID, out Order? orderentry) && orderentry != null)
                     _onMarketClose.Add(order.OrderID, order);
+
                 else
                     throw new InvalidOperationException();
             }
@@ -21,6 +22,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (!_onMarketOpen.TryGetValue(order.OrderID, out Order? orderentry) && orderentry != null)
                     _onMarketOpen.Add(order.OrderID, order);
+
                 else
                     throw new InvalidOperationException(); 
             }
@@ -29,6 +31,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (!containsOrder(order.OrderID))
                     match(order);
+
                 else
                     throw new InvalidOperationException();
             }
@@ -42,6 +45,7 @@ namespace TradingServer.OrderbookCS
                 {
                     if (!_stop.TryGetValue(stop.OrderID, out StopOrder? stoporder) && stoporder != null)
                         _stop.Add(stop.OrderID, stop);
+
                     else
                         throw new InvalidOperationException();
                 }
@@ -56,6 +60,7 @@ namespace TradingServer.OrderbookCS
                 {
                     if (!_trailingStop.TryGetValue(trail.OrderID, out TrailingStopOrder? trailstop) && trailstop != null)
                         _trailingStop.Add(trail.OrderID, trail);
+
                     else
                         throw new InvalidOperationException();
                 }
@@ -74,6 +79,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
                     _stop.Remove(cancel.OrderID);
+
                 else
                     throw new InvalidOperationException();
             }
@@ -82,6 +88,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? stop) && stop != null)
                     _trailingStop.Remove(cancel.OrderID);
+
                 else
                     throw new InvalidOperationException();
             }
@@ -90,6 +97,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (_onMarketClose.TryGetValue(cancel.OrderID, out Order? order) && order != null)
                     _onMarketClose.Remove(cancel.OrderID);
+
                 else
                     throw new InvalidOperationException();
             }
@@ -98,6 +106,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (_onMarketOpen.TryGetValue(cancel.OrderID, out Order? order) && order != null)
                     _onMarketOpen.Remove(cancel.OrderID);
+                    
                 else
                     throw new InvalidOperationException();
             }

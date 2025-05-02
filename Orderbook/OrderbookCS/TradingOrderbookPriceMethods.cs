@@ -5,7 +5,7 @@ namespace TradingServer.OrderbookCS
         private long _greatestTradedPrice = int.MinValue;
         public long lastTradedPrice { get; private set; }
 
-         protected async Task UpdateGreatestTradedPrice()
+        protected async Task UpdateGreatestTradedPrice()
         {
             while (true)
             {

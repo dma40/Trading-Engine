@@ -17,7 +17,7 @@ namespace TradingServer.Tests
             Order order1 = modify1.newOrder();
 
             IOrderCore orderCore2 = new OrderCore(200, "Dylan", "037833100", OrderTypes.GoodForDay);
-            ModifyOrder modify2 = new ModifyOrder(orderCore2, 50, 100, false); // issue with this test case?
+            ModifyOrder modify2 = new ModifyOrder(orderCore2, 50, 100, false); 
 
             Order order2 = modify2.newOrder();
 

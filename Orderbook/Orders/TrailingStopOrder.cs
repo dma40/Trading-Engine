@@ -24,6 +24,7 @@ namespace TradingServer.Orders
         }
 
         public long trail { get; private set; }
+        
         public long StopPrice 
         {  
             get

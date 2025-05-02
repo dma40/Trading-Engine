@@ -53,6 +53,7 @@ namespace TradingServer.Core
             TimeSpan now = DateTime.Now.TimeOfDay;
             TimeSpan onOpenDeadline = new TimeSpan(9, 28, 0);
             TimeSpan onCloseDeadline = new TimeSpan(15, 50, 0);
+            TimeSpan closed = new TimeSpan(16, 0, 0);
 
             RejectCreator creator = new RejectCreator(); 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, 
@@ -71,6 +72,12 @@ namespace TradingServer.Core
 
             else if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnOpen ||
             Order.StringToOrderType(request.Type) == OrderTypes.LimitOnOpen && now >= onOpenDeadline)
+            {
+                isInvalid = true;
+                reason = RejectionReason.SubmittedAfterDeadline;
+            }
+
+            else if (now >= closed)
             {
                 isInvalid = true;
                 reason = RejectionReason.SubmittedAfterDeadline;
@@ -120,26 +127,13 @@ namespace TradingServer.Core
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
             if ((int) permissionLevel < 2)
-            {
                 throw new UnauthorizedAccessException("401 Permission Error: insufficient permission to edit orders");
-            }
-
+        
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Security ID cannot be null"), Order.StringToOrderType(request.Type)); 
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
             Tuple<bool, Reject> result = checkIfOrderIsInvalid(request);
-
-            if (now.Hour >= 16)
-            {
-                return new OrderResponse
-                {
-                    Id = request.Id,
-                    Status = 403,
-                    Message = "You cannot submit orders now, the exchange is closed.\n" + 
-                    "Please try again when the market reopens at 9:30 AM"
-                };
-            }
 
             else if (result.Item1)
             {
@@ -162,9 +156,7 @@ namespace TradingServer.Core
                 }
 
                 catch (InvalidOperationException exception)
-                {
                     _logger.Error(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
-                }
                 
                 _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
                 " side by {request.Username} at {DateTime.UtcNow}");
@@ -179,25 +171,21 @@ namespace TradingServer.Core
                 }
 
                 catch (InvalidOperationException exception)
-                {
                     _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
-                }
-
+                
                 _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
                 " by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Modify")
             {
-                try 
-                {
+                try
+                { 
                     _orderbook.modifyOrder(modify);
                 }
-
+                
                 catch (InvalidOperationException exception)
-                {
                     _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.Now}");
-                }
                 
                 _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
                  " by {request.Username} at {DateTime.UtcNow}");
