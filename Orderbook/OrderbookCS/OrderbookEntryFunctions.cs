@@ -14,23 +14,21 @@ namespace TradingServer.OrderbookCS
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
-            { 
+            {
                 lock (_ordersLock)
                     addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
             }
 
             else
-            {
                 throw new InvalidOperationException("This order already exists in the orderbook, you can't add it again");
-            }
-
-            if (_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
+            
+            if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
             {
                 lock (_goodTillCancelLock)
                     _goodTillCancel.Add(order.OrderID, orderbookEntry);
             }
 
-            if (_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
+            if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
             {
                 lock (_goodForDayLock)
                     _goodForDay.Add(order.OrderID, new CancelOrder(order));
@@ -43,22 +41,13 @@ namespace TradingServer.OrderbookCS
 
             if (levels.TryGetValue(baseLimit, out Limit? limit) && limit != null)
             {
-                if (limit.head == null)
+                if (limit.tail != null)
                 {
-                    limit.head = orderbookEntry;
+                    OrderbookEntry tailPointer = limit.tail;
+                    tailPointer.next = orderbookEntry;
+                    orderbookEntry.previous = tailPointer;
                     limit.tail = orderbookEntry;
-                }
-
-                else
-                {
-                    if (limit.tail != null)
-                    {
-                        OrderbookEntry tailPointer = limit.tail;
-                        tailPointer.next = orderbookEntry;
-                        orderbookEntry.previous = tailPointer;
-                        limit.tail = orderbookEntry;
-                    }
-                }
+                }                  
             }
 
             else 
@@ -68,6 +57,8 @@ namespace TradingServer.OrderbookCS
                 baseLimit.head = orderbookEntry;
                 baseLimit.tail = orderbookEntry;
             }
+
+            orders.Add(order.OrderID, orderbookEntry);
         }
 
         protected void removeOrders(List<CancelOrder> cancels)
@@ -101,8 +92,6 @@ namespace TradingServer.OrderbookCS
                 lock (_goodForDayLock)
                     _goodForDay.Remove(day.OrderID);
             }
-
-            orderbookentry.Dispose();     
         }
 
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
@@ -112,12 +101,6 @@ namespace TradingServer.OrderbookCS
                 orderentry.next.previous = orderentry.previous;
                 orderentry.previous.next = orderentry.next;
             }
-
-            else if (orderentry.previous != null)
-                orderentry.previous.next = null;
-            
-            else if (orderentry.next != null)
-                orderentry.next.previous = null;
             
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
             {
@@ -131,11 +114,19 @@ namespace TradingServer.OrderbookCS
                     _askLimits.Remove(orderentry.ParentLimit);    
             }
 
-            else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail != orderentry)
+            else if (orderentry.ParentLimit.head == orderentry)
+            {
+                if (orderentry.next != null)
+                    orderentry.next.previous = null;
                 orderentry.ParentLimit.head = orderentry.next;
+            }
             
             else if (orderentry.ParentLimit.tail == orderentry)
+            {
+                if (orderentry.previous != null)
+                    orderentry.previous.next = null;
                 orderentry.ParentLimit.tail = orderentry.previous;
+            }
             
             orders.Remove(id);
             orderentry.Dispose();

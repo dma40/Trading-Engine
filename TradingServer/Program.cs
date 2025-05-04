@@ -1,7 +1,7 @@
 ﻿using TradingServer.Tests;
 using TradingServer.Core;
 
-Console.WriteLine("Run orderbook tests? y/n");
+Console.WriteLine("Run orderbook tests? (y/n)");
 string input = Console.ReadLine() ?? "n";
 
 if (input == "y")

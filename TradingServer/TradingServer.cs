@@ -3,7 +3,11 @@ using TradingServer.Orders;
 using TradingServer.OrderbookCS;
 using TradingServer.Logging;
 using TradingServer.Handlers;
-using TradingServer.Logging.LoggingConfiguration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using TradingServer.Rejects;
+using Trading;
+using Grpc.Core;
 
 namespace TradingServer.Core 
 {
@@ -58,7 +62,7 @@ namespace TradingServer.Core
             bool isInvalid = false;
             RejectionReason reason = RejectionReason.Unknown;
 
-            if (permissionLevel < 2)
+            if ((int) permissionLevel < 2)
             {
                 isInvalid = true;
                 reason = RejectionReason.InsufficientPermissionError;
@@ -149,9 +153,9 @@ namespace TradingServer.Core
                     _orderbook.addOrder(newOrder);
                 }
 
-                catch (InvalidOperationException exception)
+                catch (InvalidOperationException error)
                 {
-                    _logger.Error(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), error.Message + $" {DateTime.Now}");
                     exception = true;
                 }
 
@@ -162,7 +166,7 @@ namespace TradingServer.Core
 
             else if (request.Operation == "Cancel")
             {
-                bool exception = false;
+                bool error = false;
 
                 try 
                 {
@@ -173,17 +177,17 @@ namespace TradingServer.Core
                 catch (InvalidOperationException exception)
                 {
                     _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
-                    exception = true;
+                    error = true;
                 }
 
-                if (!exception)
+                if (!error)
                     _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
                     $"by {request.Username} at {DateTime.UtcNow}");
             }
 
             else if (request.Operation == "Modify")
             {
-                bool exception = false;
+                bool error = false;
 
                 try
                 { 
@@ -193,10 +197,10 @@ namespace TradingServer.Core
                 catch (InvalidOperationException exception)
                 {
                     _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.Now}");
-                    exception = true;
+                    error = true;
                 }
 
-                if (!exception)
+                if (!error)
                     _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
                     $" by {request.Username} at {DateTime.UtcNow}");
             }
