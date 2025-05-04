@@ -20,7 +20,7 @@ namespace TradingServer.OrderbookCS
             }
 
             else
-                throw new InvalidOperationException("This order already exists in the orderbook, you can't add it again");
+                throw new InvalidOperationException("This order already exists in the orderbook. You can't add it again");
             
             if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
             {
@@ -39,10 +39,12 @@ namespace TradingServer.OrderbookCS
         {
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
-            if (levels.TryGetValue(baseLimit, out Limit? limit) && limit != null)
+            if (levels.TryGetValue(baseLimit, out Limit? limit))
             {
                 if (limit.tail != null)
                 {
+                    orderbookEntry = new OrderbookEntry(order, limit);
+
                     OrderbookEntry tailPointer = limit.tail;
                     tailPointer.next = orderbookEntry;
                     orderbookEntry.previous = tailPointer;
@@ -75,11 +77,13 @@ namespace TradingServer.OrderbookCS
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry))
             {
                 lock (_ordersLock)
-                        removeOrder(cancel.OrderID, orderbookentry, _orders);
+                {
+                    removeOrder(cancel.OrderID, orderbookentry, _orders);
+                }
             }
 
             else
-                throw new InvalidOperationException("This order does not exist in the orderbook, you can't remove it");
+                throw new InvalidOperationException("This order does not exist in the orderbook. You can't remove it");
            
             if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry))
             {
@@ -118,6 +122,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (orderentry.next != null)
                     orderentry.next.previous = null;
+
                 orderentry.ParentLimit.head = orderentry.next;
             }
             
@@ -125,6 +130,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (orderentry.previous != null)
                     orderentry.previous.next = null;
+
                 orderentry.ParentLimit.tail = orderentry.previous;
             }
             
@@ -143,7 +149,7 @@ namespace TradingServer.OrderbookCS
                 }
 
                 else
-                    throw new InvalidOperationException("This order does not exist in the orderbook, you can't modify it");
+                    throw new InvalidOperationException("This order does not exist in the orderbook. You can't modify it");
             }
         }
     }

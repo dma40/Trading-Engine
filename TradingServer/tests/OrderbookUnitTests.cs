@@ -1,7 +1,6 @@
 ﻿using TradingServer.OrderbookCS;
 using TradingServer.Orders;
 using TradingServer.Instrument;
-using System.Drawing.Printing;
 
 namespace TradingServer.Tests
 {
@@ -40,6 +39,21 @@ namespace TradingServer.Tests
             Console.WriteLine("Ask limits: \n");
             getAskLimits(orders);
             Console.WriteLine("Bid limits: \n");
+            getBidLimits(orders);
+
+            IOrderCore orderCore3 = new OrderCore(300, "Dylan", "037833100", OrderTypes.GoodTillCancel);
+            ModifyOrder modify3 = new ModifyOrder(orderCore3, 50, 100, true);
+
+            Order order3 = modify3.newOrder();
+            orders.addOrder(order3);
+
+            Console.WriteLine("After adding a new order:");
+            getBidLimits(orders);
+
+            CancelOrder cancel3 = modify3.cancelOrder();
+            orders.removeOrder(cancel3);
+
+            Console.WriteLine("After removing one order:");
             getBidLimits(orders);
         }
 
@@ -144,12 +158,21 @@ namespace TradingServer.Tests
             {
                 Console.WriteLine(limit.Price + "\n");
                 if (limit.head == null)
+                {
                     Console.WriteLine("head is null");
+                }
 
                 else
                 {
                     Console.WriteLine("head is not null ");
                     Console.WriteLine(limit.head.CurrentOrder.OrderID);
+
+                    if (limit.head.next != null)
+                    {
+                        Console.WriteLine("head's next is not null");
+                        Console.WriteLine(limit.head.next.CurrentOrder.OrderID);
+                        Console.WriteLine(limit.head.next == limit.tail);
+                    } /* Also print whether it's the head, it'll help with debugging remove orders method */
                 }
             }
         }
@@ -166,6 +189,13 @@ namespace TradingServer.Tests
                 {
                     Console.WriteLine("head is not null ");
                     Console.WriteLine(limit.head.CurrentOrder.OrderID);
+
+                    if (limit.head.next != null)
+                    {
+                        Console.WriteLine("head's next is not null");
+                        Console.WriteLine(limit.head.next.CurrentOrder.OrderID);
+                        Console.WriteLine(limit.head.next == limit.tail);
+                    }
                 }
             }
         }
