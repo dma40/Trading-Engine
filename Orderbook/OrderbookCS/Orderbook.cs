@@ -4,9 +4,9 @@ namespace TradingServer.OrderbookCS
 {
     public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
     {
-        private readonly Lock _ordersLock = new();
-        private readonly Lock _goodForDayLock = new();
-        private readonly Lock _goodTillCancelLock = new();
+        private readonly object _ordersLock = new();
+        private readonly object _goodForDayLock = new();
+        private readonly object _goodTillCancelLock = new();
 
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();

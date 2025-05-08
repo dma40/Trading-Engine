@@ -25,23 +25,20 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    try
+                    lock (_ordersLock)
                     {
-                        DeleteGoodForDayOrders();
-                        DeleteExpiredGoodTillCancel();
+                        try
+                        {
+                            DeleteGoodForDayOrders();
+                            DeleteExpiredGoodTillCancel();
 
-                        _orderMutex.WaitOne();
-                        _goodForDayMutex.WaitOne();
-                        _goodTillCancelMutex.WaitOne();
+                            Thread.Sleep(closed);
+                        }                
 
-                        Thread.Sleep(closed);
-                    }                
-
-                    finally
-                    {
-                        _orderMutex.ReleaseMutex();
-                        _goodForDayMutex.ReleaseMutex();
-                        _goodTillCancelMutex.ReleaseMutex();
+                        finally
+                        {
+                            Monitor.Exit(_ordersLock);
+                        }
                     }
                 }
 

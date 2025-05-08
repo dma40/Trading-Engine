@@ -15,8 +15,18 @@ namespace TradingServer.OrderbookCS
 
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             {
-                lock (_ordersLock)
-                    addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+                if (Monitor.TryEnter(_ordersLock))
+                {
+                    try
+                    {
+                        addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+                    }
+
+                    finally
+                    {
+                        Monitor.Exit(_ordersLock);
+                    }
+                }
             }
 
             else
