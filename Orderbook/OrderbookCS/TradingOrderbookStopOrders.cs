@@ -64,7 +64,7 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime >= marketOpen && currentTime <= marketEnd)
                 {
-                    lock (_ordersLock) 
+                    lock (_stopLock) 
                     {
                         foreach (var trail in _trailingStop)
                         {

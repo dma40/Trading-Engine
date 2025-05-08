@@ -4,10 +4,6 @@ namespace TradingServer.OrderbookCS
 {
     public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
     {
-        private readonly Mutex _orderMutex = new Mutex();
-        private readonly Mutex _goodForDayMutex = new Mutex();
-        private readonly Mutex _goodTillCancelMutex = new Mutex();
-
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
         protected virtual async Task ProcessAtMarketEnd()
@@ -33,6 +29,11 @@ namespace TradingServer.OrderbookCS
                             DeleteExpiredGoodTillCancel();
 
                             Thread.Sleep(closed);
+                        }
+
+                        catch (Exception)
+                        {
+                            Console.WriteLine("It appears that something went wrong when processing these orders");
                         }                
 
                         finally

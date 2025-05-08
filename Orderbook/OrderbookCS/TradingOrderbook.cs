@@ -7,10 +7,6 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _ordersLock = new();
         private readonly Lock _stopLock = new();
 
-        private readonly Mutex _orderMutex = new Mutex();
-        private readonly Mutex _goodForDayMutex = new Mutex();
-        private readonly Mutex _goodTillCancelMutex = new Mutex();
-
         public TradingOrderbook(Security security): base(security)
         {
             _trades = new Trades();

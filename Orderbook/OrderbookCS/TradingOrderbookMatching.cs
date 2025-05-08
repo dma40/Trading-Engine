@@ -9,11 +9,10 @@ namespace TradingServer.OrderbookCS
 
         public new Trades match(Order order) 
         {   
-            Lock _orderLock = new(); 
             int type = (int) order.OrderType;
             Trades result = new Trades();
 
-            lock (_orderLock)
+            lock (_ordersLock)
             {
                 if (ImmediateHandleTypes.Contains(type))
                 {

@@ -34,20 +34,14 @@ namespace TradingServer.OrderbookCS
                             DeleteGoodForDayOrders();
                             DeleteExpiredGoodTillCancel();
                             ProcessOnMarketEndOrders(); 
+                        
+                            Thread.Sleep(closed);
                         }
-
-                        _orderMutex.WaitOne();
-                        _goodForDayMutex.WaitOne();
-                        _goodTillCancelMutex.WaitOne();
-
-                        Thread.Sleep(closed);
                     }
 
-                    finally
+                    catch (Exception exception)
                     {
-                        _orderMutex.ReleaseMutex();
-                        _goodForDayMutex.ReleaseMutex();
-                        _goodTillCancelMutex.ReleaseMutex();
+                        Console.WriteLine(exception.Message);
                     }
                 }
 

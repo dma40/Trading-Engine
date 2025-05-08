@@ -15,16 +15,16 @@ namespace TradingServer.OrderbookCS
 
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             {
-                if (Monitor.TryEnter(_ordersLock))
+                lock (_ordersLock)
                 {
                     try
                     {
                         addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
                     }
 
-                    finally
+                    catch (Exception exception)
                     {
-                        Monitor.Exit(_ordersLock);
+                        Console.WriteLine(exception.Message);
                     }
                 }
             }
@@ -88,7 +88,15 @@ namespace TradingServer.OrderbookCS
             {
                 lock (_ordersLock)
                 {
-                    removeOrder(cancel.OrderID, orderbookentry, _orders);
+                    try
+                    {
+                        removeOrder(cancel.OrderID, orderbookentry, _orders);
+                    }
+
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception.Message);
+                    }
                 }
             }
 
@@ -149,18 +157,16 @@ namespace TradingServer.OrderbookCS
         }
 
         public virtual void modifyOrder(ModifyOrder modify)
-        {   
-            lock (_ordersLock)
+        {        
+            if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry))
             {
-                if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry))
-                {
-                    removeOrder(modify.OrderID, orderentry, _orders);
-                    addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
-                }
-
-                else
-                    throw new InvalidOperationException("This order does not exist in the orderbook. You can't modify it");
+                removeOrder(modify.OrderID, orderentry, _orders);
+                addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
             }
+
+            else
+                throw new InvalidOperationException("This order does not exist in the orderbook. You can't modify it");
+            
         }
     }
 }
