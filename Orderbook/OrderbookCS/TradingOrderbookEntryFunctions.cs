@@ -11,7 +11,7 @@ namespace TradingServer.OrderbookCS
         { 
             if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
             {
-                if (!_onMarketClose.TryGetValue(order.OrderID, out Order? orderentry) && orderentry != null)
+                if (!_onMarketClose.TryGetValue(order.OrderID, out Order? orderentry))
                     _onMarketClose.Add(order.OrderID, order);
 
                 else
@@ -20,7 +20,7 @@ namespace TradingServer.OrderbookCS
 
             else if (order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
             {
-                if (!_onMarketOpen.TryGetValue(order.OrderID, out Order? orderentry) && orderentry != null)
+                if (!_onMarketOpen.TryGetValue(order.OrderID, out Order? orderentry))
                     _onMarketOpen.Add(order.OrderID, order);
 
                 else
