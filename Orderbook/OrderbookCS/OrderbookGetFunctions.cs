@@ -16,5 +16,41 @@ namespace TradingServer.OrderbookCS
         {
             return _bidLimits;
         }
+
+        public new List<OrderbookEntry> getAskOrders()
+        {
+            List<OrderbookEntry> result = new List<OrderbookEntry>();
+
+            foreach (Limit limit in _askLimits)
+            {
+                OrderbookEntry? headPointer = limit.head;
+
+                while (headPointer != null)
+                {
+                    result.Add(headPointer);
+                    headPointer = headPointer.next;
+                }
+            }
+
+            return result;
+        }
+
+        public new List<OrderbookEntry> getBidOrders()
+        {
+            List<OrderbookEntry> result = new List<OrderbookEntry>();
+
+            foreach (Limit limit in _bidLimits)
+            {
+                OrderbookEntry? headPointer = limit.head;
+                
+                while (headPointer != null)
+                {
+                    result.Add(headPointer);
+                    headPointer = headPointer.next;
+                }
+            }
+
+            return result;
+        }
     }
 }
