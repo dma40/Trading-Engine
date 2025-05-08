@@ -16,7 +16,6 @@ namespace TradingServer.OrderbookCS
             _ = Task.Run(() => ProcessTrailingStopOrders());
             _ = Task.Run(() => ProcessAtMarketOpen());
             _ = Task.Run(() => ProcessAtMarketEnd());
-           
         }
 
         ~TradingOrderbook()
