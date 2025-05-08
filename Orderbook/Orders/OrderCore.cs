@@ -14,6 +14,5 @@ namespace TradingServer.Orders
         public string Username { get; private set; }
         public string SecurityID { get; private set; }
         public OrderTypes OrderType { get; private set; }
-
     }
 }

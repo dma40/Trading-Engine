@@ -62,7 +62,7 @@ namespace TradingServer.OrderbookCS
                         while (head != null)
                         {
                             var entry = head.CurrentOrder;
-                            executeTrade(order, head.CurrentOrder);
+                            result.addTransaction(executeTrade(order, head.CurrentOrder));
 
                             if (head.CurrentOrder.CurrentQuantity > 0)
                                 break;
@@ -88,7 +88,7 @@ namespace TradingServer.OrderbookCS
                         while (head != null)
                         {
                             var entry = head.CurrentOrder;
-                            executeTrade(order, head.CurrentOrder);
+                            result.addTransaction(executeTrade(order, head.CurrentOrder));
 
                             if (head.CurrentOrder.CurrentQuantity > 0)
                                 break;
@@ -106,14 +106,18 @@ namespace TradingServer.OrderbookCS
             return result;
         }
 
-        protected virtual void executeTrade(Order incoming, Order resting)
+        protected virtual Trade executeTrade(Order incoming, Order resting)
         {
-            // this is the helper function; ideally should return a Trade object.
             if (incoming.CurrentQuantity > resting.CurrentQuantity)
             {
                 var quantity = resting.CurrentQuantity;
                 resting.DecreaseQuantity(quantity);
                 incoming.DecreaseQuantity(quantity);
+
+                OrderRecord _incoming = new OrderRecord(incoming.OrderID, 0, incoming.Quantity, incoming.Price, resting.Price, incoming.isBuySide, incoming.Username, incoming.SecurityID, 0, 0);
+                OrderRecord _resting = new OrderRecord(resting.OrderID, resting.CurrentQuantity, quantity, resting.Price, resting.Price, resting.isBuySide, incoming.Username, incoming.SecurityID, 0, 0);
+
+                return new Trade(_incoming, _resting);
             }
 
             else 
@@ -121,6 +125,12 @@ namespace TradingServer.OrderbookCS
                 var quantity = incoming.CurrentQuantity;
                 resting.DecreaseQuantity(quantity);
                 incoming.DecreaseQuantity(quantity);
+
+                OrderRecord _incoming = new OrderRecord(incoming.OrderID, 0, incoming.Quantity, incoming.Price, resting.Price, incoming.isBuySide, incoming.Username, incoming.SecurityID, 0, 0);
+                OrderRecord _resting = new OrderRecord(resting.OrderID, resting.CurrentQuantity, quantity, resting.Price, resting.Price, resting.isBuySide, incoming.Username, incoming.SecurityID, 0, 0);
+
+                return new Trade(_incoming, _resting);
+
             }
         }
     }
