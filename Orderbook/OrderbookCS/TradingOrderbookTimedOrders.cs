@@ -27,9 +27,9 @@ namespace TradingServer.OrderbookCS
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
                     now = nextTradingDayStart;
 
-                    try
+                    lock (_ordersLock)
                     {
-                        lock (_ordersLock)
+                        try
                         {
                             DeleteGoodForDayOrders();
                             DeleteExpiredGoodTillCancel();
@@ -37,11 +37,11 @@ namespace TradingServer.OrderbookCS
                         
                             Thread.Sleep(closed);
                         }
-                    }
 
-                    catch (Exception exception)
-                    {
-                        Console.WriteLine(exception.Message);
+                        catch (Exception exception)
+                        {
+                            Console.WriteLine(exception.Message);
+                        }
                     }
                 }
 

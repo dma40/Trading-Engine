@@ -13,7 +13,6 @@ namespace TradingServer.Orders
                        
             else
                 limitPrice = int.MinValue;
-             
         }
 
         public StopOrder(IOrderCore _orderCore, long _price, long _limitPrice, uint _quantity, bool _isBuy, OrderTypes _orderType): 
