@@ -7,10 +7,11 @@ namespace TradingServer.OrderbookCS
         private static readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private static readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
         private static readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
+        private static readonly List<int> _supportedOrderTypes = [0, 1, 4];
 
         public virtual void addOrder(Order order)
         {
-            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
+            if (isValidTime(order))
             {
                 return;
             }
@@ -89,7 +90,7 @@ namespace TradingServer.OrderbookCS
 
         public virtual void removeOrder(CancelOrder cancel)
         {
-            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
+            if (isValidTime(cancel))
             {
                 return;
             }
@@ -168,7 +169,7 @@ namespace TradingServer.OrderbookCS
 
         public virtual void modifyOrder(ModifyOrder modify)
         {
-            if (DateTime.Now.Hour >= 16)
+            if (isValidTime(modify))
             {
                 return;
             }
@@ -181,7 +182,19 @@ namespace TradingServer.OrderbookCS
 
             else
                 throw new InvalidOperationException("This order does not exist in the orderbook. You can't modify it");
-            
+        }
+
+        protected virtual bool isValidTime(IOrderCore order)
+        {
+            int type = (int) order.OrderType;
+
+            if (!_supportedOrderTypes.Contains(type))
+                throw new InvalidOperationException("This type of order is not supported by this orderbook");
+
+            if (type == 0)
+                return DateTime.Now.Hour < 16 || DateTime.Now.Hour > 9.5;
+
+            return true;
         }
     }
 }

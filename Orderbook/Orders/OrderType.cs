@@ -2,6 +2,7 @@ namespace TradingServer.Orders
 {
     public enum OrderTypes
     {
+        Limit,
         GoodForDay, 
         FillOrKill, 
         FillAndKill, 

@@ -134,5 +134,10 @@ namespace TradingServer.OrderbookCS
             else 
                 base.removeOrder(cancel);
         }
+
+        protected sealed override bool isValidTime(IOrderCore order)
+        {
+            return false;
+        }
     }
 }
