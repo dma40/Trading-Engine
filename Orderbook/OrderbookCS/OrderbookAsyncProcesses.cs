@@ -21,13 +21,13 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    DeleteGoodForDayOrders();
-                    DeleteExpiredGoodTillCancel();
-
                     lock (_ordersLock)
                     {
                         try
                         {
+                            DeleteGoodForDayOrders();
+                            DeleteExpiredGoodTillCancel();
+
                             Thread.Sleep(closed);
                         }
 
