@@ -9,6 +9,11 @@ namespace TradingServer.OrderbookCS
 
         public sealed override void addOrder(Order order)
         { 
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
+            {
+                return;
+            }
+
             if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
             {
                 if (!_onMarketClose.TryGetValue(order.OrderID, out Order? orderentry))
@@ -39,6 +44,11 @@ namespace TradingServer.OrderbookCS
 
         public void addOrder(StopOrder stop)
         {
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
+            {
+                return;
+            }
+
             if (stop.OrderType == OrderTypes.StopLimit || stop.OrderType == OrderTypes.StopMarket)
             {
                 lock (_stopLock)
@@ -54,6 +64,11 @@ namespace TradingServer.OrderbookCS
 
         public void addOrder(TrailingStopOrder trail)
         {
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
+            {
+                return;
+            }
+
             if (trail.OrderType == OrderTypes.TrailingStopLimit || trail.OrderType == OrderTypes.TrailingStopMarket)
             {
                 lock (_stopLock)
@@ -75,6 +90,11 @@ namespace TradingServer.OrderbookCS
 
         public sealed override void removeOrder(CancelOrder cancel)
         {
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
+            {
+                return;
+            }
+
             if (cancel.OrderType == OrderTypes.StopLimit || cancel.OrderType == OrderTypes.StopMarket)
             {
                 if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)

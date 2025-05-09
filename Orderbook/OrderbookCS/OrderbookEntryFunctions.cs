@@ -4,12 +4,17 @@ namespace TradingServer.OrderbookCS
 {
     public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
     {
-        private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
-        private readonly Dictionary<long, CancelOrder> _goodForDay = new Dictionary<long, CancelOrder>();
+        private static readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
+        private static readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
+        private static readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
 
         public virtual void addOrder(Order order)
         {
+            if (DateTime.Now.Hour >= 16)
+            {
+                return;
+            }
+            
             var baseLimit = new Limit(order.Price);
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
@@ -31,18 +36,6 @@ namespace TradingServer.OrderbookCS
 
             else
                 throw new InvalidOperationException("This order already exists in the orderbook. You can't add it again");
-            
-            if (!_goodTillCancel.TryGetValue(order.OrderID, out OrderbookEntry? orderentry) && order.OrderType == OrderTypes.GoodTillCancel)
-            {
-                lock (_goodTillCancelLock)
-                    _goodTillCancel.Add(order.OrderID, orderbookEntry);
-            }
-
-            if (!_goodForDay.TryGetValue(order.OrderID, out CancelOrder cancel) && order.OrderType == OrderTypes.GoodForDay)
-            {
-                lock (_goodForDayLock)
-                    _goodForDay.Add(order.OrderID, new CancelOrder(order));
-            }
         }
         
         private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
@@ -70,20 +63,37 @@ namespace TradingServer.OrderbookCS
                 baseLimit.tail = orderbookEntry;
             }
 
+            if (order.OrderType == OrderTypes.GoodTillCancel)
+            {
+                lock (_goodTillCancelLock)
+                    _goodTillCancel.Add(order.OrderID, orderbookEntry);
+            }
+
+            if (order.OrderType == OrderTypes.GoodForDay)
+            {
+                lock (_goodForDayLock)
+                    _goodForDay.Add(order.OrderID, orderbookEntry);
+            }
+
             orders.Add(order.OrderID, orderbookEntry);
         }
 
-        protected void removeOrders(List<CancelOrder> cancels)
+        protected void removeOrders(List<OrderbookEntry> cancels)
         {
             lock (_ordersLock)
             {
-                foreach (CancelOrder cancel in cancels)
-                    removeOrder(cancel);
+                foreach (OrderbookEntry cancel in cancels)
+                    removeOrder(cancel.OrderID, cancel, _orders);
             }
         }
 
         public virtual void removeOrder(CancelOrder cancel)
         {
+            if (DateTime.Now.Hour >= 16)
+            {
+                return;
+            }
+
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry))
             {
                 lock (_ordersLock)
@@ -102,18 +112,6 @@ namespace TradingServer.OrderbookCS
 
             else
                 throw new InvalidOperationException("This order does not exist in the orderbook. You can't remove it");
-           
-            if (_goodTillCancel.TryGetValue(cancel.OrderID, out OrderbookEntry? orderentry))
-            {
-                lock (_goodTillCancelLock)
-                    _goodTillCancel.Remove(cancel.OrderID);
-            }
-                
-            if (_goodForDay.TryGetValue(cancel.OrderID, out CancelOrder day))
-            {
-                lock (_goodForDayLock)
-                    _goodForDay.Remove(day.OrderID);
-            }
         }
 
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
@@ -151,13 +149,30 @@ namespace TradingServer.OrderbookCS
 
                 orderentry.ParentLimit.tail = orderentry.previous;
             }
+
+            if (orderentry.OrderType == OrderTypes.GoodTillCancel)
+            {
+                lock (_goodTillCancelLock)
+                    _goodTillCancel.Remove(orderentry.OrderID);
+            }
+                
+            if (orderentry.OrderType == OrderTypes.GoodForDay)
+            {
+                lock (_goodForDayLock)
+                    _goodForDay.Remove(orderentry.OrderID);
+            }
             
             orders.Remove(id);
             orderentry.Dispose();
         }
 
         public virtual void modifyOrder(ModifyOrder modify)
-        {        
+        {
+            if (DateTime.Now.Hour >= 16)
+            {
+                return;
+            }
+
             if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry))
             {
                 removeOrder(modify.OrderID, orderentry, _orders);

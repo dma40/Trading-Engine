@@ -124,6 +124,9 @@ namespace TradingServer.Orders
         public OrderbookEntry? next { get; set; }
         public OrderbookEntry? previous { get; set; }
 
+        public long OrderID => CurrentOrder.OrderID;
+        public OrderTypes OrderType => CurrentOrder.OrderType;
+
         ~OrderbookEntry()
         {
             Dispose();

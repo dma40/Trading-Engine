@@ -21,25 +21,20 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
+                    DeleteGoodForDayOrders();
+                    DeleteExpiredGoodTillCancel();
+
                     lock (_ordersLock)
                     {
                         try
                         {
-                            DeleteGoodForDayOrders();
-                            DeleteExpiredGoodTillCancel();
-
                             Thread.Sleep(closed);
                         }
 
                         catch (Exception)
                         {
-                            Console.WriteLine("It appears that something went wrong when processing these orders");
+                            Console.WriteLine("Something went wrong when processing these orders");
                         }                
-
-                        finally
-                        {
-                            Monitor.Exit(_ordersLock);
-                        }
                     }
                 }
 
@@ -57,12 +52,12 @@ namespace TradingServer.OrderbookCS
 
         protected void DeleteExpiredGoodTillCancel()
         {
-            List<CancelOrder> goodTillCancelOrders = new List<CancelOrder>();
+            List<OrderbookEntry> goodTillCancelOrders = new List<OrderbookEntry>();
 
             foreach (var order in _goodTillCancel)
             {
                 if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
-                    goodTillCancelOrders.Add(new CancelOrder(order.Value.CurrentOrder));
+                    goodTillCancelOrders.Add(order.Value);
 
                 removeOrders(goodTillCancelOrders);
             }
