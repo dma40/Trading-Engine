@@ -13,7 +13,6 @@ namespace TradingServer.OrderbookCS
 
         public OrderEntryOrderbook(Security instrument): base(instrument) 
         {
-            Console.WriteLine("Starting application...");
             _ = Task.Run(() => ProcessAtMarketEnd());
         }
 
