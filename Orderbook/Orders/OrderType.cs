@@ -18,6 +18,9 @@ namespace TradingServer.Orders
         MarketOnClose,
         LimitOnClose,
         MarketOnOpen,
-        LimitOnOpen
+        LimitOnOpen,
+
+        PairedCancel,
+        PairedExecution
     }
 }

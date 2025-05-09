@@ -27,8 +27,6 @@ namespace TradingServer.OrderbookCS
                         {
                             DeleteGoodForDayOrders();
                             DeleteExpiredGoodTillCancel();
-
-                            Thread.Sleep(closed);
                         }
 
                         catch (Exception)
@@ -36,6 +34,8 @@ namespace TradingServer.OrderbookCS
                             Console.WriteLine("Something went wrong when processing these orders");
                         }                
                     }
+
+                    await Task.Delay(closed);
                 }
 
                 await Task.Delay(200, _ts.Token);
