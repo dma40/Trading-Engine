@@ -49,7 +49,7 @@ internal static class TradingHostBuilder
         if (logConfig.LoggerType == LoggerType.ThreadPoll)
             services.AddSingleton<ITextLogger, ThreadPollLogger>();
         
-        services.AddSingleton<TradingClient>(); 
+        services.AddGrpcClient<TradingClient>(); 
         services.AddSingleton<ITradingServer, TradingServer>();
 
         services.AddHostedService<TradingServer>();
