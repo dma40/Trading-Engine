@@ -10,7 +10,7 @@ namespace TradingServer.OrderbookCS
 
         public virtual void addOrder(Order order)
         {
-            if (DateTime.Now.Hour >= 16)
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
                 return;
             }
@@ -89,7 +89,7 @@ namespace TradingServer.OrderbookCS
 
         public virtual void removeOrder(CancelOrder cancel)
         {
-            if (DateTime.Now.Hour >= 16)
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
                 return;
             }
