@@ -15,7 +15,7 @@ namespace TradingServer.OrderbookCS
 
                 lock (_stopLock)
                 {
-                    if (currentTime >= marketOpen && currentTime <= marketEnd)
+                    if (currentTime > marketOpen && currentTime < marketEnd)
                     {   
                         foreach (var order in _stop)
                         {
@@ -62,7 +62,7 @@ namespace TradingServer.OrderbookCS
 
                 TimeSpan currentTime = now.TimeOfDay;
 
-                if (currentTime >= marketOpen && currentTime <= marketEnd)
+                if (currentTime > marketOpen && currentTime < marketEnd)
                 {
                     lock (_stopLock) 
                     {
@@ -94,6 +94,11 @@ namespace TradingServer.OrderbookCS
 
                                     trail.Value.Dispose();
                                     _trailingStop.Remove(trailstop.OrderID);
+                                }
+
+                                else if (_greatestTradedPrice > trailstop.currentMaxPrice)
+                                {
+                                    trail.Value.currentMaxPrice = _greatestTradedPrice;
                                 }
                             }
                         }

@@ -27,7 +27,7 @@ namespace TradingServer.OrderbookCS
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
                     now = nextTradingDayStart;
 
-                    lock (_ordersLock)
+                    lock (_stopLock)
                     {
                         try
                         {
@@ -61,7 +61,7 @@ namespace TradingServer.OrderbookCS
                 
                 if (now.TimeOfDay == marketOpen)
                 {
-                    lock (_ordersLock)
+                    lock (_stopLock)
                     {
                         foreach (var order in _onMarketOpen)
                         {
