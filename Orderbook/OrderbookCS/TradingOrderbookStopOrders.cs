@@ -167,21 +167,6 @@ namespace TradingServer.OrderbookCS
                                     }
                                 }
 
-                                else if (primary.isBuySide)
-                                {
-                                    
-                                }
-
-                                else if (secondary.isBuySide)
-                                {
-
-                                }
-
-                                else
-                                {
-
-                                }
-
                                 _pairedCancel.Remove(pairedCancelOrder.OrderID);
                             }
 
