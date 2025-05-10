@@ -17,24 +17,18 @@ namespace TradingServer.OrderbookCS
                 if (ImmediateHandleTypes.Contains(type))
                 {
                     result = base.match(order);
-                    order.Dispose();
                 }
 
                 else if (order.OrderType == OrderTypes.FillOrKill)
                 {
                     if (canFill(order))
                         result = base.match(order);  
-
-                    order.Dispose();
                 }
 
                 else if (order.OrderType == OrderTypes.PostOnly)
                 {
                     if (!canFill(order))
                         base.addOrder(order);
-
-                    else
-                        order.Dispose();
                 }
 
                 else 
