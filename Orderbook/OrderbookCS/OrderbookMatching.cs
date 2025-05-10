@@ -133,5 +133,22 @@ namespace TradingServer.OrderbookCS
 
             }
         }
+
+        protected bool canMatch(Order order)
+        {
+            if (order.isBuySide)
+            {
+                if (_askLimits.Any() && _askLimits.Min != null && !_askLimits.Min.isEmpty)
+                    return order.Price >= _askLimits.Min.Price;
+            }
+
+            else
+            {
+                if (_bidLimits.Any() && _bidLimits.Max != null && !_bidLimits.Max.isEmpty)
+                    return order.Price <= _bidLimits.Max.Price;
+            }
+
+            return false;
+        }
     }
 }

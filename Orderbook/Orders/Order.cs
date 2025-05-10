@@ -96,6 +96,11 @@ namespace TradingServer.Orders
             return Quantity - CurrentQuantity;
         }
 
+        public Order activate()
+        {
+            return this;
+        }
+
         ~Order()
         {
             Dispose();

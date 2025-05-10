@@ -28,7 +28,7 @@ namespace TradingServer.Orders
 
         public long StopPrice => Price;
 
-        public Order activate()
+        public new Order activate()
         {
             return new Order(this);
         }

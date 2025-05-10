@@ -44,7 +44,7 @@ namespace TradingServer.Orders
 
         public long currentMaxPrice { get; set; }
 
-        public Order activate()
+        public new Order activate()
         {
             return new Order(this);
         }
