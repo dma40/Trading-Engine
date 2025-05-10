@@ -42,10 +42,7 @@ namespace TradingServer.OrderbookCS
                     result = base.match(order);
                 
                     if (order.CurrentQuantity > 0)
-                        base.addOrder(order);
-                        
-                    else 
-                        order.Dispose();      
+                        base.addOrder(order); 
                 }
                 
                 _trades.addTransactions(result);
