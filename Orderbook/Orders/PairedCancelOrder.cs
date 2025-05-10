@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace TradingServer.Orders
@@ -8,6 +9,9 @@ namespace TradingServer.Orders
         {
             if (orderCore.OrderType != OrderTypes.PairedCancel)
                 throw new InvalidDataException("You can't instantiate a PairedCancelOrder like this");
+
+            if (_primary.isBuySide != _secondary.isBuySide)
+                throw new InvalidDataException("The two orders need to be of the same side");
 
             _orderCore = orderCore;
             primary = _primary;
