@@ -169,7 +169,7 @@ namespace TradingServer.OrderbookCS
 
                                 else if (primary.isBuySide)
                                 {
-
+                                    
                                 }
 
                                 else if (secondary.isBuySide)
@@ -239,7 +239,9 @@ namespace TradingServer.OrderbookCS
                             Order primary = pairedExecutionOrder.primary;
 
                             Order activatedPrimary = primary.activate();
-                            if (canFill(activatedPrimary))
+                            base.match(activatedPrimary);
+
+                            if (activatedPrimary.CurrentQuantity > 0)
                             {
                                 match(activatedPrimary);
 
