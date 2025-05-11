@@ -11,13 +11,12 @@ namespace TradingServer.OrderbookCS
 
         public virtual void addOrder(Order order)
         {
-            if (isValidTime(order))
+            if (!isValidTime(order))
             {
                 return;
             }
             
             var baseLimit = new Limit(order.Price);
-            OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             {
@@ -90,7 +89,7 @@ namespace TradingServer.OrderbookCS
 
         public virtual void removeOrder(CancelOrder cancel)
         {
-            if (isValidTime(cancel))
+            if (!isValidTime(cancel))
             {
                 return;
             }
@@ -169,7 +168,7 @@ namespace TradingServer.OrderbookCS
 
         public virtual void modifyOrder(ModifyOrder modify)
         {
-            if (isValidTime(modify))
+            if (!isValidTime(modify))
             {
                 return;
             }
@@ -191,8 +190,8 @@ namespace TradingServer.OrderbookCS
             if (!_supportedOrderTypes.Contains(type))
                 throw new InvalidOperationException("This type of order is not supported by this orderbook");
 
-            if (type == 0)
-                return DateTime.Now.Hour < 16 || DateTime.Now.Hour > 9.5;
+            if (type == 1)
+                return DateTime.Now.Hour < 16 && DateTime.Now.Hour > 9.5;
 
             return true;
         }

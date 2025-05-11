@@ -27,7 +27,7 @@ namespace TradingServer.OrderbookCS
 
                 else if (order.OrderType == OrderTypes.PostOnly)
                 {
-                    if (!canFill(order))
+                    if (!canMatch(order))
                         base.addOrder(order);
                 }
 

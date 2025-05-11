@@ -151,14 +151,20 @@ namespace TradingServer.OrderbookCS
                         throw new InvalidOperationException();
                 }
 
-                else 
+                else
                     base.removeOrder(cancel);
             }
         }
 
         protected sealed override bool isValidTime(IOrderCore order)
         {
-            return false;
+            return false; /*
+            Should be false for the following types during off-hours:
+            - PostOnly
+            - Market
+            - FillOrKill, FillAndKill
+            - Stop, Trailing Stop orders
+             */
         }
     }
 }
