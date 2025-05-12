@@ -2,9 +2,9 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
+    public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
-        protected virtual bool canFill(Order order)
+        public bool canFill(Order order)
         {
             if (order.isBuySide)
             {
@@ -44,7 +44,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        protected virtual Trades match(Order order) 
+        public Trades match(Order order) 
         {
             if (containsOrder(order.OrderID))
                 throw new InvalidOperationException("Cannot match an order already in the orderbook");
@@ -134,7 +134,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        protected bool canMatch(Order order)
+        public bool canMatch(Order order)
         {
             if (order.isBuySide)
             {

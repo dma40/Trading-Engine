@@ -2,9 +2,10 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
+    public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
+        /*
 
         protected virtual async Task ProcessAtMarketEnd()
         {
@@ -44,13 +45,14 @@ namespace TradingServer.OrderbookCS
                     return;
             }
         }
+        */
 
-        protected void DeleteGoodForDayOrders()
+        public void DeleteGoodForDayOrders()
         {
             removeOrders(_goodForDay.Values.ToList());
         }
 
-        protected void DeleteExpiredGoodTillCancel()
+        public void DeleteExpiredGoodTillCancel()
         {
             List<OrderbookEntry> goodTillCancelOrders = new List<OrderbookEntry>();
 

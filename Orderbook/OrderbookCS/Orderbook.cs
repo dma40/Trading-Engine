@@ -2,21 +2,24 @@ using TradingServer.Instrument;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class OrderEntryOrderbook: RetrievalOrderbook, IOrderEntryOrderbook, IDisposable
+    public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
         private static readonly object _ordersLock = new();
         private readonly object _goodForDayLock = new();
         private readonly object _goodTillCancelLock = new();
 
+        private readonly Security _security;
+
         private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
 
-        public OrderEntryOrderbook(Security instrument): base(instrument) 
+        public Orderbook(Security instrument)
         {
-            _ = Task.Run(() => ProcessAtMarketEnd());
+            _security = instrument;
+            // _ = Task.Run(() => ProcessAtMarketEnd());
         }
 
-        ~OrderEntryOrderbook()
+        ~Orderbook()
         {
             Dispose();
         }

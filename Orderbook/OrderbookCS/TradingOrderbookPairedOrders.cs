@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
+    public partial class TradingEngine: IMatchingEngine, IDisposable
     {
         protected async Task ProcessPairedCancelOrders()
         {
@@ -24,7 +24,7 @@ namespace TradingServer.OrderbookCS
                             Order primary = pairedCancelOrder.primary.activate();
                             Order secondary = pairedCancelOrder.secondary.activate();
 
-                            if (canMatch(primary) && canMatch(secondary))
+                            if (orderbook.canMatch(primary) && orderbook.canMatch(secondary))
                             {
                                 if (primary.isBuySide && secondary.isBuySide)
                                 {
@@ -42,7 +42,7 @@ namespace TradingServer.OrderbookCS
                                 _pairedCancel.Remove(pairedCancelOrder.OrderID);
                             }
 
-                            else if (canMatch(primary))
+                            else if (orderbook.canMatch(primary))
                             {
                                 match(primary);
                                 secondary.Dispose();
@@ -50,7 +50,7 @@ namespace TradingServer.OrderbookCS
 
                             }
 
-                            else if (canMatch(secondary))
+                            else if (orderbook.canMatch(secondary))
                             {
                                 match(secondary);
                                 primary.Dispose();
@@ -66,7 +66,7 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed);
+                    await Task.Delay(closed, _ts.Token);
                 }
 
                 if (_ts.IsCancellationRequested)
@@ -96,12 +96,10 @@ namespace TradingServer.OrderbookCS
                             Order primary = pairedExecutionOrder.primary;
 
                             Order activatedPrimary = primary.activate();
-                            base.match(activatedPrimary);
+                            match(activatedPrimary);
 
                             if (activatedPrimary.CurrentQuantity > 0)
                             {
-                                match(activatedPrimary);
-
                                 Order activatedSecondary = pairedExecutionOrder.secondary.activate();
                                 match(activatedSecondary);
                                 _pairedExecution.Remove(pairedExecutionOrder.OrderID);
@@ -121,7 +119,7 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed);
+                    await Task.Delay(closed, _ts.Token);
                 }
 
                 if (_ts.IsCancellationRequested)

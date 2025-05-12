@@ -2,16 +2,16 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
+    public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private DateTime now;
+        private static DateTime now;
         private static readonly TimeSpan marketOpen = new TimeSpan(9, 30, 0);
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
         private readonly Dictionary<long, Order> _onMarketOpen = new Dictionary<long, Order>();
         private readonly Dictionary<long, Order> _onMarketClose = new Dictionary<long, Order>();
 
-        protected sealed override async Task ProcessAtMarketEnd()
+        protected async Task ProcessAtMarketEnd()
         {
             while (true)
             {
@@ -20,7 +20,7 @@ namespace TradingServer.OrderbookCS
                 
                 DateTime currentTime = DateTime.Now;
 
-                if (currentTime.TimeOfDay >= marketEnd)
+                if (currentTime.TimeOfDay == marketEnd)
                 {
                     DateTime tomorrow = currentTime.AddDays(1);
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
@@ -31,11 +31,9 @@ namespace TradingServer.OrderbookCS
                     {
                         try
                         {
-                            DeleteGoodForDayOrders();
-                            DeleteExpiredGoodTillCancel();
+                            orderbook.DeleteGoodForDayOrders();
+                            orderbook.DeleteExpiredGoodTillCancel();
                             ProcessOnMarketEndOrders(); 
-                        
-                            Thread.Sleep(closed);
                         }
 
                         catch (Exception exception)
@@ -43,6 +41,15 @@ namespace TradingServer.OrderbookCS
                             Console.WriteLine(exception.Message);
                         }
                     }
+                }
+
+                else
+                {
+                    DateTime tomorrow = currentTime.AddDays(1);
+                    DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 16, 0, 0);
+                    TimeSpan closed = nextTradingDayStart - DateTime.Now;
+
+                    await Task.Delay(closed, _ts.Token);
                 }
 
                 if (_ts.IsCancellationRequested)
@@ -58,6 +65,8 @@ namespace TradingServer.OrderbookCS
             {
                 if (_ts.IsCancellationRequested)
                     return;
+
+                DateTime currentTime = DateTime.Now;
                 
                 if (now.TimeOfDay == marketOpen)
                 {
@@ -74,6 +83,15 @@ namespace TradingServer.OrderbookCS
                             orderEntry.Dispose();
                         }
                     }
+                }
+
+                else
+                {
+                    DateTime tomorrow = currentTime.AddDays(1);
+                    DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
+                    TimeSpan closed = nextTradingDayStart - DateTime.Now;
+
+                    await Task.Delay(closed, _ts.Token);
                 }
 
                 if (_ts.IsCancellationRequested)

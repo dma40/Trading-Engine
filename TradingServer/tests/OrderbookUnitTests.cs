@@ -8,7 +8,7 @@ namespace TradingServer.Tests
     {
         private static void addSingleOrders()
         {
-            OrderEntryOrderbook orders = new OrderEntryOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
 
             IOrderCore orderCore1 = new OrderCore(100, "Dylan", "037833100", OrderTypes.GoodTillCancel);
             ModifyOrder modify1 = new ModifyOrder(orderCore1, 50, 100, true);
@@ -59,7 +59,7 @@ namespace TradingServer.Tests
 
         private static void removeSingleOrders()
         {
-            OrderEntryOrderbook orders = new OrderEntryOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
 
             /*
             Console.WriteLine("REMOVE SINGLE ORDER TEST A: " + true + '\n');
@@ -77,57 +77,57 @@ namespace TradingServer.Tests
 
         private static void removeNearEnds()
         {
-            OrderEntryOrderbook orders = new OrderEntryOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void modifyNearEnds()
         {
-            OrderEntryOrderbook orders = new OrderEntryOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void removeNearMiddle()
         {
-            OrderEntryOrderbook orders = new OrderEntryOrderbook(new Security("test_security"));
+           Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void modifyNearMiddle()
         {
-            OrderEntryOrderbook orders = new OrderEntryOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchBasic()
         {
-            OrderEntryOrderbook orders = new TradingOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithResting()
         {
-            OrderEntryOrderbook orders = new TradingOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithFillOrKill()
         {
-            OrderEntryOrderbook orders = new TradingOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithFillAndKill()
         {
-            OrderEntryOrderbook orders = new TradingOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchWithMarket()
         {
-            OrderEntryOrderbook orders = new TradingOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchAndRemove()
         {
-            OrderEntryOrderbook orders = new TradingOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static void testMatchAndAdd()
         {
-            OrderEntryOrderbook orders = new TradingOrderbook(new Security("test_security"));
+            Orderbook orders = new Orderbook(new Security("test_security"));
         }
 
         private static List<long> getBidOrderIds(IRetrievalOrderbook orderbook)
@@ -152,7 +152,7 @@ namespace TradingServer.Tests
             return result;
         }
 
-        private static void getAskLimits(OrderEntryOrderbook orderbook)
+        private static void getAskLimits(Orderbook orderbook)
         {
             foreach (Limit limit in orderbook.getAskLimits())
             {
@@ -177,7 +177,7 @@ namespace TradingServer.Tests
             }
         }
 
-        private static void getBidLimits(OrderEntryOrderbook orderbook)
+        private static void getBidLimits(Orderbook orderbook)
         {
             foreach (Limit limit in orderbook.getBidLimits())
             {

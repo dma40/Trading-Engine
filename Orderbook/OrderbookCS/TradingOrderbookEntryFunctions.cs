@@ -2,14 +2,14 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
+    public partial class TradingEngine: IMatchingEngine, IDisposable
     {
         private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
         private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
         private readonly Dictionary<long, PairedCancelOrder> _pairedCancel = new Dictionary<long, PairedCancelOrder>();
         private readonly Dictionary<long, PairedExecutionOrder> _pairedExecution = new Dictionary<long, PairedExecutionOrder>();
 
-        public sealed override void addOrder(Order order)
+        public void addOrder(Order order)
         { 
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
@@ -18,7 +18,6 @@ namespace TradingServer.OrderbookCS
 
             lock (_stopLock)
             {
-
                 if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
                 {
                     if (!_onMarketClose.TryGetValue(order.OrderID, out Order? orderentry))
@@ -39,7 +38,7 @@ namespace TradingServer.OrderbookCS
 
                 else 
                 {
-                    if (!containsOrder(order.OrderID))
+                    if (!orderbook.containsOrder(order.OrderID))
                         match(order);
 
                     else
@@ -100,13 +99,13 @@ namespace TradingServer.OrderbookCS
             }
         } 
 
-        public sealed override void modifyOrder(ModifyOrder modify)
+        public void modifyOrder(ModifyOrder modify)
         {
             removeOrder(modify.cancelOrder());
             addOrder(modify.newOrder());
         }
 
-        public sealed override void removeOrder(CancelOrder cancel)
+        public void removeOrder(CancelOrder cancel)
         {
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
@@ -152,11 +151,11 @@ namespace TradingServer.OrderbookCS
                 }
 
                 else
-                    base.removeOrder(cancel);
+                    orderbook.removeOrder(cancel);
             }
         }
 
-        protected sealed override bool isValidTime(IOrderCore order)
+        protected bool isValidTime(IOrderCore order)
         {
             return false; /*
             Should be false for the following types during off-hours:

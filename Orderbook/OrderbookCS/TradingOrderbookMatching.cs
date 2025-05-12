@@ -2,12 +2,12 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
+    public partial class TradingEngine: IMatchingEngine, IDisposable
     {
         private static readonly List<int> ImmediateHandleTypes = [3, 5, 7, 9, 11, 12, 13, 14];
         private readonly Trades _trades;
 
-        public new Trades match(Order order) 
+        public Trades match(Order order) 
         {   
             int type = (int) order.OrderType;
             Trades result = new Trades();
@@ -16,27 +16,27 @@ namespace TradingServer.OrderbookCS
             {
                 if (ImmediateHandleTypes.Contains(type))
                 {
-                    result = base.match(order);
+                    result = orderbook.match(order);
                 }
 
                 else if (order.OrderType == OrderTypes.FillOrKill)
                 {
-                    if (canFill(order))
-                        result = base.match(order);  
+                    if (orderbook.canFill(order))
+                        result = orderbook.match(order);  
                 }
 
                 else if (order.OrderType == OrderTypes.PostOnly)
                 {
-                    if (!canMatch(order))
-                        base.addOrder(order);
+                    if (!orderbook.canMatch(order))
+                        orderbook.addOrder(order);
                 }
 
                 else 
                 {
-                    result = base.match(order);
+                    result = orderbook.match(order);
                 
                     if (order.CurrentQuantity > 0)
-                        base.addOrder(order); 
+                        orderbook.addOrder(order); 
                 }
                 
                 _trades.addTransactions(result);

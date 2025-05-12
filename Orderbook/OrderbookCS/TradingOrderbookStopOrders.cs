@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class TradingOrderbook: OrderEntryOrderbook, ITradingOrderbook, IDisposable
+    public partial class TradingEngine: IMatchingEngine, IDisposable
     {
         protected async Task ProcessStopOrders()
         {
@@ -129,7 +129,5 @@ namespace TradingServer.OrderbookCS
                 await Task.Delay(200, _ts.Token);
             }
         }
-
-        
     }
 }

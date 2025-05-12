@@ -17,25 +17,25 @@ namespace TradingServer.OrderbookCS
 
             if (permission == PermissionLevel.ReadOnly)
             {
-                IReadOnlyOrderbook result = new ReadOnlyOrderbook(new Instrument.Security(security));
+                IReadOnlyOrderbook result = new Orderbook(new Instrument.Security(security));
                 return result;
             }
 
             else if (permission == PermissionLevel.Retrieval)
             {          
-                IRetrievalOrderbook result = new RetrievalOrderbook(new Instrument.Security(security));
+                IRetrievalOrderbook result = new Orderbook(new Instrument.Security(security));
                 return result;
             }
 
             else if (permission == PermissionLevel.OrderEntry)
             {
-                IOrderEntryOrderbook result = new OrderEntryOrderbook(new Instrument.Security(security));
+                IOrderEntryOrderbook result = new Orderbook(new Instrument.Security(security));
                 return result;
             }
 
             else 
             {
-                ITradingOrderbook result = new TradingOrderbook(new Instrument.Security(security));
+                IMatchingEngine result = new TradingEngine(new Instrument.Security(security));
                 return result;
             }
         }
