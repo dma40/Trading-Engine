@@ -2,9 +2,9 @@ namespace TradingServer.Orders
 {
     public class Order: IOrderCore, IDisposable
     {
-        public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy, OrderTypes orderType)
+        public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy)
         {
-            if (orderType == OrderTypes.Market)
+            if (orderCore.OrderType == OrderTypes.Market)
                 throw new InvalidDataException("Market orders cannot have a price");
             
             _orderCore = orderCore;
@@ -12,18 +12,18 @@ namespace TradingServer.Orders
             Quantity = quantity;
             CurrentQuantity = quantity;
             isBuySide = isBuy;
-            OrderType = orderType;
+            //isHidden = false;
         }
 
-        public Order(IOrderCore orderCore, uint quantity, bool isBuy, OrderTypes orderType)
+        public Order(IOrderCore orderCore, uint quantity, bool isBuy)
         {
-            if (orderType != OrderTypes.Market)
+            if (orderCore.OrderType != OrderTypes.Market)
                 throw new InvalidDataException("Only market orders can have no price");
             
             _orderCore = orderCore;
             Quantity = quantity;
             isBuySide = isBuy;
-            OrderType = OrderTypes.Market;
+            // isHidden = false;
 
             if (isBuySide)
                 Price = int.MaxValue;
@@ -33,13 +33,13 @@ namespace TradingServer.Orders
         }
 
         public Order(ModifyOrder modify): this(modify, 
-            modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide, modify.OrderType) {}
+            modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide) {}
 
         public Order(StopOrder stop): this(stop, stop.limitPrice, stop.Quantity, 
-            stop.isBuySide, stop.OrderType) {}
+            stop.isBuySide) {}
 
         public Order(TrailingStopOrder trail): this(trail, trail.StopPrice, trail.Quantity, 
-            trail.isBuySide, trail.OrderType) {}
+            trail.isBuySide) {}
 
         public CancelOrder cancelOrder()
         {
@@ -51,6 +51,7 @@ namespace TradingServer.Orders
         public long OrderID => _orderCore.OrderID; 
         public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
+        public bool isHidden => _orderCore.isHidden;
         public long Price { get; private set; }
         public OrderTypes OrderType { get; private set; }
 

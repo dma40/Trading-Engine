@@ -21,6 +21,9 @@ namespace TradingServer.Orders
         LimitOnOpen,
 
         PairedCancel,
-        PairedExecution
+        PairedExecution,
+
+        Hidden,
+        Iceberg
     }
 }

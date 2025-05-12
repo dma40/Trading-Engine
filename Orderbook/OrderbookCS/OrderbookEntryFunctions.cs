@@ -4,10 +4,10 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
-        private static readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
-        private static readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
-        private static readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
-        private static readonly List<int> _supportedOrderTypes = [0, 1, 4];
+        private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
+        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
+        private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
+        private readonly List<int> _supportedOrderTypes = [0, 1, 4];
 
         public void addOrder(Order order)
         {
@@ -20,22 +20,8 @@ namespace TradingServer.OrderbookCS
 
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             {
-                lock (_ordersLock)
-                {
-                    try
-                    {
-                        addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
-                    }
-
-                    catch (Exception exception)
-                    {
-                        Console.WriteLine(exception.Message);
-                    }
-                }
+                addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
             }
-
-            else
-                throw new InvalidOperationException("This order already exists in the orderbook. You can't add it again");
         }
         
         private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
@@ -65,14 +51,12 @@ namespace TradingServer.OrderbookCS
 
             if (order.OrderType == OrderTypes.GoodTillCancel)
             {
-                lock (_goodTillCancelLock)
-                    _goodTillCancel.Add(order.OrderID, orderbookEntry);
+                _goodTillCancel.Add(order.OrderID, orderbookEntry);
             }
 
             if (order.OrderType == OrderTypes.GoodForDay)
             {
-                lock (_goodForDayLock)
-                    _goodForDay.Add(order.OrderID, orderbookEntry);
+                _goodForDay.Add(order.OrderID, orderbookEntry);
             }
 
             orders.Add(order.OrderID, orderbookEntry);
@@ -80,11 +64,8 @@ namespace TradingServer.OrderbookCS
 
         private void removeOrders(List<OrderbookEntry> cancels)
         {
-            lock (_ordersLock)
-            {
-                foreach (OrderbookEntry cancel in cancels)
-                    removeOrder(cancel.OrderID, cancel, _orders);
-            }
+            foreach (OrderbookEntry cancel in cancels)
+                removeOrder(cancel.OrderID, cancel, _orders);
         }
 
         public void removeOrder(CancelOrder cancel)
@@ -96,22 +77,8 @@ namespace TradingServer.OrderbookCS
 
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry))
             {
-                lock (_ordersLock)
-                {
-                    try
-                    {
-                        removeOrder(cancel.OrderID, orderbookentry, _orders);
-                    }
-
-                    catch (Exception exception)
-                    {
-                        Console.WriteLine(exception.Message);
-                    }
-                }
+                removeOrder(cancel.OrderID, orderbookentry, _orders);
             }
-
-            else
-                throw new InvalidOperationException("This order does not exist in the orderbook. You can't remove it");
         }
 
         private void removeOrder(long id, OrderbookEntry orderentry, Dictionary<long, OrderbookEntry> orders)
@@ -178,9 +145,6 @@ namespace TradingServer.OrderbookCS
                 removeOrder(modify.OrderID, orderentry, _orders);
                 addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
             }
-
-            else
-                throw new InvalidOperationException("This order does not exist in the orderbook. You can't modify it");
         }
 
         private bool isValidTime(IOrderCore order)

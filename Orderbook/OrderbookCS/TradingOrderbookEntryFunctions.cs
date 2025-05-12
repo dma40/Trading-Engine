@@ -114,6 +114,16 @@ namespace TradingServer.OrderbookCS
 
             lock (_stopLock)
             {
+                if (cancel.isHidden)
+                {
+                    _hidden.removeOrder(cancel);
+                }
+
+                else
+                {
+                    orderbook.removeOrder(cancel);
+                }
+
                 if (cancel.OrderType == OrderTypes.StopLimit || cancel.OrderType == OrderTypes.StopMarket)
                 {
                     if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
@@ -150,8 +160,18 @@ namespace TradingServer.OrderbookCS
                         throw new InvalidOperationException();
                 }
 
-                else
-                    orderbook.removeOrder(cancel);
+                else 
+                {
+                    if (cancel.isHidden)
+                    {
+                        _hidden.removeOrder(cancel);
+                    }
+
+                    else
+                    {
+                        orderbook.removeOrder(cancel);
+                    }
+                }
             }
         }
 

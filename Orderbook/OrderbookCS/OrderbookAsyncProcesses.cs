@@ -4,12 +4,12 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
-        public void DeleteGoodForDayOrders()
+        internal void DeleteGoodForDayOrders()
         {
             removeOrders(_goodForDay.Values.ToList());
         }
 
-        public void DeleteExpiredGoodTillCancel()
+        internal void DeleteExpiredGoodTillCancel()
         {
             List<OrderbookEntry> goodTillCancelOrders = new List<OrderbookEntry>();
 

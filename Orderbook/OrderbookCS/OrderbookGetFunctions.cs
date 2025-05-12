@@ -4,8 +4,8 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {        
-        private static readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
-        private static readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
+        private readonly SortedSet<Limit> _askLimits = new SortedSet<Limit>(AskLimitComparer.comparer);
+        private readonly SortedSet<Limit> _bidLimits = new SortedSet<Limit>(BidLimitComparer.comparer);
 
         public SortedSet<Limit> getAskLimits()
         {

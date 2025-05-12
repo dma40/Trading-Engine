@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
-        private static readonly object _ordersLock = new();
+        private readonly object _ordersLock = new();
         private readonly object _goodForDayLock = new();
         private readonly object _goodTillCancelLock = new();
 

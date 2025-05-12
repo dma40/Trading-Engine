@@ -13,6 +13,7 @@ namespace TradingServer.Orders
         public long OrderID { get; private set; }
         public string Username { get; private set; }
         public string SecurityID { get; private set; }
+        public bool isHidden => isHidden;
         public OrderTypes OrderType { get; private set; }
     }
 }

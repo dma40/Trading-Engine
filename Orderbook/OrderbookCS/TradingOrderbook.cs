@@ -7,12 +7,14 @@ namespace TradingServer.OrderbookCS
         private readonly Lock _ordersLock = new();
         private readonly Lock _stopLock = new();
         public readonly Orderbook orderbook;
+        private readonly Orderbook _hidden;
 
         public TradingEngine(Security security)
         {
             _trades = new Trades();
 
             orderbook = new Orderbook(security);
+            _hidden = new Orderbook(security);
 
             _ = Task.Run(() => UpdateGreatestTradedPrice());
 
