@@ -14,6 +14,7 @@ namespace TradingServer.Rejects
         public long OrderID => _orderCore.OrderID;
         public string Username => _orderCore.Username;
         public string SecurityID => _orderCore.SecurityID;
+        public bool isHidden => _orderCore.isHidden;
         public OrderTypes OrderType => _orderCore.OrderType;
 
         private readonly IOrderCore _orderCore;

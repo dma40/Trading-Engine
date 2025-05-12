@@ -13,6 +13,7 @@ namespace TradingServer.Orders
         public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
         public long OrderID => _orderCore.OrderID;
+        public bool isHidden => _orderCore.isHidden;
         public OrderTypes OrderType => _orderCore.OrderType;
         public long ModifyPrice { get; private set; }
         public uint ModifyQuantity { get; private set; }

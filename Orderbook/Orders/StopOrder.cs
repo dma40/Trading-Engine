@@ -2,8 +2,8 @@ namespace TradingServer.Orders
 {
     public class StopOrder: Order, IOrderCore, IDisposable
     {
-        public StopOrder(IOrderCore _orderCore, long _price, uint _quantity, bool _isBuy, OrderTypes _orderType):
-        base(_orderCore, _price, _quantity, _isBuy, _orderType)
+        public StopOrder(IOrderCore _orderCore, long _price, uint _quantity, bool _isBuy):
+        base(_orderCore, _price, _quantity, _isBuy)
         {
             if (OrderType != OrderTypes.StopMarket)
                 throw new InvalidDataException();
@@ -15,8 +15,8 @@ namespace TradingServer.Orders
                 limitPrice = int.MinValue;
         }
 
-        public StopOrder(IOrderCore _orderCore, long _price, long _limitPrice, uint _quantity, bool _isBuy, OrderTypes _orderType): 
-        base(_orderCore, _price, _quantity, _isBuy, _orderType)
+        public StopOrder(IOrderCore _orderCore, long _price, long _limitPrice, uint _quantity, bool _isBuy): 
+        base(_orderCore, _price, _quantity, _isBuy)
         {
             if (OrderType != OrderTypes.StopLimit)
                 throw new InvalidDataException();
