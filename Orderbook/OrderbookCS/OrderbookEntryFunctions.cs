@@ -9,7 +9,7 @@ namespace TradingServer.OrderbookCS
         private static readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
         private static readonly List<int> _supportedOrderTypes = [0, 1, 4];
 
-        public virtual void addOrder(Order order)
+        public void addOrder(Order order)
         {
             if (!isValidTime(order))
             {
@@ -78,7 +78,7 @@ namespace TradingServer.OrderbookCS
             orders.Add(order.OrderID, orderbookEntry);
         }
 
-        protected void removeOrders(List<OrderbookEntry> cancels)
+        private void removeOrders(List<OrderbookEntry> cancels)
         {
             lock (_ordersLock)
             {
@@ -87,7 +87,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public virtual void removeOrder(CancelOrder cancel)
+        public void removeOrder(CancelOrder cancel)
         {
             if (!isValidTime(cancel))
             {
@@ -166,7 +166,7 @@ namespace TradingServer.OrderbookCS
             orderentry.Dispose();
         }
 
-        public virtual void modifyOrder(ModifyOrder modify)
+        public void modifyOrder(ModifyOrder modify)
         {
             if (!isValidTime(modify))
             {
@@ -183,7 +183,7 @@ namespace TradingServer.OrderbookCS
                 throw new InvalidOperationException("This order does not exist in the orderbook. You can't modify it");
         }
 
-        protected virtual bool isValidTime(IOrderCore order)
+        private bool isValidTime(IOrderCore order)
         {
             int type = (int) order.OrderType;
 

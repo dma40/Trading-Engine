@@ -66,7 +66,6 @@ namespace TradingServer.OrderbookCS
         }
 
         public int count => _orders.Count;
-
         public string SecurityName => _security.name;
         
         public bool containsOrder(long orderID)

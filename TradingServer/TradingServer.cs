@@ -6,6 +6,7 @@ using TradingServer.Handlers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TradingServer.Rejects;
+using TradingServer.Instrument;
 using Trading;
 using Grpc.Core;
 
@@ -14,7 +15,8 @@ namespace TradingServer.Core
     internal sealed class TradingServer: BackgroundService, ITradingServer 
     {
         private readonly ITextLogger _logger;
-        private readonly IReadOnlyOrderbook _orderbook; 
+        private readonly TradingEngine _orderbook;
+        private readonly Security _security; 
         private readonly TradingServerConfiguration _tradingConfig;
 
         public PermissionLevel permissionLevel;
@@ -23,8 +25,9 @@ namespace TradingServer.Core
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
-            _orderbook = OrderbookPermissions.createOrderbookFromConfig(_tradingConfig?.TradingServerSettings?.SecurityName ?? throw new ArgumentNullException("Security name cannot be null"), 
-                                                                        _tradingConfig?.PermissionLevel ?? throw new ArgumentNullException("Permission level cannot be null"));
+
+            _security = new Security(_tradingConfig?.TradingServerSettings?.SecurityName ?? throw new ArgumentNullException());
+            _orderbook = new TradingEngine(_security);
             permissionLevel = config.Value.PermissionLevel;
         }
 
@@ -54,7 +57,6 @@ namespace TradingServer.Core
             TimeSpan onCloseDeadline = new TimeSpan(15, 50, 0);
             TimeSpan closed = new TimeSpan(16, 0, 0);
 
-            RejectCreator creator = new RejectCreator(); 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, 
                                                 _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Securit ID cannot be null"), 
                                                 Order.StringToOrderType(request.Type));
