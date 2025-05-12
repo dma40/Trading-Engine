@@ -1,5 +1,4 @@
 using TradingServer.Instrument;
-using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
@@ -49,27 +48,6 @@ namespace TradingServer.OrderbookCS
                 _ts.Cancel();
                 _ts.Dispose();
             }
-        }
-
-        public int count => orderbook.count;
-        public OrderbookSpread spread()
-        {
-            return orderbook.spread();
-        }
-
-        public List<OrderbookEntry> getAskOrders()
-        {
-            return orderbook.getAskOrders();
-        }
-
-        public List<OrderbookEntry> getBidOrders()
-        {
-            return orderbook.getBidOrders();
-        }
-
-        public bool containsOrder(long orderID)
-        {
-            return orderbook.containsOrder(orderID); // put all of these in a seperate TradingOrderbookGetters.cs
         }
 
         private readonly CancellationTokenSource _ts = new CancellationTokenSource();
