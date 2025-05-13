@@ -1,5 +1,3 @@
-using TradingServer.Orders;
-
 namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable

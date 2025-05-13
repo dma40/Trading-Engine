@@ -22,10 +22,8 @@ namespace TradingServer.OrderbookCS
             _ = Task.Run(() => ProcessTrailingStopOrders());
             _ = Task.Run(() => ProcessAtMarketOpen());
             _ = Task.Run(() => ProcessAtMarketEnd());
-
             _ = Task.Run(() => ProcessPairedCancelOrders());
             _ = Task.Run(() => ProcessPairedExecutionOrders());
-
             _ = Task.Run(() => ProcessIcebergOrders());
         }
 

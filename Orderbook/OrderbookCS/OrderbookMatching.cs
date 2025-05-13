@@ -4,6 +4,43 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
+        public uint getEligibleOrderCount(Order order)
+        {
+            uint count = 0;
+            if (order.isBuySide)
+            {   
+                foreach (var limit in _askLimits)
+                {
+                    if (limit.Price <= order.Price)
+                    {
+                        OrderbookEntry? headPtr = limit.head;
+                        while (headPtr != null)
+                        {
+                            count += headPtr.CurrentOrder.CurrentQuantity; 
+                            headPtr = headPtr.next;
+                        }
+                    }
+                }
+            }
+
+            else
+            {
+                foreach (var limit in _bidLimits)
+                {
+                    if (limit.Price >= order.Price)
+                    {
+                        OrderbookEntry? headPtr = limit.head;
+                        while (headPtr != null)
+                        {
+                            count += headPtr.CurrentOrder.CurrentQuantity; 
+                            headPtr = headPtr.next;
+                        }
+                    }
+                }
+            }
+            return count;
+        }
+
         public bool canFill(Order order)
         {
             if (order.isBuySide)
