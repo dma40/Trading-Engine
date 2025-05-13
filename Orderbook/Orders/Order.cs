@@ -104,7 +104,7 @@ namespace TradingServer.Orders
 
         ~Order()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose() 

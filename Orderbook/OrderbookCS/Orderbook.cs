@@ -4,14 +4,11 @@ namespace TradingServer.OrderbookCS
 {
     public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
-        private readonly object _ordersLock = new();
-        private readonly object _goodForDayLock = new();
-        private readonly object _goodTillCancelLock = new();
-
         private readonly Security _security;
 
-        private bool _disposed = false;
         CancellationTokenSource _ts = new CancellationTokenSource();
+        public bool _disposed => _dispose == 1;
+        private int _dispose = 0;
 
         public Orderbook(Security instrument)
         {
@@ -20,7 +17,7 @@ namespace TradingServer.OrderbookCS
 
         ~Orderbook()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose() 
@@ -34,7 +31,7 @@ namespace TradingServer.OrderbookCS
             if (_disposed) 
                 return;
             
-            _disposed = true;
+            Interlocked.Exchange(ref _dispose, 1);
 
             if (dispose) 
             {

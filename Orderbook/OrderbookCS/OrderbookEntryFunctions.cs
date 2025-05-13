@@ -119,14 +119,12 @@ namespace TradingServer.OrderbookCS
 
             if (orderentry.OrderType == OrderTypes.GoodTillCancel)
             {
-                lock (_goodTillCancelLock)
-                    _goodTillCancel.Remove(orderentry.OrderID);
+                _goodTillCancel.Remove(orderentry.OrderID);
             }
                 
             if (orderentry.OrderType == OrderTypes.GoodForDay)
             {
-                lock (_goodForDayLock)
-                    _goodForDay.Remove(orderentry.OrderID);
+                _goodForDay.Remove(orderentry.OrderID);
             }
             
             orders.Remove(id);

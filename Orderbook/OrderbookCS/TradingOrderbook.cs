@@ -29,7 +29,7 @@ namespace TradingServer.OrderbookCS
 
         ~TradingEngine()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose() 
@@ -43,7 +43,7 @@ namespace TradingServer.OrderbookCS
             if (_disposed)  
                 return;
             
-            _disposed = true;
+            Interlocked.Exchange(ref _dispose, 1);
 
             if (dispose) 
             {
@@ -53,6 +53,7 @@ namespace TradingServer.OrderbookCS
         }
 
         private readonly CancellationTokenSource _ts = new CancellationTokenSource();
-        private bool _disposed = false;
+        private bool _disposed => _dispose == 1;
+        private int _dispose = 0;
     }
 }
