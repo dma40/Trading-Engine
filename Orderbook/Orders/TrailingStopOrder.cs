@@ -10,6 +10,9 @@ namespace TradingServer.Orders
         {
             if (_orderCore.OrderType != OrderTypes.TrailingStopMarket)
                 throw new InvalidDataException();
+
+            if (_orderCore.isHidden)
+                throw new InvalidDataException();
             
             trail = _trail;
         }
@@ -51,7 +54,7 @@ namespace TradingServer.Orders
 
         ~TrailingStopOrder()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public new void Dispose() 

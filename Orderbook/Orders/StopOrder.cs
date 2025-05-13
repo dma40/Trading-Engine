@@ -7,6 +7,9 @@ namespace TradingServer.Orders
         {
             if (OrderType != OrderTypes.StopMarket)
                 throw new InvalidDataException();
+
+            if (_orderCore.isHidden)
+                throw new InvalidDataException("Stop market orders can never go to the hidden portion of the orderbook");
             
             if (isBuySide)
                 limitPrice = int.MaxValue;
@@ -35,7 +38,7 @@ namespace TradingServer.Orders
 
          ~StopOrder()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public new void Dispose() 

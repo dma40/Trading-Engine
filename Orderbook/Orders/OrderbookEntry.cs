@@ -129,7 +129,7 @@ namespace TradingServer.Orders
 
         ~OrderbookEntry()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose() 

@@ -6,6 +6,9 @@ namespace TradingServer.Orders
         {
             if (orderCore.OrderType == OrderTypes.Market)
                 throw new InvalidDataException("Market orders cannot have a price");
+
+            if (orderCore.isHidden)
+                throw new InvalidDataException("Market orders cannot go to the hidden portion");
             
             _orderCore = orderCore;
             Price = price;
