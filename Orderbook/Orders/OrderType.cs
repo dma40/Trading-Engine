@@ -23,7 +23,6 @@ namespace TradingServer.Orders
         PairedCancel,
         PairedExecution,
 
-        Hidden,
         Iceberg
     }
 }
