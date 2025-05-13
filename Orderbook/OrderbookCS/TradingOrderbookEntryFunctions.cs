@@ -8,6 +8,7 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
         private readonly Dictionary<long, PairedCancelOrder> _pairedCancel = new Dictionary<long, PairedCancelOrder>();
         private readonly Dictionary<long, PairedExecutionOrder> _pairedExecution = new Dictionary<long, PairedExecutionOrder>();
+        private readonly Dictionary<long, IcebergOrder> _iceberg = new Dictionary<long, IcebergOrder>();
 
         public void addOrder(Order order)
         { 
@@ -97,6 +98,17 @@ namespace TradingServer.OrderbookCS
                 else
                     throw new InvalidOperationException();
             }
+        }
+
+        public void addOrder(IcebergOrder order)
+        {
+            if (order.OrderType == OrderTypes.Iceberg)
+                {
+                    if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
+                    {
+                        _iceberg.Add(order.OrderID, order);
+                    }
+                }
         } 
 
         public void modifyOrder(ModifyOrder modify)
@@ -122,6 +134,17 @@ namespace TradingServer.OrderbookCS
                 else
                 {
                     orderbook.removeOrder(cancel);
+                }
+
+                if (cancel.OrderType == OrderTypes.Iceberg)
+                {
+                    if (_iceberg.TryGetValue(cancel.OrderID, out IcebergOrder? _order))
+                    {
+                        if (_order.isEmpty)
+                        {
+                            _iceberg.Remove(cancel.OrderID);
+                        }
+                    }
                 }
 
                 if (cancel.OrderType == OrderTypes.StopLimit || cancel.OrderType == OrderTypes.StopMarket)

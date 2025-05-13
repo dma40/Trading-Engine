@@ -16,13 +16,19 @@ namespace TradingServer.Orders
 
         private uint fullQuantity;
 
+        public bool isEmpty => fullQuantity == 0;
+
         public void replenish()
         {
             /* This is called only when the quantity is 0 */
             float total = MathF.Min(Quantity, fullQuantity);
 
             Random random = new Random();
-            IncreaseQuantity((uint) random.Next(1, (int) total));
+
+            var increase = (uint) random.Next(1, (int) total + 1);
+            IncreaseQuantity(increase);
+
+            fullQuantity -= increase;
         }
     }
 }
