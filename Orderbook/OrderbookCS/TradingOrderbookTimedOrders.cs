@@ -4,7 +4,6 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private static DateTime now;
         private static readonly TimeSpan marketOpen = new TimeSpan(9, 30, 0);
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
@@ -66,6 +65,7 @@ namespace TradingServer.OrderbookCS
                     return;
 
                 DateTime currentTime = DateTime.Now;
+                DateTime now = DateTime.Now;
                 
                 if (now.TimeOfDay == marketOpen)
                 {
