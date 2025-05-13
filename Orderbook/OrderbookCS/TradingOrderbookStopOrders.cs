@@ -11,6 +11,7 @@ namespace TradingServer.OrderbookCS
                 if (_ts.IsCancellationRequested)
                     return;
                 
+                DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
                 DateTime current = DateTime.Now;
                 
@@ -70,6 +71,7 @@ namespace TradingServer.OrderbookCS
                 if (_ts.IsCancellationRequested)
                     return;
 
+                DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
                 DateTime current = DateTime.Now;
 

@@ -9,6 +9,7 @@ namespace TradingServer.OrderbookCS
         {
             while (true)
             {
+                DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
                 DateTime current = DateTime.Now;
 

@@ -51,7 +51,7 @@ namespace TradingServer.Logging
 
             catch (OperationCanceledException)
             {
-                Console.WriteLine("Something went wrong!");
+                Console.WriteLine("Logger has shut down.");
             }
         }
 

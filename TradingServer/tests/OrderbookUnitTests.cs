@@ -17,8 +17,12 @@ namespace TradingServer.Tests
 
             IOrderCore orderCore2 = new OrderCore(200, "Dylan", "037833100", OrderTypes.GoodForDay);
             ModifyOrder modify2 = new ModifyOrder(orderCore2, 50, 100, false); 
-
+            Console.WriteLine("Modify 2 is GFD?:" + (modify2.OrderType == OrderTypes.GoodForDay));
+            Console.WriteLine("Modify 2 is valid time right now? " + (DateTime.Now.Hour < 16 && DateTime.Now.Hour > 9.5));
+            Console.WriteLine("Modify 2 is valid? " + Orderbook.isValidTime(modify2));
             Order order2 = modify2.newOrder();
+            Console.WriteLine(order2.OrderType);
+            Console.WriteLine("Order order2 is valid right now? " + Orderbook.isValidTime(order2));
 
             orders.addOrder(order1);
             orders.addOrder(order2); 

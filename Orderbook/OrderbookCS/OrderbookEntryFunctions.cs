@@ -7,12 +7,12 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
         private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
-        private readonly List<int> _supportedOrderTypes = [0, 1, 4];
-
+    
         public void addOrder(Order order)
         {
             if (!isValidTime(order))
             {
+                Console.WriteLine("Time is not valid. Exiting method...");
                 return;
             }
             
@@ -145,17 +145,13 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        private bool isValidTime(IOrderCore order)
+        public static bool isValidTime(IOrderCore order)
         {
-            int type = (int) order.OrderType;
-
-            if (!_supportedOrderTypes.Contains(type))
-                throw new InvalidOperationException("This type of order is not supported by this orderbook");
-
-            if (type == 1)
+            if (order.OrderType == OrderTypes.GoodForDay)
                 return DateTime.Now.Hour < 16 && DateTime.Now.Hour > 9.5;
-
-            return true;
+            
+            else
+                return true;
         }
     }
 }

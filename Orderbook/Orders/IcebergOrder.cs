@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace TradingServer.Orders
 {
     public class IcebergOrder: Order, IOrderCore

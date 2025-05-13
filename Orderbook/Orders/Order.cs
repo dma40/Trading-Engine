@@ -12,7 +12,6 @@ namespace TradingServer.Orders
             Quantity = quantity;
             CurrentQuantity = quantity;
             isBuySide = isBuy;
-            //isHidden = false;
         }
 
         public Order(IOrderCore orderCore, uint quantity, bool isBuy)
@@ -23,7 +22,6 @@ namespace TradingServer.Orders
             _orderCore = orderCore;
             Quantity = quantity;
             isBuySide = isBuy;
-            // isHidden = false;
 
             if (isBuySide)
                 Price = int.MaxValue;
@@ -52,9 +50,9 @@ namespace TradingServer.Orders
         public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
         public bool isHidden => _orderCore.isHidden;
-        public long Price { get; private set; }
-        public OrderTypes OrderType { get; private set; }
+        public OrderTypes OrderType => _orderCore.OrderType;
 
+        public long Price { get; private set; }
         public uint Quantity { get; private set; }
         public uint CurrentQuantity { get; private set; }
         public bool isBuySide { get; private set; }
