@@ -44,8 +44,8 @@ namespace TradingServer.OrderbookCS
                 else
                 {
                     DateTime tomorrow = currentTime.AddDays(1);
-                    DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 16, 0, 0);
-                    TimeSpan closed = nextTradingDayStart - DateTime.Now;
+                    DateTime nextTradingDayEnd = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 16, 0, 0);
+                    TimeSpan closed = nextTradingDayEnd - DateTime.Now;
 
                     await Task.Delay(closed, _ts.Token);
                 }
