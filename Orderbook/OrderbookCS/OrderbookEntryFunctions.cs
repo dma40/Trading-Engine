@@ -12,7 +12,6 @@ namespace TradingServer.OrderbookCS
         {
             if (!isValidTime(order))
             {
-                Console.WriteLine("Time is not valid. Exiting method...");
                 return;
             }
             

@@ -156,7 +156,7 @@ namespace TradingServer.OrderbookCS
                         throw new InvalidOperationException();
                 }
 
-                else if (cancel.OrderType == OrderTypes.TrailingStopLimit || cancel.OrderType == OrderTypes.TrailingStopMarket)
+                if (cancel.OrderType == OrderTypes.TrailingStopLimit || cancel.OrderType == OrderTypes.TrailingStopMarket)
                 {
                     if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? stop) && stop != null)
                         _trailingStop.Remove(cancel.OrderID);
@@ -165,7 +165,7 @@ namespace TradingServer.OrderbookCS
                         throw new InvalidOperationException();
                 }
 
-                else if (cancel.OrderType == OrderTypes.LimitOnClose || cancel.OrderType == OrderTypes.MarketOnClose)
+                if (cancel.OrderType == OrderTypes.LimitOnClose || cancel.OrderType == OrderTypes.MarketOnClose)
                 {
                     if (_onMarketClose.TryGetValue(cancel.OrderID, out Order? order) && order != null)
                         _onMarketClose.Remove(cancel.OrderID);
@@ -174,7 +174,7 @@ namespace TradingServer.OrderbookCS
                         throw new InvalidOperationException();
                 }
 
-                else if (cancel.OrderType == OrderTypes.LimitOnOpen || cancel.OrderType == OrderTypes.MarketOnOpen)
+                if (cancel.OrderType == OrderTypes.LimitOnOpen || cancel.OrderType == OrderTypes.MarketOnOpen)
                 {
                     if (_onMarketOpen.TryGetValue(cancel.OrderID, out Order? order) && order != null)
                         _onMarketOpen.Remove(cancel.OrderID);
@@ -183,30 +183,34 @@ namespace TradingServer.OrderbookCS
                         throw new InvalidOperationException();
                 }
 
-                else 
+                if (cancel.isHidden)
                 {
-                    if (cancel.isHidden)
-                    {
-                        _hidden.removeOrder(cancel);
-                    }
-
-                    else
-                    {
-                        orderbook.removeOrder(cancel);
-                    }
+                    _hidden.removeOrder(cancel);
                 }
+
+                else
+                {
+                    orderbook.removeOrder(cancel);
+                }
+                
             }
         }
 
         protected bool isValidTime(IOrderCore order)
         {
-            return false; /*
-            Should be false for the following types during off-hours:
-            - PostOnly
-            - Market
-            - FillOrKill, FillAndKill
-            - Stop, Trailing Stop orders
-             */
+            if (order.OrderType == OrderTypes.PostOnly
+                || order.OrderType == OrderTypes.Market
+                || order.OrderType == OrderTypes.FillOrKill 
+                || order.OrderType == OrderTypes.FillAndKill
+                || order.OrderType == OrderTypes.StopLimit 
+                || order.OrderType == OrderTypes.StopMarket
+                || order.OrderType == OrderTypes.TrailingStopLimit
+                || order.OrderType == OrderTypes.TrailingStopMarket)
+            {
+                return DateTime.Now.Hour <= 16 && DateTime.Now.Hour >= 9.5;
+            }
+
+            return true;
         }
     }
 }

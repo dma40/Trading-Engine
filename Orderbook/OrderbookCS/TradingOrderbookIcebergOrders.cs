@@ -2,7 +2,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        protected async Task ProcessIcebergOrders() // check this for correctness
+        protected async Task ProcessIcebergOrders() 
         {
             while (true)
             {
@@ -25,7 +25,7 @@ namespace TradingServer.OrderbookCS
 
                             else if (iceberg.isEmpty)
                             {
-                                _iceberg.Remove(iceberg.OrderID); //  update removeOrder to remove from _iceberg
+                                _iceberg.Remove(iceberg.OrderID);
                             }
                         }
                     }

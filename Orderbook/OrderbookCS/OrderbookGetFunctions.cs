@@ -75,6 +75,5 @@ namespace TradingServer.OrderbookCS
     
         public long askVolume => getAskOrders().Count;
         public long bidVolume => getBidOrders().Count;
-
     }
 }
