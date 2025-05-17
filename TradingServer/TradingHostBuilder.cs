@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using TradingServer.Core.Configuration;
 using TradingServer.Logging;
 using TradingServer.Logging.LoggingConfiguration;
-using TradingServer.Handlers;
+using TradingServer.Services;
 
 using Trading;
 using Microsoft.Extensions.Configuration;

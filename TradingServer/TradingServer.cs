@@ -2,13 +2,13 @@ using TradingServer.Core.Configuration;
 using TradingServer.Orders;
 using TradingServer.OrderbookCS;
 using TradingServer.Logging;
-using TradingServer.Handlers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TradingServer.Rejects;
 using TradingServer.Instrument;
 using Trading;
 using Grpc.Core;
+using TradingServer.Services;
 using Google.Protobuf.Reflection;
 
 namespace TradingServer.Core 
@@ -126,7 +126,6 @@ namespace TradingServer.Core
             {
                 _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(reject.reason));
             }
-            
         }
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
