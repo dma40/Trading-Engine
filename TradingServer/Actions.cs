@@ -4,11 +4,11 @@ namespace TradingServer.Core
     {
         ContainsOrder,
         GetCount,
-        GetSpread,
+        GetSpread, // Level 1 data
         GetAskOrders,
-        GetBidOrders,
+        GetBidOrders, // Level 2 data
         AddOrder,
         ModifyOrder,
-        RemoveOrder
+        RemoveOrder // Level 3 data
     }
 }

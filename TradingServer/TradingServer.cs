@@ -9,15 +9,16 @@ using TradingServer.Rejects;
 using TradingServer.Instrument;
 using Trading;
 using Grpc.Core;
+using Google.Protobuf.Reflection;
 
 namespace TradingServer.Core 
 {
     internal sealed class TradingServer: BackgroundService, ITradingServer 
     {
         private readonly ITextLogger _logger;
-        private readonly TradingEngine _orderbook;
         private readonly Security _security; 
         private readonly TradingServerConfiguration _tradingConfig;
+        public readonly TradingEngine _engine;
 
         public PermissionLevel permissionLevel;
 
@@ -27,7 +28,7 @@ namespace TradingServer.Core
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
 
             _security = new Security(_tradingConfig?.TradingServerSettings?.SecurityName ?? throw new ArgumentNullException());
-            _orderbook = new TradingEngine(_security);
+            _engine = new TradingEngine(_security);
             permissionLevel = config.Value.PermissionLevel;
         }
 
@@ -50,7 +51,7 @@ namespace TradingServer.Core
             return Task.CompletedTask;
         }
 
-        private Tuple<bool, Reject> checkIfOrderIsInvalid(OrderRequest request)
+        public void checkIfOrderIsInvalid(OrderRequest request)
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
             TimeSpan onOpenDeadline = new TimeSpan(9, 28, 0);
@@ -121,8 +122,11 @@ namespace TradingServer.Core
 
             Reject reject = RejectCreator.GenerateRejection(orderCore, reason);
 
-            Tuple<bool, Reject> result = new Tuple<bool, Reject>(isInvalid, reject);
-            return result;
+            if (isInvalid)
+            {
+                _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(reject.reason));
+            }
+            
         }
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
@@ -131,28 +135,14 @@ namespace TradingServer.Core
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
-            Tuple<bool, Reject> result = checkIfOrderIsInvalid(request);
-
-            if (result.Item1)
-            {
-                _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(result.Item2.reason));
-
-                return new OrderResponse
-                {
-                    Id = request.Id,
-                    Status = 500,
-                    Message = RejectCreator.RejectReasonToString(result.Item2.reason)
-                };
-            }
-
-            else if (request.Operation == "Add")
+            if (request.Operation == "Add")
             {
                 bool exception = false;
 
-                try 
+                try
                 {
                     Order newOrder = modify.newOrder();
-                    _orderbook.addOrder(newOrder);
+                    _engine.addOrder(newOrder);
                 }
 
                 catch (InvalidOperationException error)
@@ -162,7 +152,7 @@ namespace TradingServer.Core
                 }
 
                 if (!exception)
-                    _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" + 
+                    _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" +
                     $" side by {request.Username} at {DateTime.UtcNow}");
             }
 
@@ -170,10 +160,10 @@ namespace TradingServer.Core
             {
                 bool error = false;
 
-                try 
+                try
                 {
                     CancelOrder cancelOrder = modify.cancelOrder();
-                    _orderbook.removeOrder(cancelOrder);
+                    _engine.removeOrder(cancelOrder);
                 }
 
                 catch (InvalidOperationException exception)
@@ -183,7 +173,7 @@ namespace TradingServer.Core
                 }
 
                 if (!error)
-                    _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" + 
+                    _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" +
                     $"by {request.Username} at {DateTime.UtcNow}");
             }
 
@@ -192,10 +182,10 @@ namespace TradingServer.Core
                 bool error = false;
 
                 try
-                { 
-                    _orderbook.modifyOrder(modify);
+                {
+                    _engine.modifyOrder(modify);
                 }
-                
+
                 catch (InvalidOperationException exception)
                 {
                     _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.Now}");
