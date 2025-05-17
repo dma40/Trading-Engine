@@ -15,8 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderbookCS", "Orderbook\Or
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradingServices", "TradingServices\TradingServices.csproj", "{52206DF1-909A-4A88-B393-FCAD62130FF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderHandlers", "OrderHandlers\OrderHandlers.csproj", "{8893BF99-5105-4A66-9FC1-B7C7A95DC5A4}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

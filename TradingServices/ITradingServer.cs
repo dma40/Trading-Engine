@@ -1,7 +1,7 @@
 ﻿using Grpc.Core;
 using Trading;
 
-namespace TradingServer.Handlers
+namespace TradingServer.Services
 {
     public interface ITradingServer
     {
