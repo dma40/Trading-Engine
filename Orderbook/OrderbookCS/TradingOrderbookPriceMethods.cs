@@ -2,8 +2,8 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private static long _greatestTradedPrice = int.MinValue;
-        public static long lastTradedPrice { get; private set; }
+        private long _greatestTradedPrice = int.MinValue;
+        public long lastTradedPrice { get; private set; }
 
         protected async Task UpdateGreatestTradedPrice()
         {
