@@ -14,6 +14,5 @@
         Database,
         Console,
         ThreadPoll,
-        Trace
     }
 }
