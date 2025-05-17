@@ -12,8 +12,7 @@ namespace TradingServer.Core;
 
 internal static class TradingHostBuilder 
 {
-    public static IHost BuildTradingServer() => Host.CreateDefaultBuilder().
-    ConfigureServices((context, services) =>
+    public static IHost BuildTradingServer() => Host.CreateDefaultBuilder().ConfigureServices((context, services) =>
     {
         services.AddOptions();
         
@@ -38,16 +37,24 @@ internal static class TradingHostBuilder
                                         Get<LoggerConfiguration>() ?? defaultConfig;
 
         if (logConfig.LoggerType == LoggerType.Text)
+        {
             services.AddSingleton<ITextLogger, TextLogger>();
-        
+        }
+
         if (logConfig.LoggerType == LoggerType.Database)
-           services.AddSingleton<ITextLogger, DatabaseLogger>();
-        
+        {
+            services.AddSingleton<ITextLogger, DatabaseLogger>();
+        }
+
         if (logConfig.LoggerType == LoggerType.Console)
+        {
             services.AddSingleton<ITextLogger, ConsoleLogger>();
+        }
 
         if (logConfig.LoggerType == LoggerType.ThreadPoll)
+        {
             services.AddSingleton<ITextLogger, ThreadPollLogger>();
+        }
         
         services.AddGrpcClient<TradingClient>(); 
         services.AddSingleton<ITradingServer, TradingServer>();
