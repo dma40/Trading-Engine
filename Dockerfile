@@ -12,11 +12,8 @@ RUN apt-get update && apt-get install -y \
 COPY TradingServer.sln .
 
 COPY Logging/ ./Logging/
-COPY OrderHandlers/ ./OrderHandlers/
 COPY TradingServer/ ./TradingServer/
-
 COPY Orderbook/ ./Orderbook/
-
 COPY TradingServices/ ./TradingServices/
 
 RUN dotnet restore TradingServer.sln
