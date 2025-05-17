@@ -9,4 +9,4 @@ A simplified simulation of modern day exchange trading, which
 Note that you also need the following to run this project successfully:
 
 - .NET 9.0 installed in your codespace 
-- A MySQL connection running (ideally on port 3306)
+- A MySQL connection running on your computer + a viable connection (test your connection first before running!)
