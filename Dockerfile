@@ -4,11 +4,6 @@ WORKDIR /Trading-Engine
 
 RUN apt-get update && apt-get install -y protobuf-compiler 
 
-RUN apt-get update && apt-get install -y \
-    libssl-dev \
-    libcurl4-openssl-dev \
-    zlib1g-dev
-
 COPY TradingServer.sln .
 
 COPY Logging/ ./Logging/
@@ -17,6 +12,8 @@ COPY Orderbook/ ./Orderbook/
 COPY TradingServices/ ./TradingServices/
 
 RUN dotnet restore TradingServer.sln
+
+RUN dotnet build -c Release
 
 RUN mkdir -p /Trading-Engine/publish && chmod -R 777 /Trading-Engine/publish
 RUN dotnet publish TradingServer.sln -c Release 
