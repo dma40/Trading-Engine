@@ -41,19 +41,24 @@ internal static class TradingHostBuilder
             services.AddSingleton<ITextLogger, TextLogger>();
         }
 
-        if (logConfig.LoggerType == LoggerType.Database)
+        else if (logConfig.LoggerType == LoggerType.Database)
         {
             services.AddSingleton<ITextLogger, DatabaseLogger>();
         }
 
-        if (logConfig.LoggerType == LoggerType.Console)
+        else if (logConfig.LoggerType == LoggerType.Console)
         {
             services.AddSingleton<ITextLogger, ConsoleLogger>();
         }
 
-        if (logConfig.LoggerType == LoggerType.ThreadPoll)
+        else if (logConfig.LoggerType == LoggerType.ThreadPoll)
         {
             services.AddSingleton<ITextLogger, ThreadPollLogger>();
+        }
+
+        else
+        {
+            throw new ArgumentException("This is not a supported logger type");
         }
         
         services.AddGrpcClient<TradingClient>(); 

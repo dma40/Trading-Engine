@@ -14,10 +14,14 @@ namespace TradingServer.Logging
             _logConfig = logConfig.Value ?? throw new ArgumentNullException();
 
             if (_logConfig.LoggerType != LoggerType.ThreadPoll)
+            {
                 throw new InvalidDataException();
-            
+            }
+
             if (_logConfig.TextLoggerConfiguration == null)
+            {
                 throw new NullReferenceException(nameof(_logConfig.TextLoggerConfiguration));
+            }
             
             DateTime now = DateTime.UtcNow;
 
