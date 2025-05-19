@@ -103,12 +103,12 @@ namespace TradingServer.OrderbookCS
         public void addOrder(IcebergOrder order)
         {
             if (order.OrderType == OrderTypes.Iceberg)
+            {
+                if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
                 {
-                    if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
-                    {
-                        _iceberg.Add(order.OrderID, order);
-                    }
+                    _iceberg.Add(order.OrderID, order);
                 }
+            }
         } 
 
         public void modifyOrder(ModifyOrder modify)
