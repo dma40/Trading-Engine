@@ -79,3 +79,4 @@ TradingServer/obj/Debug/net9.0/TradingServer.AssemblyInfoInputs.cache
 TradingServer/appsettings.json
 TradingServer/appsettings.json
 /.idea
+db_credentials.sh
