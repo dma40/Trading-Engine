@@ -21,8 +21,10 @@ namespace TradingServer.Logging
 
             string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
             string? password = Environment.GetEnvironmentVariable("MYSQL_PASS");
-            string db = $"CREATE DATABASE IF NOT EXISTS {_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
-            string dbname = $"{_logConfig.TextLoggerConfiguration.Filename}-{now:yyyy-MM-dd}";
+            string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
+            
+            string db = $"CREATE DATABASE IF NOT EXISTS {filename}-{now:yyyy-MM-dd}";
+            string dbname = $"{filename}-{now:yyyy-MM-dd}";
             string dblink = $"Server=localhost;Port=3306;Database={dbname};User={user};Password={password}";
             string link = $"Server=localhost;Port=3306;User ID={user};Password={password}";
 
