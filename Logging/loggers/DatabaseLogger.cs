@@ -26,10 +26,10 @@ namespace TradingServer.Logging
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
             string dbname = $"{filename}_{now:yyyy-MM-dd}";
-            string db = $"CREATE DATABASE IF NOT EXISTS {dbname}";
-            string dblink = $"Server=localhost;Port=3306;Database={dbname};User={user};Password={password}";
-            string link = $"Server=localhost;Port=3306;User ID={user};Password={password}";
-
+            string dbquery = $"CREATE DATABASE IF NOT EXISTS {dbname}";
+            string link = $"Server=localhost;Port=3306;Uid={user};Pwd={password}";
+            string dblink = $"Server=localhost;Port=3306;Database={dbname};Uid={user};Pwd={password}";
+            
             string createTableRequest = @"
             CREATE TABLE IF NOT EXISTS LogInformation (
                 type INT NOT NULL,
@@ -43,7 +43,7 @@ namespace TradingServer.Logging
             using (var conn = new MySqlConnection(link))
             {
                 conn.Open();
-                using (var command = new MySqlCommand(db, conn))
+                using (var command = new MySqlCommand(dbquery, conn))
                 {
                     command.ExecuteNonQueryAsync();
 
