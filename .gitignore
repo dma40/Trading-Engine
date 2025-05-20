@@ -81,3 +81,4 @@ TradingServer/appsettings.json
 /.idea
 db_credentials.sh
 *.sh
+/cmake-build-debug

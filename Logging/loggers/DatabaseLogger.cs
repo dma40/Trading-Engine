@@ -18,15 +18,15 @@ namespace TradingServer.Logging
             {
                 throw new InvalidOperationException("You can't initialize a DatabaseLogger in this way");
             }
-            
+
             DateTime now = DateTime.UtcNow;
 
             string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
             string? password = Environment.GetEnvironmentVariable("MYSQL_PASS");
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
-            string db = $"CREATE DATABASE IF NOT EXISTS {filename}-{now:yyyy-MM-dd}";
-            string dbname = $"{filename}-{now:yyyy-MM-dd}";
+            string dbname = $"{filename}_{now:yyyy-MM-dd}";
+            string db = $"CREATE DATABASE IF NOT EXISTS {dbname}";
             string dblink = $"Server=localhost;Port=3306;Database={dbname};User={user};Password={password}";
             string link = $"Server=localhost;Port=3306;User ID={user};Password={password}";
 
