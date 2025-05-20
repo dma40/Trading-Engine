@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(TradingServer)
+project(Trading-Engine)
 
 file(GLOB_RECURSE ORDERBOOK_SOURCES "Orderbook/OrderbookCS/*.cs")
 file(GLOB_RECURSE ORDER_SOURCES "Orderbook/Orders/*.cs")
