@@ -13,7 +13,7 @@ file(GLOB_RECURSE SERVICE_SOURCES "TradingServices/*.cs")
 add_custom_command(
         OUTPUT Orderbook/Orders/bin/Debug/net9.0/TradingServer.Orders.dll
         COMMAND dotnet build Orderbook/Orders/Orders.csproj
-        DEPENDS ${ORDERBOOK_SOURCES}
+        DEPENDS ${ORDERS_SOURCES}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -25,7 +25,7 @@ add_custom_target(
 add_custom_command(
         OUTPUT Orderbook/OrderbookCS/bin/Debug/net9.0/TradingServer.Orderbook.dll
         COMMAND dotnet build Orderbook/OrderbookCS/OrderbookCS.csproj
-        DEPENDS ${ORDERBOOK_SOURCES}
+        DEPENDS ${ORDERBOOK_SOURCES} Orders
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
