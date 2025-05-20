@@ -70,12 +70,6 @@ add_custom_target(
         DEPENDS TradingServer/bin/debug/net9.0/TradingServer.Core.dll
 )
 
-add_custom_target(
-        Restore ALL
-        COMMAND dotnet restore TradingServer/TradingServer.csproj
-)
-add_dependencies(TradingServer Restore)
-
 add_custom_target(BackgroundTradingHost ALL
         COMMAND dotnet run --project TradingServer/TradingServer.csproj
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
