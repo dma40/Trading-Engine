@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using TradingServer.Logging.LoggingConfiguration;
 
 using MySql.Data.MySqlClient;
+using Npgsql;
 
 namespace TradingServer.Logging
 {
@@ -21,13 +22,13 @@ namespace TradingServer.Logging
 
             DateTime now = DateTime.UtcNow;
 
-            string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
-            string? password = Environment.GetEnvironmentVariable("MYSQL_PASS");
+            string? user = Environment.GetEnvironmentVariable("SQL_USER");
+            string? password = Environment.GetEnvironmentVariable("SQL_PASS");
 
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
             string dbname = $"{filename}_{now:yyyy-MM-dd}";
-            string dbquery = $"CREATE DATABASE IF NOT EXISTS {dbname}";
+            string dbquery = $"CREATE DATABASE {dbname}";
             string link = $"Server=localhost;Port=3306;Uid={user};Pwd={password}";
             string dblink = $"Server=localhost;Port=3306;Database={dbname};Uid={user};Pwd={password}";
             
@@ -42,15 +43,15 @@ namespace TradingServer.Logging
             )";
 
 
-            using (var conn = new MySqlConnection(link))
+            using (var conn = new NpgsqlConnection(link))
             {
                 conn.Open();
-                using (var command = new MySqlCommand(dbquery, conn))
+                using (var command = new NpgsqlCommand(dbquery, conn))
                 {
                     command.ExecuteNonQueryAsync();
 
-                    var connection = new MySqlConnection(dblink);
-                    using (var request = new MySqlCommand(createTableRequest, connection))
+                    var connection = new NpgsqlConnection(dblink);
+                    using (var request = new NpgsqlCommand(createTableRequest, connection))
                     {
                         request.ExecuteNonQueryAsync();
                     }
@@ -62,7 +63,7 @@ namespace TradingServer.Logging
 
         private static async Task LogAsync(string db, BufferBlock<LogInformation> logs, CancellationToken token)
         {
-            MySqlConnection connection = new MySqlConnection(db);
+            NpgsqlConnection connection = new NpgsqlConnection(db);
 
             try
             {
@@ -70,7 +71,7 @@ namespace TradingServer.Logging
                 {
                     var item = await logs.ReceiveAsync(token).ConfigureAwait(false);
                     string request = FormatLogItem(item);
-                    using (var command = new MySqlCommand(request, connection))
+                    using (var command = new NpgsqlCommand(request, connection))
                     {
                         await command.ExecuteNonQueryAsync();
                     }
