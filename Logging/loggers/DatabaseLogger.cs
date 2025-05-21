@@ -41,6 +41,7 @@ namespace TradingServer.Logging
                 name VARCHAR(100) NOT NULL
             )";
 
+
             using (var conn = new MySqlConnection(link))
             {
                 conn.Open();
@@ -54,6 +55,7 @@ namespace TradingServer.Logging
                         request.ExecuteNonQueryAsync();
                     }
                 }
+
                 _ = Task.Run(() => LogAsync(dblink, _logQueue, _ts.Token));
             }
         }
@@ -62,7 +64,7 @@ namespace TradingServer.Logging
         {
             MySqlConnection connection = new MySqlConnection(db);
 
-            try 
+            try
             {
                 while (!token.IsCancellationRequested)
                 {
