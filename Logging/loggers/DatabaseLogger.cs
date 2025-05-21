@@ -2,7 +2,6 @@ using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Options;
 using TradingServer.Logging.LoggingConfiguration;
 
-using MySql.Data.MySqlClient;
 using Npgsql;
 
 namespace TradingServer.Logging
