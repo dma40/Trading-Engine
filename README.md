@@ -42,7 +42,7 @@ to start the trading server.
 Depending on your system architecture, building with the Docker builder may cause a segfault due to potential incompatibilities of gRPC binaries. To get around this, build the container using the following command:
 
 ```
-docker buildx build --platform linux/amd64
+docker buildx build --platform linux/amd64 .
 ```
 
 This ensures that the build to emulate amd64 architecture, which should prevent any errors from occurring.
