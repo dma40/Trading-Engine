@@ -3,5 +3,5 @@
 export SQL_USER="sql-username"
 export SQL_PASS="sql-password"
 
-echo "MYSQL_USER is set to: $MYSQL_USER"
-echo "MYSQL_PASS is set to: $MYSQL_PASS"å
+echo "SQL_USER is set to: $SQL_USER"
+echo "SQL_PASS is set to: $SQL_PASS"
