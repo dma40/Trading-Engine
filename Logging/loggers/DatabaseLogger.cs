@@ -23,6 +23,7 @@ namespace TradingServer.Logging
 
             string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
             string? password = Environment.GetEnvironmentVariable("MYSQL_PASS");
+
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
             string dbname = $"{filename}_{now:yyyy-MM-dd}";
