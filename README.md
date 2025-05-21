@@ -1,10 +1,14 @@
 # Trading-Engine
 
+## Intro
+
 A simplified simulation of modern day exchange trading, which 
 
 - supports multiple order types available on stock exchanges
 - supports text logging, trace logging, database logging, and console logging
 - uses gRPC to send order information to the trading server
+
+## Running the simulation on your computer
 
 To run this project successfully, you need
 
