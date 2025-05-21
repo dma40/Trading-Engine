@@ -29,8 +29,8 @@ namespace TradingServer.Logging
 
             string dbname = $"{filename}_{now:yyyy-MM-dd}";
             string dbquery = $"CREATE DATABASE {dbname}";
-            string link = $"Server=localhost;Port=3306;Uid={user};Pwd={password}";
-            string dblink = $"Server=localhost;Port=3306;Database={dbname};Uid={user};Pwd={password}";
+            string link = $"Server=localhost;Port=5432;Uid={user};Pwd={password}";
+            string dblink = $"Server=localhost;Port=5432;Database={dbname};Uid={user};Pwd={password}";
             
             string createTableRequest = @"
             CREATE TABLE IF NOT EXISTS LogInformation (
