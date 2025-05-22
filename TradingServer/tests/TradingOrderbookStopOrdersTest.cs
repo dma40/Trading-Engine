@@ -13,6 +13,7 @@ using NUnit.Framework.Constraints;
 
 namespace TradingServer.Tests
 {
+    [TestFixture]
     public class TradingOrderbookStopOrderTest()
     {
         private TradingEngine _tradingEngine;

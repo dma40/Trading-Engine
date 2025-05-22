@@ -8,6 +8,7 @@ using NUnit.Framework;
 
 namespace TradingServer.Tests
 {
+    [TestFixture]
     public class TradingOrderbookMatchingTest
     {
         private TradingEngine _tradingEngine;

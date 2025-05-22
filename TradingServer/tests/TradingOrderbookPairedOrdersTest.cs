@@ -11,6 +11,7 @@ using NUnit.Framework;
 
 namespace TradingServer.Tests
 {
+    [TestFixture]
     public class TradingOrderbookPairedOrdersTest
     {
         private TradingEngine _tradingEngine;

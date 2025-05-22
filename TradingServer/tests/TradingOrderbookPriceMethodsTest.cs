@@ -10,6 +10,7 @@ using TradingServer.Instrument;
 
 namespace TradingServer.Tests
 {
+    [TestFixture]
     public class TradingOrderbookPriceMethodsTest
     {
         private TradingEngine _tradingEngine;

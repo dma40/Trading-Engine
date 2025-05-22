@@ -108,16 +108,16 @@ namespace TradingServer.Tests
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                testOrders.Add(new Order(core, i / 4, 1, false));
+                _orderbook.addOrder(new Order(core, i / 4, 1, false));
             }
 
             IOrderCore currentQuantityCanBeFullyFilled = new OrderCore(20004, "Dylan", "TEST", OrderTypes.GoodTillCancel);
             Order currentQuantityCanBeFullyFilledTest = new Order(currentQuantityCanBeFullyFilled, 10000, 19999, true);
 
             _orderbook.match(currentQuantityCanBeFullyFilledTest);
-            Assert.That(_orderbook.getAskLimits().Count == 0);
+            Assert.That(_orderbook.getAskLimits().Count == 1);
             Console.WriteLine(currentQuantityCanBeFullyFilledTest.CurrentQuantity);
-            Assert.That(currentQuantityCanBeFullyFilledTest.CurrentQuantity == 19999);
+            Assert.That(currentQuantityCanBeFullyFilledTest.CurrentQuantity == 0);
         }
     }
 }
