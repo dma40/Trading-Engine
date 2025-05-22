@@ -26,8 +26,23 @@ namespace TradingServer.Logging
 
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
-            string dbname = $"{filename}_{now.Year}_{now.Month}_{now.Day}";
-            string dbquery = $"CREATE DATABASE {dbname};";
+            string dbname = $"{filename}_{now:yyyy-MM-dd}";
+            //string dbquery = $"CREATE DATABASE {dbname}";
+            string dbquery = @$"DO $$  
+                                BEGIN
+
+                                    IF NOT EXISTS (
+                                        SELECT FROM pg_database WHERE name = '{dbname}'
+                                    ) 
+
+                                    THEN
+                                        PERFORM dblink_exec('dbname={dbname}', 'CREATE DATABASE {dbname}')
+                                    
+                                    END IF;
+
+                                END
+                                $$";
+
             string link = $"Server=localhost;Port=5432;Uid={user};Pwd={password}";
             string dblink = $"Server=localhost;Port=5432;Database={dbname};Uid={user};Pwd={password}";
             
@@ -91,7 +106,7 @@ namespace TradingServer.Logging
         private static string FormatLogItem(LogInformation log)
         {
             return "INSERT INTO LogInformation (type, module, message, now, id, name) " 
-            + $"VALUES ({log.type}, {log.module}, {log.message}, {log.now}, {log.id}, {log.name});";
+            + $"VALUES ({log.type}, {log.module}, {log.message}, {log.now}, {log.id}, {log.name})";
         }
 
         ~DatabaseLogger() 
