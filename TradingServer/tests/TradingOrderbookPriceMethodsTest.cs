@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Moq;
 using Xunit;
 using NUnit.Framework;
+using TradingServer.Orders;
 using TradingServer.OrderbookCS;
 using TradingServer.Instrument;
 
@@ -23,7 +24,11 @@ namespace TradingServer.Tests
         [Fact]
         public void TestPriceUpdatedCorrectly()
         {
-
+            for (int i = 0; i < 20000; i++)
+            {
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+            }
         }
 
         [Fact]

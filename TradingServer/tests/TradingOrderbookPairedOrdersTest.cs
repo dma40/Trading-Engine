@@ -24,6 +24,11 @@ namespace TradingServer.Tests
         [Fact]
         public void PairedExecutionOrderTest()
         {
+            for (int i = 0; i < 20000; i++)
+            {
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+            }
             // Order primary =
             // Order secondary = 
             // PairedExecutionOrder peo = new PairedExecutionOrder(core, primary, secondary);
@@ -34,6 +39,12 @@ namespace TradingServer.Tests
         [Fact]
         public void PairedCancelOrderTest()
         {
+            for (int i = 0; i < 20000; i++)
+            {
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+            }
+
             // Order primary = 
             // Order secondary = 
             // PairedCancelOrder pco = new PairedCancelOrder(core, primary, secondary);

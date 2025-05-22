@@ -25,17 +25,29 @@ namespace TradingServer.Tests
 
         public void StopOrderAddedWhenGreatestPriceChanges()
         {
-
+            for (int i = 0; i < 20000; i++)
+            {
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+            }
         }
 
         public void StopOrderTestChangedCorrectly()
         {
-
+            for (int i = 0; i < 20000; i++)
+            {
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+            }
         }
 
         public void TrailingStopOrderMatchedWhenPriceChanges()
         {
-
+            for (int i = 0; i < 20000; i++)
+            {
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+            }
         }
     }
 }

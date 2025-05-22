@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
-using NUnit.Framework;
+using TradingServer.Orders;
 using TradingServer.OrderbookCS;
+using NUnit.Framework;
 using Xunit;
 using TradingServer.Instrument;
 
@@ -24,7 +25,11 @@ namespace TradingServer.Tests
         [Fact]
         public void IcebergTest()
         {
-
+            for (int i = 0; i < 20000; i++)
+            {
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+            }
         }
     }
 }
