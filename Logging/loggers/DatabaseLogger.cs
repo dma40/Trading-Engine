@@ -19,40 +19,43 @@ namespace TradingServer.Logging
                 throw new InvalidOperationException("You can't initialize a DatabaseLogger in this way");
             }
 
-            DateTime now = DateTime.UtcNow;
+            DateTime now = DateTime.Now;
 
             string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
             string? password = Environment.GetEnvironmentVariable("MYSQL_PASS");
 
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
-            string dbname = $"{filename}_{now:yyyy-MM-dd}";
-            string dbquery = $"CREATE DATABASE IF NOT EXISTS {dbname}";
+            string dbname = $"{filename}_{now.Year}_{now.Month}_{now.Day}"; // maybe include the time too
+            string dbquery = $"CREATE DATABASE IF NOT EXISTS {dbname};";
             string link = $"Server=localhost;Port=3306;Uid={user};Pwd={password}";
             string dblink = $"Server=localhost;Port=3306;Database={dbname};Uid={user};Pwd={password}";
             
             string createTableRequest = @"
             CREATE TABLE IF NOT EXISTS LogInformation (
-                type INT NOT NULL,
+                type INT NOT NULL PRIMARY KEY,
                 module VARCHAR(100) NOT NULL,
                 message VARCHAR(200) NOT NULL,
-                now TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                now TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 id INT NOT NULL,
                 name VARCHAR(100) NOT NULL
-            )";
+            );";
 
 
             using (var conn = new MySqlConnection(link))
             {
                 conn.Open();
+
                 using (var command = new MySqlCommand(dbquery, conn))
                 {
-                    command.ExecuteNonQueryAsync();
+                    command.ExecuteNonQuery();
 
                     var connection = new MySqlConnection(dblink);
+                    connection.Open();
+
                     using (var request = new MySqlCommand(createTableRequest, connection))
                     {
-                        request.ExecuteNonQueryAsync();
+                        request.ExecuteNonQuery();
                     }
                 }
 
@@ -92,7 +95,7 @@ namespace TradingServer.Logging
         private static string FormatLogItem(LogInformation log)
         {
             return "INSERT INTO LogInformation (type, module, message, now, id, name) " 
-            + $"VALUES ({log.type}, {log.module}, {log.message}, {log.now}, {log.id}, {log.name})";
+            + $"VALUES ({log.type}, {log.module}, {log.message}, {log.now}, {log.id}, {log.name});";
         }
 
         ~DatabaseLogger() 

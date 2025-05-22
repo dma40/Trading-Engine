@@ -23,7 +23,7 @@ namespace TradingServer.Logging
                 throw new NullReferenceException(nameof(_logConfig.TextLoggerConfiguration));
             }
             
-            DateTime now = DateTime.UtcNow;
+            DateTime now = DateTime.Now;
 
             string logdir = Path.Combine(_logConfig.TextLoggerConfiguration.Directory 
                             ?? throw new NullReferenceException(), $"{now:yyyy-MM-dd}");
