@@ -82,7 +82,7 @@ namespace TradingServer.Logging
 
             catch (OperationCanceledException)
             {
-                Console.WriteLine("Logger has been shut down.");
+                Console.WriteLine("Logger has shut down.");
             }
         }
 
