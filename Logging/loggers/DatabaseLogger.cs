@@ -19,15 +19,15 @@ namespace TradingServer.Logging
                 throw new InvalidOperationException("You can't initialize a DatabaseLogger in this way");
             }
 
-            DateTime now = DateTime.UtcNow;
+            DateTime now = DateTime.Now;
 
             string? user = Environment.GetEnvironmentVariable("SQL_USER");
             string? password = Environment.GetEnvironmentVariable("SQL_PASS");
 
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
-            string dbname = $"{filename}_{now:yyyy-MM-dd}";
-            string dbquery = $"CREATE DATABASE {dbname}";
+            string dbname = $"{filename}_{now.Year}_{now.Month}_{now.Day}";
+            string dbquery = $"CREATE DATABASE {dbname};";
             string link = $"Server=localhost;Port=5432;Uid={user};Pwd={password}";
             string dblink = $"Server=localhost;Port=5432;Database={dbname};Uid={user};Pwd={password}";
             
@@ -36,11 +36,10 @@ namespace TradingServer.Logging
                 type INT NOT NULL,
                 module VARCHAR(100) NOT NULL,
                 message VARCHAR(200) NOT NULL,
-                now TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                now TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 id INT NOT NULL,
                 name VARCHAR(100) NOT NULL
-            )";
-
+            );";
 
             using (var conn = new NpgsqlConnection(link))
             {
@@ -92,7 +91,7 @@ namespace TradingServer.Logging
         private static string FormatLogItem(LogInformation log)
         {
             return "INSERT INTO LogInformation (type, module, message, now, id, name) " 
-            + $"VALUES ({log.type}, {log.module}, {log.message}, {log.now}, {log.id}, {log.name})";
+            + $"VALUES ({log.type}, {log.module}, {log.message}, {log.now}, {log.id}, {log.name});";
         }
 
         ~DatabaseLogger() 

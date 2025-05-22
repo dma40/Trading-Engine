@@ -1,6 +1,18 @@
 ﻿using TradingServer.Tests;
 using TradingServer.Core;
 
+OrderbookEntryFunctionsTest orderbookEntryFunctionsTest = new OrderbookEntryFunctionsTest();
+
+orderbookEntryFunctionsTest.Setup();
+orderbookEntryFunctionsTest.AddRemoveOrderTest();
+orderbookEntryFunctionsTest.ModifyOrderTest();
+
+
+OrderbookMatchingTest orderbookMatchingTest = new OrderbookMatchingTest();
+orderbookMatchingTest.Setup();
+orderbookMatchingTest.canFillTests();
+orderbookMatchingTest.MatchTest();
+
 Console.WriteLine("Starting trading server...\n");
 
 _ = Task.Run(() => processInputs());

@@ -10,21 +10,15 @@ namespace TradingServer.OrderbookCS
     
         public void addOrder(Order order)
         {
-            if (!isValidTime(order))
-            {
-                return;
-            }
-            
-            var baseLimit = new Limit(order.Price);
-
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             {
-                addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+                addOrder(order, order.isBuySide ? _bidLimits : _askLimits, _orders);
             }
         }
         
-        private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
+        private void addOrder(Order order, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
         {
+            Limit baseLimit = new Limit(order.Price);
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
             if (levels.TryGetValue(baseLimit, out Limit? limit))
@@ -67,13 +61,16 @@ namespace TradingServer.OrderbookCS
                 removeOrder(cancel.OrderID, cancel, _orders);
         }
 
+        private void removeOrders(List<CancelOrder> cancels)
+        {
+            foreach (CancelOrder cancel in cancels)
+            {
+                removeOrder(cancel);
+            }
+        }
+
         public void removeOrder(CancelOrder cancel)
         {
-            if (!isValidTime(cancel))
-            {
-                return;
-            }
-
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry))
             {
                 removeOrder(cancel.OrderID, orderbookentry, _orders);
@@ -132,15 +129,10 @@ namespace TradingServer.OrderbookCS
 
         public void modifyOrder(ModifyOrder modify)
         {
-            if (!isValidTime(modify))
-            {
-                return;
-            }
-
             if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry))
             {
                 removeOrder(modify.OrderID, orderentry, _orders);
-                addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+                addOrder(modify.newOrder(), modify.isBuySide ? _bidLimits : _askLimits, _orders);
             }
         }
 

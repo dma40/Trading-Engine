@@ -7,8 +7,9 @@ namespace TradingServer.OrderbookCS
         public uint getEligibleOrderCount(Order order)
         {
             uint count = 0;
+
             if (order.isBuySide)
-            {   
+            {
                 foreach (var limit in _askLimits)
                 {
                     if (limit.Price <= order.Price)
@@ -16,7 +17,7 @@ namespace TradingServer.OrderbookCS
                         OrderbookEntry? headPtr = limit.head;
                         while (headPtr != null)
                         {
-                            count += headPtr.CurrentOrder.CurrentQuantity; 
+                            count += headPtr.CurrentOrder.CurrentQuantity;
                             headPtr = headPtr.next;
                         }
                     }
@@ -32,7 +33,7 @@ namespace TradingServer.OrderbookCS
                         OrderbookEntry? headPtr = limit.head;
                         while (headPtr != null)
                         {
-                            count += headPtr.CurrentOrder.CurrentQuantity; 
+                            count += headPtr.CurrentOrder.CurrentQuantity;
                             headPtr = headPtr.next;
                         }
                     }
@@ -54,8 +55,10 @@ namespace TradingServer.OrderbookCS
                         OrderbookEntry? askHead = ask.head;
 
                         while (askHead != null)
+                        {
                             askQuantity += askHead.CurrentOrder.CurrentQuantity;
-                            askHead = askHead?.next;     
+                            askHead = askHead?.next;
+                        }
                     }
                 }
                 return askQuantity >= order.CurrentQuantity;
@@ -72,8 +75,10 @@ namespace TradingServer.OrderbookCS
                         OrderbookEntry? bidHead = bid.head;
 
                         while (bidHead != null)
+                        {
                             bidQuantity += bidHead.CurrentOrder.CurrentQuantity;
                             bidHead = bidHead?.next;
+                        }
                     }
                 }
 
@@ -87,6 +92,7 @@ namespace TradingServer.OrderbookCS
                 throw new InvalidOperationException("Cannot match an order already in the orderbook");
                 
             Trades result = new Trades();
+            List<OrderbookEntry> cancels = new List<OrderbookEntry>();
 
             if (order.isBuySide)
             {
@@ -99,22 +105,22 @@ namespace TradingServer.OrderbookCS
                         while (head != null)
                         {
                             var entry = head.CurrentOrder;
-                            result.addTransaction(executeTrade(order, head.CurrentOrder));
+                            result.addTransaction(executeTrade(order, entry));
 
-                            if (head.CurrentOrder.CurrentQuantity > 0)
+                            if (entry.CurrentQuantity > 0)
                                 break;
-                        
-                            else 
+
+                            else
                             {
+                                cancels.Add(head);
                                 head = head.next;
-                                removeOrder(entry.cancelOrder());
                             }
                         }
                     }
                 }
             }
 
-            else 
+            else
             {
                 foreach (var bid in _bidLimits)
                 {
@@ -125,21 +131,22 @@ namespace TradingServer.OrderbookCS
                         while (head != null)
                         {
                             var entry = head.CurrentOrder;
-                            result.addTransaction(executeTrade(order, head.CurrentOrder));
+                            result.addTransaction(executeTrade(order, entry));
 
-                            if (head.CurrentOrder.CurrentQuantity > 0)
+                            if (entry.CurrentQuantity > 0)
                                 break;
-                            
-                            else 
+
+                            else
                             {
+                                cancels.Add(head);
                                 head = head.next;
-                                removeOrder(entry.cancelOrder());
                             }
                         }
                     }
                 }
             }
 
+            removeOrders(cancels);
             return result;
         }
 
@@ -167,7 +174,6 @@ namespace TradingServer.OrderbookCS
                 OrderRecord _resting = new OrderRecord(resting.OrderID, resting.CurrentQuantity, quantity, resting.Price, resting.Price, resting.isBuySide, incoming.Username, incoming.SecurityID, 0, 0);
 
                 return new Trade(_incoming, _resting);
-
             }
         }
 
