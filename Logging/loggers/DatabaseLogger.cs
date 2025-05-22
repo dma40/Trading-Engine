@@ -27,7 +27,6 @@ namespace TradingServer.Logging
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
             string dbname = $"{filename}_{now:yyyy-MM-dd}";
-            //string dbquery = $"CREATE DATABASE {dbname}";
             string dbquery = @$"DO $$  
                                 BEGIN
 
