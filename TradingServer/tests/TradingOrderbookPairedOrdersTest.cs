@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
-using Xunit;
 using TradingServer.OrderbookCS;
 using TradingServer.Orders;
 using TradingServer.Instrument;
@@ -22,7 +21,7 @@ namespace TradingServer.Tests
             _tradingEngine = new TradingEngine(new Security("TEST"));
         }
 
-        [Fact]
+        [Test]
         public void PairedExecutionOrderTest()
         {
             for (int i = 0; i < 20000; i++)
@@ -30,6 +29,9 @@ namespace TradingServer.Tests
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
+            
+            // IOrderCore primaryCore = new OrderCore()
+            // IOrderCore secondaryCore = new OrderCore()
             // Order primary =
             // Order secondary = 
             // PairedExecutionOrder peo = new PairedExecutionOrder(core, primary, secondary);
@@ -37,7 +39,7 @@ namespace TradingServer.Tests
             // test various situations
         }
 
-        [Fact]
+        [Test]
         public void PairedCancelOrderTest()
         {
             for (int i = 0; i < 20000; i++)
@@ -46,6 +48,8 @@ namespace TradingServer.Tests
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
 
+            // IOrderCore primaryCore = new OrderCore()
+            // IOrderCOre secondaryCore = new OrderCore()
             // Order primary = 
             // Order secondary = 
             // PairedCancelOrder pco = new PairedCancelOrder(core, primary, secondary);

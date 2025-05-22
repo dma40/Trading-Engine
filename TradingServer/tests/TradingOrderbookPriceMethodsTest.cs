@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
-using Xunit;
 using NUnit.Framework;
 using TradingServer.Orders;
 using TradingServer.OrderbookCS;
@@ -21,8 +20,7 @@ namespace TradingServer.Tests
             _tradingEngine = new TradingEngine(new Security("TEST"));
         }
 
-
-        [Fact]
+        [Test]
         public void TestPriceUpdatedCorrectly()
         {
             for (int i = 0; i < 20000; i++)
@@ -32,7 +30,7 @@ namespace TradingServer.Tests
             }
         }
 
-        [Fact]
+        [Test]
         /* Runs outside of market hours */
         public void skipsUpdateOutsideOfHours()
         {

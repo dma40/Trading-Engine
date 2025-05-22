@@ -32,7 +32,7 @@ namespace TradingServer.Tests
             }
 
             IOrderCore testCore = new OrderCore(20001, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-            Order testOrder = new Order(testCore, 500, 5000, false);
+            Order testOrder = new Order(testCore, 500, 100, true);
 
             Assert.That(_orderbook.canFill(testOrder));
             Assert.That(_orderbook.getEligibleOrderCount(testOrder) == 2004);
@@ -116,7 +116,6 @@ namespace TradingServer.Tests
 
             _orderbook.match(currentQuantityCanBeFullyFilledTest);
             Assert.That(_orderbook.getAskLimits().Count == 1);
-            Console.WriteLine(currentQuantityCanBeFullyFilledTest.CurrentQuantity);
             Assert.That(currentQuantityCanBeFullyFilledTest.CurrentQuantity == 0);
         }
     }

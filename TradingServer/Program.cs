@@ -12,6 +12,11 @@ OrderbookMatchingTest orderbookMatchingTest = new OrderbookMatchingTest();
 orderbookMatchingTest.Setup();
 orderbookMatchingTest.canFillTests();
 orderbookMatchingTest.MatchTest();
+orderbookMatchingTest.getEligibleOrderCountTest();
+
+TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();
+icebergOrdersTest.Setup();
+await icebergOrdersTest.IcebergTest();
 
 Console.WriteLine("Starting trading server...\n");
 

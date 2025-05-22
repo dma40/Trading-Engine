@@ -12,10 +12,12 @@ namespace TradingServer.OrderbookCS
 
         public void addOrder(Order order)
         { 
+            /*
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
                 return;
             }
+            */
 
             lock (_stopLock)
             {
@@ -106,6 +108,7 @@ namespace TradingServer.OrderbookCS
             {
                 if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
                 {
+                    match(order);
                     _iceberg.Add(order.OrderID, order);
                 }
             }

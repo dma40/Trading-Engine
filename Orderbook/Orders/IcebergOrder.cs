@@ -11,6 +11,9 @@ namespace TradingServer.Orders
             if (core.isHidden)
                 throw new InvalidDataException("Iceberg orders cannot go to the hidden of the orderbook");
 
+            if (_fullQuantity < _visibleQuantity)
+                throw new InvalidDataException("Full quantity cannot be less than visible quantity");
+
             fullQuantity = _fullQuantity; 
         }
 
@@ -20,14 +23,16 @@ namespace TradingServer.Orders
 
         public void replenish()
         {
-            /* This is called only when the quantity is 0 */
+            /* This is called only when the current quantity is 0 */
             float total = MathF.Min(Quantity, fullQuantity);
 
             Random random = new Random();
 
             var increase = (uint) random.Next(1, (int) total + 1);
+            //Console.WriteLine("Increase: " + increase);
             IncreaseQuantity(increase);
 
+            fullQuantity -= Quantity;
             fullQuantity -= increase;
         }
     }

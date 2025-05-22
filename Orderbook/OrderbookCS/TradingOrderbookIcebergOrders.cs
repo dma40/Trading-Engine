@@ -1,8 +1,10 @@
+using TradingServer.Orders;
+
 namespace TradingServer.OrderbookCS
 {
-    public partial class TradingEngine: IMatchingEngine, IDisposable
+    public partial class TradingEngine : IMatchingEngine, IDisposable
     {
-        protected async Task ProcessIcebergOrders() 
+        protected async Task ProcessIcebergOrders()
         {
             while (true)
             {
@@ -16,7 +18,7 @@ namespace TradingServer.OrderbookCS
                         foreach (var order in _iceberg)
                         {
                             var iceberg = order.Value;
-                            
+
                             if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
                             {
                                 iceberg.replenish();
@@ -30,16 +32,37 @@ namespace TradingServer.OrderbookCS
                         }
                     }
 
-                    else 
+                    else
                     {
                         foreach (var order in _iceberg)
                         {
-                            var iceberg = order.Value;
+                            IcebergOrder iceberg = order.Value;
 
                             if (iceberg.isEmpty)
                             {
+                                // Console.WriteLine("Iceberg is currently empty");
                                 _iceberg.Remove(iceberg.OrderID);
                             }
+
+                            /*
+                            else if (iceberg.CurrentQuantity == 0)
+                            {
+                                Console.WriteLine("There is a empty iceberg order, but there is invisible quantity remaining.");
+                                iceberg.replenish();
+                                addOrder(iceberg);
+                                Console.WriteLine(iceberg.CurrentQuantity);
+                                Console.WriteLine(containsOrder(iceberg.OrderID));
+                            }
+                            */
+
+                            /*
+                            else
+                            {
+                                Console.WriteLine("A non-empty iceberg order is in a internal queue.");
+                                iceberg.replenish();
+                                addOrder(iceberg);
+                            }
+                            */
                         }
                     }
                 }
