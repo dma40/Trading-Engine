@@ -4,7 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private long _greatestTradedPrice = int.MinValue;
+        private long _greatestTradedPrice = -1;
         public long lastTradedPrice
         {
             get

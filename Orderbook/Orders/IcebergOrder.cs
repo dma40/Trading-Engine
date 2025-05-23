@@ -29,7 +29,6 @@ namespace TradingServer.Orders
             Random random = new Random();
 
             var increase = (uint) random.Next(1, (int) total + 1);
-            //Console.WriteLine("Increase: " + increase);
             IncreaseQuantity(increase);
 
             fullQuantity -= Quantity;

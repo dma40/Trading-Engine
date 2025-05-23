@@ -30,7 +30,7 @@ namespace TradingServer.Orders
                 Price = int.MaxValue;
             
             else 
-                Price = int.MinValue;      
+                Price = -1;      
         }
 
         public Order(ModifyOrder modify): this(modify, 

@@ -22,7 +22,7 @@ namespace TradingServer.Orders
 
             else
             {
-                limitPrice = int.MinValue;
+                limitPrice = -1;
             }
         }
 

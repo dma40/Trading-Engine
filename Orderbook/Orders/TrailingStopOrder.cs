@@ -2,7 +2,7 @@ namespace TradingServer.Orders
 {
     public class TrailingStopOrder: Order, IOrderCore, IDisposable
     {
-        static int ask = int.MinValue;
+        static int ask = -1;
         static int bid = int.MaxValue;
 
         public TrailingStopOrder(IOrderCore _orderCore, long _trail, uint _quantity, bool _isBuy): 
