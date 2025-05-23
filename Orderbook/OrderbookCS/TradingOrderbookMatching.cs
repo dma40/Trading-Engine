@@ -28,32 +28,33 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                    else if (order.OrderType == OrderTypes.PostOnly)
+                else if (order.OrderType == OrderTypes.PostOnly)
+                {
+                    if (!orderbook.canMatch(order))
                     {
-                        if (!orderbook.canMatch(order))
+                        Console.WriteLine("This order cannot be matched");
+                        orderbook.addOrder(order);
+                    }
+                }
+
+                else
+                {
+                    result = orderbook.match(order);
+                    result.addTransactions(_hidden.match(order));
+
+                    if (order.CurrentQuantity > 0)
+                    {
+                        if (order.isHidden)
+                        {
+                            _hidden.addOrder(order);
+                        }
+
+                        else
                         {
                             orderbook.addOrder(order);
                         }
                     }
-
-                    else
-                    {
-                        result = orderbook.match(order);
-                        result.addTransactions(_hidden.match(order));
-
-                        if (order.CurrentQuantity > 0)
-                        {
-                            if (order.isHidden)
-                            {
-                                _hidden.addOrder(order);
-                            }
-
-                            else
-                            {
-                                orderbook.addOrder(order);
-                            }
-                        }
-                    }
+                }
 
                 _trades.addTransactions(result);
                

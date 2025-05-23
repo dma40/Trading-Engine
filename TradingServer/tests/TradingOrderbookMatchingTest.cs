@@ -90,12 +90,14 @@ namespace TradingServer.Tests
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                testOrders.Add(new Order(core, i / 4, 1, false));
+                testOrders.Add(new Order(core, i / 4, 1, true));
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, true));
             }
 
             IOrderCore unmatchableCoreSameSide = new OrderCore(20000, "Dylan", "TEST", OrderTypes.PostOnly);
             Order unmatchableSameSideOrder = new Order(unmatchableCoreSameSide, 5000, 1, true);
+
+            Console.WriteLine(_tradingEngine.orderbook.canMatch(unmatchableSameSideOrder));
 
             _tradingEngine.addOrder(unmatchableSameSideOrder);
             Assert.That(_tradingEngine.containsOrder(unmatchableSameSideOrder.OrderID));
@@ -135,7 +137,7 @@ namespace TradingServer.Tests
 
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
                 _tradingEngine.addOrder(new Order(visibleCore, i / 4, 1, false));
-                
+
                 Assert.That(!_tradingEngine.orderbook.containsOrder(i));
             }
         }
