@@ -4,6 +4,6 @@ namespace TradingServer.OrderbookCS
 {
     public interface IMatchingEngine: IOrderEntryOrderbook
     {
-        new Trades match(Order order);
+        Trades match(Order order);
     }
 }
