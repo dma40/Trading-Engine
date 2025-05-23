@@ -12,7 +12,6 @@ namespace TradingServer.OrderbookCS
             int type = (int) order.OrderType;
             Trades result = new Trades();
 
-            lock (_ordersLock)
             {
                 if (ImmediateHandleTypes.Contains(type))
                 {

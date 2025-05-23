@@ -14,6 +14,10 @@ orderbookMatchingTest.canFillTests();
 orderbookMatchingTest.MatchTest();
 orderbookMatchingTest.getEligibleOrderCountTest();
 
+TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
+priceMethodsTest.Setup();
+priceMethodsTest.TestPriceUpdatedCorrectly();
+
 TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();
 icebergOrdersTest.Setup();
 await icebergOrdersTest.IcebergTest();

@@ -12,14 +12,12 @@ namespace TradingServer.OrderbookCS
 
         public void addOrder(Order order)
         { 
-            /*
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
                 return;
             }
-            */
 
-            lock (_stopLock)
+            lock (_ordersLock)
             {
                 if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
                 {
@@ -59,7 +57,7 @@ namespace TradingServer.OrderbookCS
 
             if (stop.OrderType == OrderTypes.StopLimit || stop.OrderType == OrderTypes.StopMarket)
             {
-                lock (_stopLock)
+                lock (_ordersLock)
                 {
                     if (!_stop.TryGetValue(stop.OrderID, out StopOrder? stoporder) && stoporder != null)
                         _stop.Add(stop.OrderID, stop);
@@ -79,7 +77,7 @@ namespace TradingServer.OrderbookCS
 
             if (trail.OrderType == OrderTypes.TrailingStopLimit || trail.OrderType == OrderTypes.TrailingStopMarket)
             {
-                lock (_stopLock)
+                lock (_ordersLock)
                 {
                     if (!_trailingStop.TryGetValue(trail.OrderID, out TrailingStopOrder? trailstop) && trailstop != null)
                         _trailingStop.Add(trail.OrderID, trail);
@@ -92,7 +90,7 @@ namespace TradingServer.OrderbookCS
 
         public void addOrder(PairedCancelOrder pairedCancel)
         {
-            lock (_stopLock)
+            lock (_ordersLock)
             {
                 if (!_pairedCancel.TryGetValue(pairedCancel.OrderID, out PairedCancelOrder? paired))
                     _pairedCancel.Add(pairedCancel.OrderID, pairedCancel);
@@ -127,7 +125,7 @@ namespace TradingServer.OrderbookCS
                 return;
             }
 
-            lock (_stopLock)
+            lock (_ordersLock)
             {
                 if (cancel.isHidden)
                 {
@@ -195,7 +193,6 @@ namespace TradingServer.OrderbookCS
                 {
                     orderbook.removeOrder(cancel);
                 }
-                
             }
         }
 
