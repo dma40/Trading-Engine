@@ -93,8 +93,8 @@ namespace TradingServer.OrderbookCS
                                     _trailingStop.Remove(trailstop.OrderID);
                                 }
 
-                                else if (_greatestTradedPrice > trailstop.currentMaxPrice)
-                                    trail.Value.currentMaxPrice = _greatestTradedPrice; 
+                                else if (greatestTradedPrice > trailstop.currentMaxPrice)
+                                    trail.Value.currentMaxPrice = greatestTradedPrice; 
                             }
 
                             else 
@@ -107,9 +107,9 @@ namespace TradingServer.OrderbookCS
                                     _trailingStop.Remove(trailstop.OrderID);
                                 }
 
-                                else if (_greatestTradedPrice > trailstop.currentMaxPrice)
+                                else if (greatestTradedPrice > trailstop.currentMaxPrice)
                                 {
-                                    trail.Value.currentMaxPrice = _greatestTradedPrice;
+                                    trail.Value.currentMaxPrice = greatestTradedPrice;
                                 }
                             }
                         }

@@ -40,27 +40,6 @@ namespace TradingServer.Tests
                     Assert.That(_tradingEngine.lastTradedPrice == i / 4);
                 }
             }
-
-            /*
-            IOrderCore currentQuantityCanBeFullyFilled = new OrderCore(20004, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-            Order currentQuantityCanBeFullyFilledTest = new Order(currentQuantityCanBeFullyFilled, 10000, 19999, true);
-
-            _tradingEngine.addOrder(currentQuantityCanBeFullyFilledTest);
-            Assert.That(currentQuantityCanBeFullyFilledTest.CurrentQuantity == 0);
-
-            TimeSpan now = DateTime.Now.TimeOfDay;
-            if (now <= new TimeSpan(16, 0, 0) && now >= new TimeSpan(9, 30, 0))
-            {
-                Assert.That(_tradingEngine.lastTradedPrice == 0);
-            }
-            */
-        }
-
-        [Test]
-        /* Runs outside of market hours */
-        public void skipsUpdateOutsideOfHours()
-        {
-
         }
     }
 }
