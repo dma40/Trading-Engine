@@ -16,8 +16,6 @@ namespace TradingServer.OrderbookCS
             orderbook = new Orderbook(security);
             _hidden = new Orderbook(security);
 
-            _ = Task.Run(() => UpdateGreatestTradedPrice());
-
             _ = Task.Run(() => ProcessStopOrders());
             _ = Task.Run(() => ProcessTrailingStopOrders());
             _ = Task.Run(() => ProcessAtMarketOpen());
