@@ -17,7 +17,14 @@ namespace TradingServer.OrderbookCS
                 else
                 {
                     List<Trade> trades = _trades.recordedTrades;
-                    return trades[_trades.count - 1].tradedPrice;
+                    long price = trades[_trades.count - 1].tradedPrice;
+
+                    if (price > _greatestTradedPrice)
+                    {
+                        _greatestTradedPrice = price;
+                    }
+
+                    return price;
                 }
             }
         }
