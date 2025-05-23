@@ -4,6 +4,7 @@ using TradingServer.Orders;
 using TradingServer.OrderbookCS;
 using TradingServer.Instrument;
 using NUnit.Framework;
+using System.ComponentModel;
 
 namespace TradingServer.Tests
 {
@@ -19,54 +20,128 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public void FillAndKillTest()
+        public void FillOrKillTest()
         {
+            List<Order> testOrders = new List<Order>();
+
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                testOrders.Add(new Order(core, i / 4, 1, false));
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
+
+            IOrderCore unfillableFOKCore = new OrderCore(20000, "Dylan", "TEST", OrderTypes.FillOrKill);
+            Order unfillableFOKOrder = new Order(unfillableFOKCore, 100, 100000000, true);
+
+            _tradingEngine.addOrder(unfillableFOKOrder);
+
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 5000);
+
+            IOrderCore fillableFOKCore = new OrderCore(20001, "Dylan", "TEST", OrderTypes.FillOrKill);
+            Order fillableFOKOrder = new Order(fillableFOKCore, 100, 404, true);
+
+            _tradingEngine.addOrder(fillableFOKOrder);
+
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 4899);
+
+            for (int i = 404; i < 20000; i++)
+            {
+                _tradingEngine.removeOrder(testOrders[i].cancelOrder());
+            }
+
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 0);
         }
 
         [Test]
-        public void ImmediateHandleTypeMatched()
+        public void ImmediateHandleTypeMatchedTest()
         {
+            List<Order> testOrders = new List<Order>();
+
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                testOrders.Add(new Order(core, i / 4, 1, false));
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
+
+            IOrderCore fakCore = new OrderCore(20000, "Dylan", "TEST", OrderTypes.FillAndKill);
+            Order fakOrder = new Order(fakCore, 100, 1000000, true);
+
+            _tradingEngine.addOrder(fakOrder);
+
+            Assert.That(!_tradingEngine.containsOrder(fakOrder.OrderID));
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 4899);
+
+            for (int i = 404; i < 20000; i++)
+            {
+                _tradingEngine.removeOrder(testOrders[i].cancelOrder());
+            }
+
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 0);
+            Assert.That(_tradingEngine.orderbook.getBidLimits().Count == 0);
         }
 
         [Test]
-        public void PostOnlyMatch()
+        public void PostOnlyMatchTest()
         {
+            List<Order> testOrders = new List<Order>();
+
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                testOrders.Add(new Order(core, i / 4, 1, false));
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, true));
             }
 
-            IOrderCore unmatchableCore = new OrderCore(20000, "Dylan", "TEST", OrderTypes.PostOnly);
+            IOrderCore unmatchableCoreSameSide = new OrderCore(20000, "Dylan", "TEST", OrderTypes.PostOnly);
+            Order unmatchableSameSideOrder = new Order(unmatchableCoreSameSide, 5000, 1, true);
+
+            _tradingEngine.addOrder(unmatchableSameSideOrder);
+            Assert.That(_tradingEngine.containsOrder(unmatchableSameSideOrder.OrderID));
+
+            IOrderCore unmatchableCore = new OrderCore(20001, "Dylan", "TEST", OrderTypes.PostOnly);
             Order unmatchableOrder = new Order(unmatchableCore, 5001, 5001, false);
 
-            _tradingEngine.match(unmatchableOrder);
+            _tradingEngine.addOrder(unmatchableOrder);
 
-            Assert.That(!_tradingEngine.containsOrder(unmatchableOrder.OrderID));
+            Assert.That(_tradingEngine.containsOrder(unmatchableOrder.OrderID));
+
+            IOrderCore matchableCore = new OrderCore(20002, "Dylan", "TEST", OrderTypes.PostOnly);
+            Order matchableOrder = new Order(matchableCore, 100, 100000, false);
+
+            _tradingEngine.addOrder(matchableOrder);
+            Assert.That(!_tradingEngine.containsOrder(matchableOrder.OrderID));
+
+            _tradingEngine.removeOrder(unmatchableOrder.cancelOrder());
+            _tradingEngine.removeOrder(unmatchableSameSideOrder.cancelOrder());
+
+            foreach (Order order in testOrders)
+            {
+                _tradingEngine.removeOrder(order.cancelOrder());
+            }
+
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 0);
+            Assert.That(_tradingEngine.orderbook.getBidLimits().Count == 0);
         }
 
         [Test]
-        public void HiddenOrderAddedCorrectly()
+        public void HiddenOrderMatchedCorrectly()
         {
             for (int i = 0; i < 20000; i++)
             {
-                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel, true);
+                IOrderCore visibleCore = new OrderCore(i + 20000, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(visibleCore, i / 4, 1, false));
+                
+                Assert.That(!_tradingEngine.orderbook.containsOrder(i));
             }
         }
 
         [Test]
-        public void VisibleOrderAddedCorrectly()
+        public void VisibleOrderMatchedCorrectly()
         {
             for (int i = 0; i < 20000; i++)
             {

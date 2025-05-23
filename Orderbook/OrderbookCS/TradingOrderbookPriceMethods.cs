@@ -9,7 +9,7 @@ namespace TradingServer.OrderbookCS
         {
             get
             {
-                if (_trades.count > 0)
+                if (_trades.count == 0)
                 {
                     return -1;
                 }

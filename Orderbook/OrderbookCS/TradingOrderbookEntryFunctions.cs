@@ -25,7 +25,7 @@ namespace TradingServer.OrderbookCS
                         _onMarketClose.Add(order.OrderID, order);
 
                     else
-                        throw new InvalidOperationException();
+                        throw new InvalidOperationException("This order already exists in an internal queue");
                 }
 
                 else if (order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
@@ -34,16 +34,18 @@ namespace TradingServer.OrderbookCS
                         _onMarketOpen.Add(order.OrderID, order);
 
                     else
-                        throw new InvalidOperationException(); 
+                        throw new InvalidOperationException("This order already exists in an internal queue"); 
                 }
 
                 else 
                 {
-                    if (!orderbook.containsOrder(order.OrderID))
+                    if (!orderbook.containsOrder(order.OrderID) && !_hidden.containsOrder(order.OrderID))
+                    {
                         match(order);
+                    }
 
                     else
-                        throw new InvalidOperationException();
+                        throw new InvalidOperationException("This order currently exists in the orderbook");
                 }
             }
         }

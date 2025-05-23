@@ -18,9 +18,17 @@ TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMet
 priceMethodsTest.Setup();
 priceMethodsTest.TestPriceUpdatedCorrectly();
 
+TradingOrderbookMatchingTest matchingTest = new TradingOrderbookMatchingTest();
+matchingTest.Setup();
+matchingTest.PostOnlyMatchTest();
+matchingTest.ImmediateHandleTypeMatchedTest();
+matchingTest.HiddenOrderMatchedCorrectly();
+
+/*
 TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();
 icebergOrdersTest.Setup();
 await icebergOrdersTest.IcebergTest();
+*/
 
 Console.WriteLine("Starting trading server...\n");
 

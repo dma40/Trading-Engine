@@ -5,10 +5,9 @@ namespace TradingServer.Orders
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy)
         {
             if (orderCore.OrderType == OrderTypes.Market)
+            {
                 throw new InvalidDataException("Market orders cannot have a price");
-
-            if (orderCore.isHidden)
-                throw new InvalidDataException("Market orders cannot go to the hidden portion");
+            }
             
             _orderCore = orderCore;
             Price = price;
@@ -20,7 +19,14 @@ namespace TradingServer.Orders
         public Order(IOrderCore orderCore, uint quantity, bool isBuy)
         {
             if (orderCore.OrderType != OrderTypes.Market)
+            {
                 throw new InvalidDataException("Only market orders can have no price");
+            }
+
+            if (orderCore.isHidden)
+                {
+                    throw new InvalidDataException("Market orders cannot go to the hidden portion");
+                }
             
             _orderCore = orderCore;
             Quantity = quantity;
