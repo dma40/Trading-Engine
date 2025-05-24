@@ -6,6 +6,7 @@ using NUnit.Framework;
 using TradingServer.Orders;
 using TradingServer.OrderbookCS;
 using TradingServer.Instrument;
+using NUnit.Framework.Constraints;
 
 namespace TradingServer.Tests
 {
@@ -26,7 +27,8 @@ namespace TradingServer.Tests
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                IOrderCore sellCore = new OrderCore(i + 200001, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                IOrderCore sellCore = new OrderCore(i + 20000, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+
                 _tradingEngine.addOrder(new Order(buyCore, i / 4, 1, false));
                 _tradingEngine.addOrder(new Order(sellCore, i / 4, 1, true));
 
@@ -38,6 +40,11 @@ namespace TradingServer.Tests
                 if (now >= marketOpen && now <= marketEnd)
                 {
                     Assert.That(_tradingEngine.lastTradedPrice == i / 4);
+                }
+
+                else
+                {
+                    Assert.That(_tradingEngine.lastTradedPrice == -1);
                 }
             }
         }

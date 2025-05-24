@@ -16,19 +16,27 @@ namespace TradingServer.OrderbookCS
                 if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
                 {
                     if (!_onMarketClose.TryGetValue(order.OrderID, out Order? orderentry))
+                    {
                         _onMarketClose.Add(order.OrderID, order);
+                    }
 
                     else
+                    {
                         throw new InvalidOperationException("This order already exists in an internal queue");
+                    }
                 }
 
                 else if (order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.MarketOnOpen)
                 {
                     if (!_onMarketOpen.TryGetValue(order.OrderID, out Order? orderentry))
+                    {
                         _onMarketOpen.Add(order.OrderID, order);
+                    }
 
                     else
-                        throw new InvalidOperationException("This order already exists in an internal queue"); 
+                    {
+                        throw new InvalidOperationException("This order already exists in an internal queue");
+                    }
                 }
 
                 else 
@@ -39,7 +47,9 @@ namespace TradingServer.OrderbookCS
                     }
 
                     else
+                    {
                         throw new InvalidOperationException("This order currently exists in the orderbook");
+                    }
                 }
             }
         }
@@ -55,11 +65,15 @@ namespace TradingServer.OrderbookCS
             {
                 lock (_ordersLock)
                 {
-                    if (!_stop.TryGetValue(stop.OrderID, out StopOrder? stoporder) && stoporder != null)
+                    if (!_stop.TryGetValue(stop.OrderID, out StopOrder? stoporder))
+                    {
                         _stop.Add(stop.OrderID, stop);
+                    }
 
                     else
-                        throw new InvalidOperationException();
+                    {
+                        throw new InvalidOperationException("This order already exists in a internal queue");
+                    }
                 }
             } 
         }
@@ -75,11 +89,15 @@ namespace TradingServer.OrderbookCS
             {
                 lock (_ordersLock)
                 {
-                    if (!_trailingStop.TryGetValue(trail.OrderID, out TrailingStopOrder? trailstop) && trailstop != null)
+                    if (!_trailingStop.TryGetValue(trail.OrderID, out TrailingStopOrder? trailstop))
+                    {
                         _trailingStop.Add(trail.OrderID, trail);
+                    }
 
                     else
-                        throw new InvalidOperationException();
+                    {
+                        throw new InvalidOperationException("This order already exists in a internal queue");
+                    }
                 }
             }
         }
@@ -89,10 +107,14 @@ namespace TradingServer.OrderbookCS
             lock (_ordersLock)
             {
                 if (!_pairedCancel.TryGetValue(pairedCancel.OrderID, out PairedCancelOrder? paired))
+                {
                     _pairedCancel.Add(pairedCancel.OrderID, pairedCancel);
-                
+                }
+
                 else
-                    throw new InvalidOperationException();
+                {
+                    throw new InvalidOperationException("This order already exists in a internal queue");
+                }
             }
         }
 
@@ -146,7 +168,7 @@ namespace TradingServer.OrderbookCS
 
                 if (cancel.OrderType == OrderTypes.StopLimit || cancel.OrderType == OrderTypes.StopMarket)
                 {
-                    if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop) && stop != null)
+                    if (_stop.TryGetValue(cancel.OrderID, out StopOrder? stop))
                         _stop.Remove(cancel.OrderID);
 
                     else
@@ -155,7 +177,7 @@ namespace TradingServer.OrderbookCS
 
                 if (cancel.OrderType == OrderTypes.TrailingStopLimit || cancel.OrderType == OrderTypes.TrailingStopMarket)
                 {
-                    if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? stop) && stop != null)
+                    if (_trailingStop.TryGetValue(cancel.OrderID, out TrailingStopOrder? stop))
                         _trailingStop.Remove(cancel.OrderID);
 
                     else
@@ -164,20 +186,28 @@ namespace TradingServer.OrderbookCS
 
                 if (cancel.OrderType == OrderTypes.LimitOnClose || cancel.OrderType == OrderTypes.MarketOnClose)
                 {
-                    if (_onMarketClose.TryGetValue(cancel.OrderID, out Order? order) && order != null)
+                    if (_onMarketClose.TryGetValue(cancel.OrderID, out Order? order))
+                    {
                         _onMarketClose.Remove(cancel.OrderID);
+                    }
 
                     else
+                    {
                         throw new InvalidOperationException();
+                    }
                 }
 
                 if (cancel.OrderType == OrderTypes.LimitOnOpen || cancel.OrderType == OrderTypes.MarketOnOpen)
                 {
-                    if (_onMarketOpen.TryGetValue(cancel.OrderID, out Order? order) && order != null)
+                    if (_onMarketOpen.TryGetValue(cancel.OrderID, out Order? order))
+                    {
                         _onMarketOpen.Remove(cancel.OrderID);
-                    
+                    }
+
                     else
-                        throw new InvalidOperationException();
+                    {
+                        throw new InvalidOperationException("This order neither exists in the orderbook nor a internal queue");
+                    }
                 }
 
                 if (cancel.isHidden)

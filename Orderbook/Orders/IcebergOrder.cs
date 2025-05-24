@@ -6,13 +6,19 @@ namespace TradingServer.Orders
         base(core, _price, _visibleQuantity, _isBuy)
         {
             if (core.OrderType != OrderTypes.Iceberg)
+            {
                 throw new InvalidDataException("This is the wrong type");
+            }
 
             if (core.isHidden)
+            {
                 throw new InvalidDataException("Iceberg orders cannot go to the hidden of the orderbook");
+            }
 
             if (_fullQuantity < _visibleQuantity)
+            {
                 throw new InvalidDataException("Full quantity cannot be less than visible quantity");
+            }
 
             fullQuantity = _fullQuantity; 
         }

@@ -7,22 +7,29 @@ orderbookEntryFunctionsTest.Setup();
 orderbookEntryFunctionsTest.AddRemoveOrderTest();
 orderbookEntryFunctionsTest.ModifyOrderTest();
 
-
 OrderbookMatchingTest orderbookMatchingTest = new OrderbookMatchingTest();
+
 orderbookMatchingTest.Setup();
 orderbookMatchingTest.canFillTests();
 orderbookMatchingTest.MatchTest();
 orderbookMatchingTest.getEligibleOrderCountTest();
 
 TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
+
 priceMethodsTest.Setup();
 priceMethodsTest.TestPriceUpdatedCorrectly();
 
 TradingOrderbookMatchingTest matchingTest = new TradingOrderbookMatchingTest();
+
 matchingTest.Setup();
 matchingTest.PostOnlyMatchTest();
 matchingTest.ImmediateHandleTypeMatchedTest();
-matchingTest.HiddenOrderMatchedCorrectly();
+matchingTest.HiddenAndVisibleOrdersMatchedCorrectly();
+
+TradingOrderbookStopOrderTest stopOrderTest = new TradingOrderbookStopOrderTest();
+
+stopOrderTest.Setup();
+stopOrderTest.StopOrderAddedWhenLatestPriceChanges();
 
 /*
 TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();
@@ -38,7 +45,7 @@ await engine.StartAsync().ConfigureAwait(false);
 
 static void processInputs()
 {
-    // A starting point for any user interface for this trading platform.
+    // A starting point for any API for this trading platform.
 }
 
 

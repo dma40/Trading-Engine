@@ -32,7 +32,6 @@ namespace TradingServer.OrderbookCS
                 {
                     if (!orderbook.canMatch(order))
                     {
-                        Console.WriteLine("This order cannot be matched");
                         orderbook.addOrder(order);
                     }
                 }

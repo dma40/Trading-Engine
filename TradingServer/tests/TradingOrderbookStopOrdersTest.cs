@@ -23,13 +23,26 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public void StopOrderAddedWhenGreatestPriceChanges()
+        public void StopOrderAddedWhenLatestPriceChanges()
         {
-            for (int i = 0; i < 20000; i++)
+            IOrderCore stopCore = new OrderCore(40000, "Dylan", "TEST", OrderTypes.StopLimit);
+            StopOrder stop = new StopOrder(stopCore, 98, 100, 100, false);
+
+            _tradingEngine.addOrder(stop);
+
+            Assert.That(!_tradingEngine.orderbook.containsOrder(stop.OrderID));
+
+            for (int i = 0; i < 404; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                IOrderCore sellCore = new OrderCore(i + 404, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, true));
+                _tradingEngine.addOrder(new Order(sellCore, i / 4, 1, false));
+                Assert.That(_tradingEngine.lastTradedPrice == i / 4);
             }
+
+            Assert.That(_tradingEngine.orderbook.containsOrder(stop.OrderID));
         }
 
         [Test]

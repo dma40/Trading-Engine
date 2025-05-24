@@ -108,7 +108,9 @@ namespace TradingServer.OrderbookCS
                             result.addTransaction(executeTrade(order, entry));
 
                             if (entry.CurrentQuantity > 0)
+                            {
                                 break;
+                            }
 
                             else
                             {
@@ -134,7 +136,9 @@ namespace TradingServer.OrderbookCS
                             result.addTransaction(executeTrade(order, entry));
 
                             if (entry.CurrentQuantity > 0)
+                            {
                                 break;
+                            }
 
                             else
                             {
@@ -182,13 +186,17 @@ namespace TradingServer.OrderbookCS
             if (order.isBuySide)
             {
                 if (_askLimits.Any() && _askLimits.Min != null && !_askLimits.Min.isEmpty)
+                {
                     return order.Price >= _askLimits.Min.Price;
+                }
             }
 
             else
             {
                 if (_bidLimits.Any() && _bidLimits.Max != null && !_bidLimits.Max.isEmpty)
+                {
                     return order.Price <= _bidLimits.Max.Price;
+                }
             }
 
             return false;

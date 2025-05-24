@@ -13,60 +13,70 @@ namespace TradingServer.OrderbookCS
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
 
-                lock (_stopLock)
+                if (_ts.IsCancellationRequested)
                 {
-                    if (currentTime >= marketOpen && currentTime <= marketEnd)
+                    return;
+                }
+
+                lock (_stopLock)
                     {
-                        foreach (var order in _iceberg)
+                        if (currentTime >= marketOpen && currentTime <= marketEnd)
                         {
-                            var iceberg = order.Value;
-
-                            if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
+                            foreach (var order in _iceberg)
                             {
-                                iceberg.replenish();
-                                addOrder(iceberg);
+                                var iceberg = order.Value;
+
+                                if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
+                                {
+                                    iceberg.replenish();
+                                    addOrder(iceberg);
+                                }
+
+                                else if (iceberg.isEmpty)
+                                {
+                                    _iceberg.Remove(iceberg.OrderID);
+                                }
                             }
+                        }
 
-                            else if (iceberg.isEmpty)
+                        else
+                        {
+                            foreach (var order in _iceberg)
                             {
-                                _iceberg.Remove(iceberg.OrderID);
+                                IcebergOrder iceberg = order.Value;
+
+                                if (iceberg.isEmpty)
+                                {
+                                    // Console.WriteLine("Iceberg is currently empty");
+                                    _iceberg.Remove(iceberg.OrderID);
+                                }
+
+                                /*
+                                else if (iceberg.CurrentQuantity == 0)
+                                {
+                                    Console.WriteLine("There is a empty iceberg order, but there is invisible quantity remaining.");
+                                    iceberg.replenish();
+                                    addOrder(iceberg);
+                                    Console.WriteLine(iceberg.CurrentQuantity);
+                                    Console.WriteLine(containsOrder(iceberg.OrderID));
+                                }
+                                */
+
+                                /*
+                                else
+                                {
+                                    Console.WriteLine("A non-empty iceberg order is in a internal queue.");
+                                    iceberg.replenish();
+                                    addOrder(iceberg);
+                                }
+                                */
                             }
                         }
                     }
 
-                    else
-                    {
-                        foreach (var order in _iceberg)
-                        {
-                            IcebergOrder iceberg = order.Value;
-
-                            if (iceberg.isEmpty)
-                            {
-                                // Console.WriteLine("Iceberg is currently empty");
-                                _iceberg.Remove(iceberg.OrderID);
-                            }
-
-                            /*
-                            else if (iceberg.CurrentQuantity == 0)
-                            {
-                                Console.WriteLine("There is a empty iceberg order, but there is invisible quantity remaining.");
-                                iceberg.replenish();
-                                addOrder(iceberg);
-                                Console.WriteLine(iceberg.CurrentQuantity);
-                                Console.WriteLine(containsOrder(iceberg.OrderID));
-                            }
-                            */
-
-                            /*
-                            else
-                            {
-                                Console.WriteLine("A non-empty iceberg order is in a internal queue.");
-                                iceberg.replenish();
-                                addOrder(iceberg);
-                            }
-                            */
-                        }
-                    }
+                if (_ts.IsCancellationRequested)
+                {
+                    return;
                 }
 
                 await Task.Delay(200, _ts.Token);

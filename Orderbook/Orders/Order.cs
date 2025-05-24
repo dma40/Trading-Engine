@@ -33,10 +33,14 @@ namespace TradingServer.Orders
             isBuySide = isBuy;
 
             if (isBuySide)
+            {
                 Price = int.MaxValue;
-            
-            else 
-                Price = -1;      
+            }
+
+            else
+            {
+                Price = -1;
+            }   
         }
 
         public Order(ModifyOrder modify): this(modify, 

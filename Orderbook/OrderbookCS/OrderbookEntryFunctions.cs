@@ -61,14 +61,6 @@ namespace TradingServer.OrderbookCS
                 removeOrder(cancel.OrderID, cancel, _orders);
         }
 
-        private void removeOrders(List<CancelOrder> cancels)
-        {
-            foreach (CancelOrder cancel in cancels)
-            {
-                removeOrder(cancel);
-            }
-        }
-
         public void removeOrder(CancelOrder cancel)
         {
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry))
@@ -89,18 +81,24 @@ namespace TradingServer.OrderbookCS
             {
                 orderentry.ParentLimit.head = null;
                 orderentry.ParentLimit.tail = null;
-                
-                if (orderentry.CurrentOrder.isBuySide)
-                    _bidLimits.Remove(orderentry.ParentLimit);
 
-                else 
-                    _askLimits.Remove(orderentry.ParentLimit);    
+                if (orderentry.CurrentOrder.isBuySide)
+                {
+                    _bidLimits.Remove(orderentry.ParentLimit);
+                }
+
+                else
+                {
+                    _askLimits.Remove(orderentry.ParentLimit);
+                }  
             }
 
             else if (orderentry.ParentLimit.head == orderentry)
             {
                 if (orderentry.next != null)
+                {
                     orderentry.next.previous = null;
+                }
 
                 orderentry.ParentLimit.head = orderentry.next;
             }
@@ -108,7 +106,9 @@ namespace TradingServer.OrderbookCS
             else if (orderentry.ParentLimit.tail == orderentry)
             {
                 if (orderentry.previous != null)
+                {
                     orderentry.previous.next = null;
+                }
 
                 orderentry.ParentLimit.tail = orderentry.previous;
             }

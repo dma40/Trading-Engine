@@ -97,8 +97,6 @@ namespace TradingServer.Tests
             IOrderCore unmatchableCoreSameSide = new OrderCore(20000, "Dylan", "TEST", OrderTypes.PostOnly);
             Order unmatchableSameSideOrder = new Order(unmatchableCoreSameSide, 5000, 1, true);
 
-            Console.WriteLine(_tradingEngine.orderbook.canMatch(unmatchableSameSideOrder));
-
             _tradingEngine.addOrder(unmatchableSameSideOrder);
             Assert.That(_tradingEngine.containsOrder(unmatchableSameSideOrder.OrderID));
 
@@ -128,7 +126,7 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public void HiddenOrderMatchedCorrectly()
+        public void HiddenAndVisibleOrdersMatchedCorrectly()
         {
             for (int i = 0; i < 20000; i++)
             {
@@ -140,26 +138,22 @@ namespace TradingServer.Tests
 
                 Assert.That(!_tradingEngine.orderbook.containsOrder(i));
             }
-        }
 
-        [Test]
-        public void VisibleOrderMatchedCorrectly()
-        {
-            for (int i = 0; i < 20000; i++)
-            {
-                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
-            }
-        }
+            IOrderCore visible = new OrderCore(40000, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+            Order visibleOrder = new Order(visible, 2, 24, true);
 
-        [Test]
-        public void HasEligibleOrderTest()
-        {
-            for (int i = 0; i < 20000; i++)
-            {
-                IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
-            }
+            _tradingEngine.addOrder(visibleOrder);
+
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 4997);
+            Assert.That(!_tradingEngine.containsOrder(visibleOrder.OrderID));
+
+            IOrderCore hidden = new OrderCore(40001, "Dylan", "TEST", OrderTypes.GoodTillCancel, true);
+            Order hiddenOrder = new Order(hidden, 3, 12, true);
+
+            _tradingEngine.addOrder(hiddenOrder);
+
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 4996);
+            Assert.That(hiddenOrder.CurrentQuantity == 4);
         }
     }
 }

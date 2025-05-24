@@ -12,7 +12,9 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
 
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
@@ -24,27 +26,33 @@ namespace TradingServer.OrderbookCS
                     {
                         foreach (var order in _stop)
                         {
-                            var tempOrder = order.Value;
+                            StopOrder stop = order.Value;
+                            Console.WriteLine("Price of this order: " + stop.StopPrice);
+                            Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
 
-                            if (tempOrder.isBuySide)
+                            if (stop.isBuySide)
                             {
-                                if (lastTradedPrice <= order.Value.StopPrice)
+                                Console.WriteLine("This is a buy side order. Processing...");
+                                if (lastTradedPrice <= stop.StopPrice)
                                 {
+                                    Console.WriteLine("Activating the buy side order");
                                     Order activated = order.Value.activate();
                                     match(activated);
 
-                                    _stop.Remove(tempOrder.OrderID);
+                                    _stop.Remove(stop.OrderID);
                                 }
                             }
 
                             else
                             {
+                                Console.WriteLine("This is a sell side order. Processing...");
                                 if (lastTradedPrice >= order.Value.StopPrice)
                                 {
+                                    Console.WriteLine("Activating the sell side order");
                                     Order activated = order.Value.activate();
                                     match(activated);
 
-                                    _stop.Remove(tempOrder.OrderID);
+                                    _stop.Remove(stop.OrderID);
                                 }
                             }
                         }
@@ -61,7 +69,9 @@ namespace TradingServer.OrderbookCS
                 }
 
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
 
                 await Task.Delay(200, _ts.Token);
             }
@@ -72,7 +82,9 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
 
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
@@ -128,8 +140,10 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed);
                 }
 
-                if (_ts.IsCancellationRequested) 
+                if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
 
                 await Task.Delay(200, _ts.Token);
             }

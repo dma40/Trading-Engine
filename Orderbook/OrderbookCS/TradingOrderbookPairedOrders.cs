@@ -6,13 +6,15 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Dictionary<long, PairedCancelOrder> _pairedCancel = new Dictionary<long, PairedCancelOrder>();
         private readonly Dictionary<long, PairedExecutionOrder> _pairedExecution = new Dictionary<long, PairedExecutionOrder>();
-        
+
         protected async Task ProcessPairedCancelOrders()
         {
             while (true)
             {
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
 
                 TimeSpan timeOfDay = DateTime.Now.TimeOfDay;
                 DateTime current = DateTime.Now;
@@ -73,7 +75,9 @@ namespace TradingServer.OrderbookCS
                 }
 
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
 
                 await Task.Delay(200, _ts.Token);
             }

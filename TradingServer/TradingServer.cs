@@ -10,19 +10,20 @@ using Trading;
 using Grpc.Core;
 using TradingServer.Services;
 using Google.Protobuf.Reflection;
+using ZstdSharp.Unsafe;
 
-namespace TradingServer.Core 
+namespace TradingServer.Core
 {
-    internal sealed class TradingServer: BackgroundService, ITradingServer 
+    internal sealed class TradingServer : BackgroundService, ITradingServer
     {
         private readonly ITextLogger _logger;
-        private readonly Security _security; 
+        private readonly Security _security;
         private readonly TradingServerConfiguration _tradingConfig;
         public readonly TradingEngine _engine;
 
         public PermissionLevel permissionLevel;
 
-        public TradingServer(ITextLogger logger, IOptions<TradingServerConfiguration> config) 
+        public TradingServer(ITextLogger logger, IOptions<TradingServerConfiguration> config)
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
@@ -34,13 +35,13 @@ namespace TradingServer.Core
 
         public Task Run(CancellationToken token) => ExecuteAsync(token);
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken) 
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation(nameof(TradingServer), "Starting Process");
             _logger.LogInformation(nameof(TradingServer), $"Security name: {_tradingConfig.TradingServerSettings?.SecurityName}");
             _logger.LogInformation(nameof(TradingServer), $"Security ID: {_tradingConfig.TradingServerSettings?.SecurityID}");
-            
-            while (!stoppingToken.IsCancellationRequested) 
+
+            while (!stoppingToken.IsCancellationRequested)
             {
                 CancellationTokenSource cts = new CancellationTokenSource();
                 cts.Cancel();
@@ -58,20 +59,20 @@ namespace TradingServer.Core
             TimeSpan onCloseDeadline = new TimeSpan(15, 50, 0);
             TimeSpan closed = new TimeSpan(16, 0, 0);
 
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, 
-                                                _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Securit ID cannot be null"), 
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username,
+                                                _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Securit ID cannot be null"),
                                                 Order.StringToOrderType(request.Type));
 
             bool isInvalid = false;
             RejectionReason reason = RejectionReason.Unknown;
 
-            if ((int) permissionLevel < 2)
+            if ((int)permissionLevel < 2)
             {
                 isInvalid = true;
                 reason = RejectionReason.InsufficientPermissionError;
             }
 
-            if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnClose || 
+            if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnClose ||
             Order.StringToOrderType(request.Type) == OrderTypes.LimitOnClose && now >= onCloseDeadline)
             {
                 isInvalid = true;
@@ -91,7 +92,7 @@ namespace TradingServer.Core
                 reason = RejectionReason.SubmittedAfterDeadline;
             }
 
-            else if (Order.StringToOrderType(request.Type) == OrderTypes.Market && 
+            else if (Order.StringToOrderType(request.Type) == OrderTypes.Market &&
                 (!string.IsNullOrWhiteSpace(request.Price.ToString())
                  || !string.IsNullOrWhiteSpace(request.Operation)))
             {
@@ -99,15 +100,15 @@ namespace TradingServer.Core
                 reason = RejectionReason.EmptyOrNullArgument;
             }
 
-            else if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill 
-                || (Order.StringToOrderType(request.Type) == OrderTypes.FillOrKill)) 
+            else if ((Order.StringToOrderType(request.Type) == OrderTypes.FillAndKill
+                || (Order.StringToOrderType(request.Type) == OrderTypes.FillOrKill))
                 && (!string.IsNullOrEmpty(request.Operation)))
             {
                 isInvalid = true;
                 reason = RejectionReason.OperationNotFound;
             }
 
-            else if (string.IsNullOrWhiteSpace(request.Id.ToString()) 
+            else if (string.IsNullOrWhiteSpace(request.Id.ToString())
                 || string.IsNullOrWhiteSpace(request.Username))
             {
                 isInvalid = true;
@@ -130,7 +131,7 @@ namespace TradingServer.Core
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Security ID cannot be null"), Order.StringToOrderType(request.Type)); 
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Security ID cannot be null"), Order.StringToOrderType(request.Type));
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
@@ -151,8 +152,10 @@ namespace TradingServer.Core
                 }
 
                 if (!exception)
+                {
                     _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" +
                     $" side by {request.Username} at {DateTime.UtcNow}");
+                }
             }
 
             else if (request.Operation == "Cancel")
@@ -172,8 +175,10 @@ namespace TradingServer.Core
                 }
 
                 if (!error)
+                {
                     _logger.LogInformation(nameof(TradingServer), $"Removed order {request.Id}" +
                     $"by {request.Username} at {DateTime.UtcNow}");
+                }
             }
 
             else if (request.Operation == "Modify")
@@ -192,10 +197,12 @@ namespace TradingServer.Core
                 }
 
                 if (!error)
+                {
                     _logger.LogInformation(nameof(TradingServer), $"Modified order {request.Id} in {request.Side}" +
                     $" by {request.Username} at {DateTime.UtcNow}");
+                }
             }
- 
+
             await Task.Delay(200);
 
             return new OrderResponse

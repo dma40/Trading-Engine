@@ -15,7 +15,9 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
                 
                 DateTime currentTime = DateTime.Now;
 
@@ -51,7 +53,9 @@ namespace TradingServer.OrderbookCS
                 }
 
                 if (_ts.IsCancellationRequested)
-                    return; 
+                {
+                    return;
+                }
 
                 await Task.Delay(200, _ts.Token);
             }
@@ -62,7 +66,9 @@ namespace TradingServer.OrderbookCS
             while (true)
             {
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
 
                 DateTime currentTime = DateTime.Now;
                 DateTime now = DateTime.Now;
@@ -94,7 +100,9 @@ namespace TradingServer.OrderbookCS
                 }
 
                 if (_ts.IsCancellationRequested)
+                {
                     return;
+                }
                 
                 await Task.Delay(200, _ts.Token);
             }
