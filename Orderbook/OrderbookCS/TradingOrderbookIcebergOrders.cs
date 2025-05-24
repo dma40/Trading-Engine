@@ -6,50 +6,45 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Dictionary<long, IcebergOrder> _iceberg = new Dictionary<long, IcebergOrder>();
 
-        protected async Task ProcessIcebergOrders()
+        protected async Task ProcessIcebergOrders(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
 
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
                 lock (_stopLock)
+                {
+                    if (currentTime >= marketOpen && currentTime <= marketEnd)
                     {
-                        if (currentTime >= marketOpen && currentTime <= marketEnd)
+                        foreach (var order in _iceberg)
                         {
-                            foreach (var order in _iceberg)
+                            var iceberg = order.Value;
+
+                            if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
                             {
-                                var iceberg = order.Value;
+                                iceberg.replenish();
+                                addOrder(iceberg);
+                            }
 
-                                if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
-                                {
-                                    iceberg.replenish();
-                                    addOrder(iceberg);
-                                }
-
-                                else if (iceberg.isEmpty)
-                                {
-                                    _iceberg.Remove(iceberg.OrderID);
-                                }
+                            else if (iceberg.isEmpty)
+                            {
+                                _iceberg.Remove(iceberg.OrderID);
                             }
                         }
+                    }
 
-                        else
+                    else
+                    {
+                        foreach (var order in _iceberg)
                         {
-                            foreach (var order in _iceberg)
-                            {
-                                IcebergOrder iceberg = order.Value;
+                            IcebergOrder iceberg = order.Value;
 
-                                if (iceberg.isEmpty)
-                                {
-                                    // Console.WriteLine("Iceberg is currently empty");
-                                    _iceberg.Remove(iceberg.OrderID);
-                                }
+                            if (iceberg.isEmpty)
+                            {
+                                // Console.WriteLine("Iceberg is currently empty");
+                                 _iceberg.Remove(iceberg.OrderID);
+                            }
 
                                 /*
                                 else if (iceberg.CurrentQuantity == 0)
@@ -70,13 +65,8 @@ namespace TradingServer.OrderbookCS
                                     addOrder(iceberg);
                                 }
                                 */
-                            }
                         }
                     }
-
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
                 }
 
                 await Task.Delay(200, _ts.Token);

@@ -6,6 +6,7 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Lock _ordersLock = new();
         private readonly Lock _stopLock = new();
+
         public readonly Orderbook orderbook;
         private readonly Orderbook _hidden;
 
@@ -16,13 +17,13 @@ namespace TradingServer.OrderbookCS
             orderbook = new Orderbook(security);
             _hidden = new Orderbook(security);
 
-            _ = Task.Run(() => ProcessStopOrders());
-            _ = Task.Run(() => ProcessTrailingStopOrders());
-            _ = Task.Run(() => ProcessAtMarketOpen());
-            _ = Task.Run(() => ProcessAtMarketEnd());
-            _ = Task.Run(() => ProcessPairedCancelOrders());
-            _ = Task.Run(() => ProcessPairedExecutionOrders());
-            _ = Task.Run(() => ProcessIcebergOrders());
+            _ = Task.Run(() => ProcessStopOrders(_ts.Token));
+            _ = Task.Run(() => ProcessTrailingStopOrders(_ts.Token));
+            _ = Task.Run(() => ProcessAtMarketOpen(_ts.Token));
+            _ = Task.Run(() => ProcessAtMarketEnd(_ts.Token));
+            _ = Task.Run(() => ProcessPairedCancelOrders(_ts.Token));
+            _ = Task.Run(() => ProcessPairedExecutionOrders(_ts.Token));
+            _ = Task.Run(() => ProcessIcebergOrders(_ts.Token));
         }
 
         ~TradingEngine()
@@ -42,10 +43,10 @@ namespace TradingServer.OrderbookCS
             {
                 return;
             }
-            
-            Interlocked.Exchange(ref _dispose, 1);
 
-            if (dispose) 
+            Interlocked.Exchange(ref _dispose, 1);
+           
+            if (dispose)
             {
                 orderbook.Dispose();
                 _hidden.Dispose();

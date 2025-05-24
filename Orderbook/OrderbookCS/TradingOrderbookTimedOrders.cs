@@ -10,15 +10,10 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, Order> _onMarketOpen = new Dictionary<long, Order>();
         private readonly Dictionary<long, Order> _onMarketClose = new Dictionary<long, Order>();
 
-        protected async Task ProcessAtMarketEnd()
+        protected async Task ProcessAtMarketEnd(CancellationToken token)
         {
-            while (true)
-            {
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-                
+            while (!token.IsCancellationRequested)
+            {    
                 DateTime currentTime = DateTime.Now;
 
                 if (currentTime.TimeOfDay == marketEnd)
@@ -49,27 +44,17 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayEnd = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 16, 0, 0);
                     TimeSpan closed = nextTradingDayEnd - DateTime.Now;
 
-                    await Task.Delay(closed, _ts.Token);
+                    await Task.Delay(closed, token);
                 }
 
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                await Task.Delay(200, _ts.Token);
+                await Task.Delay(200, token);
             }
         }
 
-        protected async Task ProcessAtMarketOpen()
+        protected async Task ProcessAtMarketOpen(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
                 DateTime currentTime = DateTime.Now;
                 DateTime now = DateTime.Now;
                 
@@ -96,15 +81,10 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed, _ts.Token);
-                }
-
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
+                    await Task.Delay(closed, token);
                 }
                 
-                await Task.Delay(200, _ts.Token);
+                await Task.Delay(200, token);
             }
         }
 

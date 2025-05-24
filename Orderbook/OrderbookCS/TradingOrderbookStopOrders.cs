@@ -7,15 +7,10 @@ namespace TradingServer.OrderbookCS
         private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
         private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
 
-        protected async Task ProcessStopOrders()
+        protected async Task ProcessStopOrders(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
                 DateTime current = DateTime.Now;
@@ -46,10 +41,10 @@ namespace TradingServer.OrderbookCS
                             else
                             {
                                 Console.WriteLine("This is a sell side order. Processing...");
-                                if (lastTradedPrice >= order.Value.StopPrice)
+                                if (lastTradedPrice >= stop.StopPrice)
                                 {
                                     Console.WriteLine("Activating the sell side order");
-                                    Order activated = order.Value.activate();
+                                    Order activated = stop.activate();
                                     match(activated);
 
                                     _stop.Remove(stop.OrderID);
@@ -68,24 +63,14 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed);
                 }
 
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                await Task.Delay(200, _ts.Token);
+                await Task.Delay(200, token);
             }
         }
 
-        protected async Task ProcessTrailingStopOrders()
+        protected async Task ProcessTrailingStopOrders(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
                 DateTime current = DateTime.Now;
@@ -140,12 +125,7 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed);
                 }
 
-                if (_ts.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                await Task.Delay(200, _ts.Token);
+                await Task.Delay(200, token);
             }
         }
     }
