@@ -4,19 +4,22 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
+        private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
+        private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
+
         protected async Task ProcessStopOrders()
         {
             while (true)
             {
                 if (_ts.IsCancellationRequested)
                     return;
-                
+
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
                 DateTime current = DateTime.Now;
-                
+
                 if (currentTime > marketOpen && currentTime < marketEnd)
-                {   
+                {
                     lock (_stopLock)
                     {
                         foreach (var order in _stop)
@@ -42,7 +45,7 @@ namespace TradingServer.OrderbookCS
                                     match(activated);
 
                                     _stop.Remove(tempOrder.OrderID);
-                                }     
+                                }
                             }
                         }
                     }

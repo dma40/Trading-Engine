@@ -139,10 +139,14 @@ namespace TradingServer.OrderbookCS
         public static bool isValidTime(IOrderCore order)
         {
             if (order.OrderType == OrderTypes.GoodForDay)
+            {
                 return DateTime.Now.Hour < 16 && DateTime.Now.Hour > 9.5;
-            
+            }
+
             else
+            {
                 return true;
+            }
         }
     }
 }

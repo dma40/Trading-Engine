@@ -7,16 +7,24 @@ namespace TradingServer.Orders
         public int Compare(Limit? limit, Limit? other)
         {
             if (limit == null || other == null)
+            {
                 throw new ArgumentNullException("Cannot compare null limits");
-            
+            }
+
             if (limit.Price == other.Price)
+            {
                 return 0;
-            
+            }
+
             else if (limit.Price < other.Price)
+            {
                 return -1;
-            
-            else 
+            }
+
+            else
+            {
                 return 1;
+            }
         }
     }
 
@@ -27,16 +35,24 @@ namespace TradingServer.Orders
         public int Compare(Limit? limit, Limit? other)
         {
             if (limit == null || other == null)
+            {
                 throw new ArgumentNullException("Cannot compare null limits");
-            
+            }
+
             if (limit.Price == other.Price)
+            {
                 return 0;
-            
+            }
+
             else if (limit.Price > other.Price)
+            {
                 return -1;
-            
-            else 
-                return 1;   
+            }
+
+            else
+            {
+                return 1;
+            }
         }
     }
 }

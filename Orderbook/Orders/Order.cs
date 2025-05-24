@@ -24,9 +24,9 @@ namespace TradingServer.Orders
             }
 
             if (orderCore.isHidden)
-                {
-                    throw new InvalidDataException("Market orders cannot go to the hidden portion");
-                }
+            {
+                throw new InvalidDataException("Market orders cannot go to the hidden portion");
+            }
             
             _orderCore = orderCore;
             Quantity = quantity;
@@ -69,19 +69,29 @@ namespace TradingServer.Orders
         public static OrderTypes StringToOrderType(string input)
         {
             if (input == "FillOrKill")
+            {
                 return OrderTypes.FillOrKill;
-            
+            }
+
             else if (input == "GoodTillCancel")
+            {
                 return OrderTypes.GoodTillCancel;
-            
-            else if (input == "IntermediateOrCancel")    
+            }
+
+            else if (input == "IntermediateOrCancel")
+            {
                 return OrderTypes.FillAndKill;
-        
-            else if (input == "PostOnly")    
+            }
+
+            else if (input == "PostOnly")
+            {
                 return OrderTypes.PostOnly;
-        
-            else         
-                return OrderTypes.GoodForDay;    
+            }
+
+            else
+            {
+                return OrderTypes.GoodForDay;
+            }
     
             throw new InvalidOperationException("You cannot have this as a input, this is not in the enum");
         }
@@ -93,8 +103,10 @@ namespace TradingServer.Orders
 
         public void DecreaseQuantity(uint decrease) 
         {
-            if (decrease > CurrentQuantity) 
+            if (decrease > CurrentQuantity)
+            {
                 throw new InvalidOperationException("You cannot take away more orders than are currently open!");
+            }
             
             CurrentQuantity -= decrease;
         }
@@ -122,8 +134,10 @@ namespace TradingServer.Orders
 
         private void Dispose(bool dispose) 
         {
-            if (_disposed)  
+            if (_disposed)
+            {
                 return;
+            }
             
             _disposed = true;
 

@@ -4,6 +4,9 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
+        private readonly Dictionary<long, PairedCancelOrder> _pairedCancel = new Dictionary<long, PairedCancelOrder>();
+        private readonly Dictionary<long, PairedExecutionOrder> _pairedExecution = new Dictionary<long, PairedExecutionOrder>();
+        
         protected async Task ProcessPairedCancelOrders()
         {
             while (true)

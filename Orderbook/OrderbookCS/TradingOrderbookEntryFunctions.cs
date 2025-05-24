@@ -4,12 +4,6 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
-        private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
-        private readonly Dictionary<long, PairedCancelOrder> _pairedCancel = new Dictionary<long, PairedCancelOrder>();
-        private readonly Dictionary<long, PairedExecutionOrder> _pairedExecution = new Dictionary<long, PairedExecutionOrder>();
-        private readonly Dictionary<long, IcebergOrder> _iceberg = new Dictionary<long, IcebergOrder>();
-
         public void addOrder(Order order)
         { 
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)

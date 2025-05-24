@@ -9,10 +9,14 @@ namespace TradingServer.Orders
         base(_orderCore, _isBuy ? bid : ask, _quantity, _isBuy)
         {
             if (_orderCore.OrderType != OrderTypes.TrailingStopMarket)
+            {
                 throw new InvalidDataException();
+            }
 
             if (_orderCore.isHidden)
+            {
                 throw new InvalidDataException();
+            }
             
             trail = _trail;
         }
@@ -21,7 +25,9 @@ namespace TradingServer.Orders
         base(_orderCore, _price, _quantity, _isBuy)
         {
             if (_orderCore.OrderType != OrderTypes.TrailingStopLimit)
+            {
                 throw new InvalidDataException();
+            }
             
             trail = _trail;
         }
@@ -38,10 +44,14 @@ namespace TradingServer.Orders
             set
             {
                 if (isBuySide)
+                {
                     StopPrice = currentMaxPrice - trail;
+                }
 
                 else
+                {
                     StopPrice = currentMaxPrice + trail;
+                }
             } 
         }
 
@@ -65,8 +75,10 @@ namespace TradingServer.Orders
 
         private void Dispose(bool dispose) 
         {
-            if (_disposed)  
+            if (_disposed)
+            {
                 return;
+            }
             
             _disposed = true;
 

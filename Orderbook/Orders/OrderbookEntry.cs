@@ -87,7 +87,9 @@ namespace TradingServer.Orders
                 else 
                 {
                     if (head != null)
+                    {
                         return head.CurrentOrder.isBuySide ? Side.Bid : Side.Ask;
+                    }
                 }
 
                 return Side.Unknown;
@@ -140,8 +142,10 @@ namespace TradingServer.Orders
 
         protected virtual void Dispose(bool dispose) 
         {
-            if (_disposed)  
+            if (_disposed)
+            {
                 return;
+            }
 
             _disposed = true;
 

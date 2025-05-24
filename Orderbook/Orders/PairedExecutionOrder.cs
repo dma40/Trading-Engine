@@ -5,10 +5,14 @@ namespace TradingServer.Orders
         public PairedExecutionOrder(IOrderCore orderCore, Order _primary, Order _secondary)
         {
             if (orderCore.OrderType != OrderTypes.PairedExecution)
+            {
                 throw new InvalidDataException();
+            }
 
             if (_primary.isBuySide != _secondary.isBuySide)
+            {
                 throw new InvalidDataException();
+            }
 
             _orderCore = orderCore;
 

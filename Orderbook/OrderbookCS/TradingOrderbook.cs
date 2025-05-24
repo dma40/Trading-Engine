@@ -38,13 +38,18 @@ namespace TradingServer.OrderbookCS
 
         protected virtual void Dispose(bool dispose) 
         {
-            if (_disposed)  
+            if (_disposed)
+            {
                 return;
+            }
             
             Interlocked.Exchange(ref _dispose, 1);
 
             if (dispose) 
             {
+                orderbook.Dispose();
+                _hidden.Dispose();
+
                 _ts.Cancel();
                 _ts.Dispose();
             }

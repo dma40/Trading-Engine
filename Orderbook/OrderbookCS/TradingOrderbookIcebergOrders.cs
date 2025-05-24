@@ -4,6 +4,8 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine : IMatchingEngine, IDisposable
     {
+        private readonly Dictionary<long, IcebergOrder> _iceberg = new Dictionary<long, IcebergOrder>();
+
         protected async Task ProcessIcebergOrders()
         {
             while (true)
