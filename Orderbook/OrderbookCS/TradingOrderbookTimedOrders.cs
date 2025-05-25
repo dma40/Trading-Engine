@@ -18,9 +18,10 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime.TimeOfDay == marketEnd)
                 {
-                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(200), token);
+                    //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(200), token);
 
-                    if (acquired)
+                    //if (acquired)
+                    lock (_ordersLock)
                     {
                         try
                         {
@@ -39,7 +40,7 @@ namespace TradingServer.OrderbookCS
                         }
                     }
 
-                    _semaphore.Release();
+                    //_semaphore.Release();
                 }
 
                 else
@@ -64,9 +65,10 @@ namespace TradingServer.OrderbookCS
 
                 if (now.TimeOfDay == marketOpen)
                 {
-                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+                    //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
 
-                    if (acquired)
+                    //if (acquired)
+                    lock (_ordersLock)
                     {
                         foreach (var order in _onMarketOpen)
                         {

@@ -17,9 +17,10 @@ namespace TradingServer.OrderbookCS
 
                 if (timeOfDay >= marketOpen && timeOfDay <= marketEnd)
                 {
-                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+                    //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
 
-                    if (acquired)
+                    //if (acquired)
+                    lock (_ordersLock)
                     {
                         foreach (var pairedCancel in _pairedCancel)
                         {
@@ -61,7 +62,7 @@ namespace TradingServer.OrderbookCS
                             }
                         }
 
-                        _semaphore.Release();
+                        //_semaphore.Release();
                     }
                 }
 
@@ -87,9 +88,10 @@ namespace TradingServer.OrderbookCS
 
                 if (timeOfDay > marketOpen && timeOfDay < marketEnd)
                 {
-                    bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
+                    //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
 
-                    if (acquired)
+                    //if (acquired)
+                    lock (_ordersLock)
                     {
                         foreach (var pairedExecution in _pairedExecution)
                         {

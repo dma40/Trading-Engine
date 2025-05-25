@@ -6,16 +6,17 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Dictionary<long, IcebergOrder> _iceberg = new Dictionary<long, IcebergOrder>();
 
-        protected async Task ProcessIcebergOrders(CancellationToken token)
+        protected void ProcessIcebergOrders(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
 
-                bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+                //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
 
-                if (acquired)
+                //if (acquired)
+                lock (_ordersLock)
                 {
                     if (currentTime >= marketOpen && currentTime <= marketEnd)
                     {
@@ -26,7 +27,7 @@ namespace TradingServer.OrderbookCS
                             if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
                             {
                                 iceberg.replenish();
-                                await addOrder(iceberg);
+                                addOrder(iceberg);
                             }
 
                             else if (iceberg.isEmpty)
@@ -71,7 +72,7 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                _semaphore.Release();
+                //_semaphore.Release();
 
                 // await Task.Delay(200, token);
             }

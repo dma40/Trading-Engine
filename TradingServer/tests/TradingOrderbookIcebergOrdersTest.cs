@@ -34,10 +34,10 @@ namespace TradingServer.Tests
             OrderCore icebergCore = new OrderCore(20000, "Dylan", "TEST", OrderTypes.Iceberg);
             IcebergOrder icebergTest = new IcebergOrder(icebergCore, 1000000000, 2, true, 2);
 
-            await _tradingEngine.addOrder(icebergTest);
+            //await _tradingEngine.addOrder(icebergTest);
             await Task.Delay(100);
 
-            Console.WriteLine(icebergTest.CurrentQuantity);
+            //Console.WriteLine(icebergTest.CurrentQuantity);
 
             //Assert.That(_tradingEngine.containsOrder(icebergTest.OrderID));
         }

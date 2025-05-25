@@ -17,9 +17,10 @@ namespace TradingServer.OrderbookCS
                 return;
             }
 
-            bool acquired = _semaphore.Wait(TimeSpan.FromSeconds(2), _ts.Token);
+            //bool acquired = _semaphore.Wait(TimeSpan.FromSeconds(2), _ts.Token);
 
-            if (acquired)
+            //if (acquired)
+            lock (_ordersLock)
             {
                 if (isQueuable(order))
                 {
@@ -41,28 +42,30 @@ namespace TradingServer.OrderbookCS
                 }
             }
 
-            _semaphore.Release();
+            //_semaphore.Release();
         }
 
-        public async Task addOrder(AbstractPairedOrder paired)
+        public void addOrder(AbstractPairedOrder paired)
         {
-            bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
+            //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
 
-            if (acquired)
+            //if (acquired)
+            lock (_ordersLock)
             {
                 _paired.Route(paired);
             }
 
-            _semaphore.Release();
+            //_semaphore.Release();
         }
 
-        public async Task addOrder(IcebergOrder order)
+        public void addOrder(IcebergOrder order)
         {
             if (order.OrderType == OrderTypes.Iceberg)
             {
-                bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
+                //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
 
-                if (acquired)
+                //if (acquired)
+                lock (_ordersLock)
                 {
                     if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
                     {
@@ -72,7 +75,7 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                _semaphore.Release();
+                //_semaphore.Release();
             }
         }
 
@@ -91,7 +94,8 @@ namespace TradingServer.OrderbookCS
 
             bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(500), _ts.Token);
 
-            if (acquired)
+            //if (acquired)
+            lock (_ordersLock)
             {
                 if (cancel.isHidden)
                 {
@@ -107,7 +111,7 @@ namespace TradingServer.OrderbookCS
                 _paired.Remove(cancel);
             }
 
-            _semaphore.Release();
+            //_semaphore.Release();
         }
 
         protected bool isValidTime(IOrderCore order)

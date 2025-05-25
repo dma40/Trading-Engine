@@ -21,7 +21,8 @@ namespace TradingServer.OrderbookCS
                 {
                     bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
 
-                    if (acquired)
+                    //if (acquired)
+                    lock (_ordersLock)
                     {
                         // make a list of CancelOrders, and then remove all of the orders; 
                         // this method was implemented in Orderbook.
@@ -59,7 +60,7 @@ namespace TradingServer.OrderbookCS
                         }
                     }
 
-                    _semaphore.Release();
+                   // _semaphore.Release();
                 }
 
                 else
@@ -71,7 +72,7 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed, token);
                 }
 
-                await Task.Delay(200, token);
+                // await Task.Delay(200, token);
             }
         }
 
@@ -85,9 +86,10 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime > marketOpen && currentTime < marketEnd)
                 {
-                    bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
+                    //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
 
-                    if (acquired)
+                    //if (acquired)
+                    lock (_ordersLock)
                     {
                         foreach (var trail in _trailingStop)
                         {
@@ -135,7 +137,7 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed, token);
                 }
 
-                await Task.Delay(200, token);
+                //await Task.Delay(200, token);
             }
         }
     }

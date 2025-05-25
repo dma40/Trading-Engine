@@ -21,7 +21,7 @@ matchingTest.Setup();
 
 matchingTest.PostOnlyMatchTest();
 matchingTest.ImmediateHandleTypeMatchedTest();
-matchingTest.HiddenAndVisibleOrdersMatchedCorrectly();
+matchingTest.HiddenAndVisibleOrdersMatchedCorrectly(); // switch back to scoped locks; they're faster.
 
 TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
 
@@ -47,15 +47,14 @@ _ = Task.Run(() => processInputs());
 using var server = TradingHostBuilder.BuildTradingServer();
 await server.StartAsync().ConfigureAwait(false);
 
-/* Alternatively,
-
+/*
 TradingServerServiceProvider.ServiceProvider = server.Services;
 {
     using var scope = TradingServerServiceProvider.ServiceProvider.CreateScope();
     await server.RunAsync().ConfigureAwait(false);
 }
-
 */
+
 
 static void processInputs()
 {
