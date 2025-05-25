@@ -24,7 +24,7 @@ namespace TradingServer.Core
                     _engine.addOrder(newOrder);
                 }
 
-                catch (InvalidOperationException error)
+                catch (Exception error)
                 {
                     _logger.Error(nameof(TradingServer), error.Message + $" {DateTime.Now}");
                     exception = true;
@@ -47,7 +47,7 @@ namespace TradingServer.Core
                     _engine.removeOrder(cancelOrder);
                 }
 
-                catch (InvalidOperationException exception)
+                catch (Exception exception)
                 {
                     _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
                     error = true;
@@ -69,7 +69,7 @@ namespace TradingServer.Core
                     _engine.modifyOrder(modify);
                 }
 
-                catch (InvalidOperationException exception)
+                catch (Exception exception)
                 {
                     _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.Now}");
                     error = true;

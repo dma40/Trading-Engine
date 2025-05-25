@@ -147,9 +147,10 @@ namespace TradingServer.Orders
                 return;
             }
 
-            _disposed = true;
+            //_disposed = true;
+            Interlocked.Exchange(ref _disposed, true);
 
-            if (dispose) 
+            if (dispose)
             {
                 _ts.Cancel();
                 _ts.Dispose();

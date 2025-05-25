@@ -92,7 +92,7 @@ namespace TradingServer.OrderbookCS
                 return;
             }
 
-            bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(500), _ts.Token);
+            //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(500), _ts.Token);
 
             //if (acquired)
             lock (_ordersLock)

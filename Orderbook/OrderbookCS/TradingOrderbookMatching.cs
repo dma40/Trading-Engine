@@ -68,7 +68,7 @@ namespace TradingServer.OrderbookCS
 
         public bool hasEligibleOrderCount(Order order)
         {
-           return orderbook.getEligibleOrderCount(order) + _hidden.getEligibleOrderCount(order) > order.CurrentQuantity;
+           return orderbook.getEligibleOrderCount(order) + _hidden.getEligibleOrderCount(order) >= order.CurrentQuantity;
         }
     }
 }

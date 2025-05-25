@@ -13,9 +13,6 @@ namespace TradingServer.Orders
             {
                 throw new InvalidDataException("The two orders need to be of the same side");
             }
-
-            _orderCore = orderCore;
         }
-        private readonly IOrderCore _orderCore;
     }
 }

@@ -20,7 +20,9 @@ namespace TradingServer.Core
         private readonly ITextLogger _logger;
         private readonly Security _security;
         private readonly TradingServerConfiguration _tradingConfig;
-        public readonly TradingEngine _engine;
+        private readonly OrderValidator _validator;
+
+        private readonly TradingEngine _engine;
 
         public PermissionLevel permissionLevel;
 
@@ -31,6 +33,8 @@ namespace TradingServer.Core
 
             _security = new Security(_tradingConfig?.TradingServerSettings?.SecurityName ?? throw new ArgumentNullException());
             _engine = new TradingEngine(_security);
+            _validator = new OrderValidator();
+
             permissionLevel = config.Value.PermissionLevel;
         }
 

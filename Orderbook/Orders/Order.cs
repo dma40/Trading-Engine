@@ -122,7 +122,7 @@ namespace TradingServer.Orders
 
         public virtual Order activate()
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public virtual void replenish()
@@ -147,10 +147,11 @@ namespace TradingServer.Orders
             {
                 return;
             }
-            
-            _disposed = true;
 
-            if (dispose) 
+            //_disposed = true;
+            Interlocked.Exchange(ref _disposed, true);
+
+            if (dispose)
             {
                 _ts.Cancel();
                 _ts.Dispose();

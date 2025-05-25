@@ -90,6 +90,6 @@ namespace TradingServer.Orders
         }
 
         private bool _disposed = false;
-        CancellationTokenSource _ts = new CancellationTokenSource();
+        private readonly CancellationTokenSource _ts = new CancellationTokenSource();
     }
 }

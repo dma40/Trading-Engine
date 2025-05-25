@@ -13,10 +13,6 @@ namespace TradingServer.Orders
             {
                 throw new InvalidDataException();
             }
-
-            _orderCore = orderCore;
         }
-
-        private readonly IOrderCore _orderCore;
     }
 }

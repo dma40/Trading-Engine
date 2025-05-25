@@ -45,7 +45,7 @@ namespace TradingServer.OrderbookCS
                 return;
             }
 
-            Interlocked.Exchange(ref _dispose, 1);
+            Interlocked.Exchange(ref _disposed, true);
            
             if (dispose)
             {
@@ -58,7 +58,6 @@ namespace TradingServer.OrderbookCS
         }
 
         private readonly CancellationTokenSource _ts = new CancellationTokenSource();
-        private bool _disposed => _dispose == 1;
-        private int _dispose = 0;
+        private bool _disposed = false;
     }
 }
