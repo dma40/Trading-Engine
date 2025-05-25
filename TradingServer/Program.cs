@@ -21,7 +21,7 @@ matchingTest.Setup();
 
 matchingTest.PostOnlyMatchTest();
 matchingTest.ImmediateHandleTypeMatchedTest();
-matchingTest.HiddenAndVisibleOrdersMatchedCorrectly(); // switch back to scoped locks; they're faster.
+matchingTest.HiddenAndVisibleOrdersMatchedCorrectly(); 
 
 TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
 

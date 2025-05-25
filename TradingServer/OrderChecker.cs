@@ -1,8 +1,6 @@
 using Trading;
 using TradingServer.Orders;
 using TradingServer.OrderbookCS;
-using System.Security.Cryptography.X509Certificates;
-using Org.BouncyCastle.Security;
 using TradingServer.Rejects;
 
 namespace TradingServer.Core
@@ -13,7 +11,6 @@ namespace TradingServer.Core
         {
             _validators = new Dictionary<RejectionReason, IValidator>();
 
-            // _validators.Add(key: RejectionReason.InsufficientPermissionError, value: new PermissionValidator(level));
             _validators.Add(key: RejectionReason.SubmittedAfterDeadline, value: new DeadlineValidator());
             _validators.Add(key: RejectionReason.EmptyOrNullArgument, value: new EmptyOrNullArgumentValidator());
             _validators.Add(key: RejectionReason.InvalidOrUnknownArgument, value: new InvalidArgumentValidator());

@@ -1,5 +1,4 @@
 using TradingServer.Core.Configuration;
-using TradingServer.Orders;
 using TradingServer.OrderbookCS;
 using TradingServer.Logging;
 using Microsoft.Extensions.Hosting;
@@ -9,9 +8,6 @@ using TradingServer.Instrument;
 using Trading;
 using Grpc.Core;
 using TradingServer.Services;
-using Google.Protobuf.Reflection;
-using ZstdSharp.Unsafe;
-using System.Threading.Tasks;
 
 namespace TradingServer.Core
 {
