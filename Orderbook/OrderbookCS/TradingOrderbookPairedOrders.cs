@@ -60,6 +60,8 @@ namespace TradingServer.OrderbookCS
                                 _pairedCancel.Remove(pairedCancelOrder.OrderID);
                             }
                         }
+
+                        _semaphore.Release();
                     }
                 }
 
@@ -72,7 +74,7 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed, token);
                 }
 
-                await Task.Delay(200, token);
+                // await Task.Delay(200, token);
             }
         }
 
@@ -110,6 +112,8 @@ namespace TradingServer.OrderbookCS
                             }
                         }
                     }
+
+                    _semaphore.Release();
                 }
 
                 else
@@ -121,7 +125,7 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed, token);
                 }
 
-                await Task.Delay(200, token);
+                // await Task.Delay(200, token);
             }
         }
     }

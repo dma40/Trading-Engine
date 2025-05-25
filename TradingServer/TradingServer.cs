@@ -150,7 +150,7 @@ namespace TradingServer.Core
                 try
                 {
                     Order newOrder = modify.newOrder();
-                    await _engine.addOrder(newOrder);
+                    _engine.addOrder(newOrder);
                 }
 
                 catch (InvalidOperationException error)
@@ -173,7 +173,7 @@ namespace TradingServer.Core
                 try
                 {
                     CancelOrder cancelOrder = modify.cancelOrder();
-                    await _engine.removeOrder(cancelOrder);
+                    _engine.removeOrder(cancelOrder);
                 }
 
                 catch (InvalidOperationException exception)
@@ -195,7 +195,7 @@ namespace TradingServer.Core
 
                 try
                 {
-                    await _engine.modifyOrder(modify);
+                    _engine.modifyOrder(modify);
                 }
 
                 catch (InvalidOperationException exception)

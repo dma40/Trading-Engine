@@ -71,7 +71,9 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                await Task.Delay(200, token);
+                _semaphore.Release();
+
+                // await Task.Delay(200, token);
             }
         }
     }

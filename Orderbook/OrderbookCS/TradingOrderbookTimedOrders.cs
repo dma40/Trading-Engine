@@ -19,7 +19,7 @@ namespace TradingServer.OrderbookCS
                 if (currentTime.TimeOfDay == marketEnd)
                 {
                     bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(200), token);
-                    
+
                     if (acquired)
                     {
                         try
@@ -38,6 +38,8 @@ namespace TradingServer.OrderbookCS
                             Console.WriteLine(exception.Message);
                         }
                     }
+
+                    _semaphore.Release();
                 }
 
                 else
@@ -59,7 +61,7 @@ namespace TradingServer.OrderbookCS
             {
                 DateTime currentTime = DateTime.Now;
                 DateTime now = DateTime.Now;
-                
+
                 if (now.TimeOfDay == marketOpen)
                 {
                     bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
@@ -77,6 +79,8 @@ namespace TradingServer.OrderbookCS
                             orderEntry.Dispose();
                         }
                     }
+
+                    _semaphore.Release();
                 }
 
                 else
@@ -88,7 +92,7 @@ namespace TradingServer.OrderbookCS
                     await Task.Delay(closed, token);
                 }
                 
-                await Task.Delay(200, token);
+                //await Task.Delay(200, token);
             }
         }
 

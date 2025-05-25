@@ -14,22 +14,26 @@ orderbookMatchingTest.canFillTests();
 orderbookMatchingTest.MatchTest();
 orderbookMatchingTest.getEligibleOrderCountTest();
 
-TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
-
-priceMethodsTest.Setup();
-await priceMethodsTest.TestPriceUpdatedCorrectly();
 
 TradingOrderbookMatchingTest matchingTest = new TradingOrderbookMatchingTest();
 
 matchingTest.Setup();
-await matchingTest.PostOnlyMatchTest();
-await matchingTest.ImmediateHandleTypeMatchedTest();
-await matchingTest.HiddenAndVisibleOrdersMatchedCorrectly();
+
+matchingTest.PostOnlyMatchTest();
+matchingTest.ImmediateHandleTypeMatchedTest();
+matchingTest.HiddenAndVisibleOrdersMatchedCorrectly();
+
+TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
+
+priceMethodsTest.Setup();
+priceMethodsTest.TestPriceUpdatedCorrectly();
 
 TradingOrderbookStopOrderTest stopOrderTest = new TradingOrderbookStopOrderTest();
 
+/*
 stopOrderTest.Setup();
 await stopOrderTest.StopOrderAddedWhenLatestPriceChanges();
+*/
 
 /*
 TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();

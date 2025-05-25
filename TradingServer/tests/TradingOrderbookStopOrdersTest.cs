@@ -23,12 +23,12 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public async Task StopOrderAddedWhenLatestPriceChanges()
+        public void StopOrderAddedWhenLatestPriceChanges()
         {
             IOrderCore stopCore = new OrderCore(40000, "Dylan", "TEST", OrderTypes.StopLimit);
             StopOrder stop = new StopOrder(stopCore, 98, 100, 100, false);
 
-            await _tradingEngine.addOrder(stop);
+            _tradingEngine.addOrder(stop);
 
             Assert.That(!_tradingEngine.orderbook.containsOrder(stop.OrderID));
 
@@ -37,8 +37,8 @@ namespace TradingServer.Tests
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 IOrderCore sellCore = new OrderCore(i + 404, "Dylan", "TEST", OrderTypes.GoodTillCancel);
 
-                await _tradingEngine.addOrder(new Order(core, i / 4, 1, true));
-                await _tradingEngine.addOrder(new Order(sellCore, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, true));
+                _tradingEngine.addOrder(new Order(sellCore, i / 4, 1, false));
                 Assert.That(_tradingEngine.lastTradedPrice == i / 4);
             }
 
@@ -46,22 +46,22 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public async void StopOrderTestChangedCorrectly()
+        public void StopOrderTestChangedCorrectly()
         {
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                await _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
         }
 
         [Test]
-        public async Task TrailingStopOrderMatchedWhenPriceChanges()
+        public void TrailingStopOrderMatchedWhenPriceChanges()
         {
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                await _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
         }
     }

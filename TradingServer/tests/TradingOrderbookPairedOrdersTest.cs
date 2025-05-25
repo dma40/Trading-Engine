@@ -22,12 +22,12 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public async Task PairedExecutionOrderTest()
+        public void PairedExecutionOrderTest()
         {
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                await _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
             
             // IOrderCore primaryCore = new OrderCore()
@@ -40,12 +40,12 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public async Task PairedCancelOrderTest()
+        public void PairedCancelOrderTest()
         {
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                await _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
 
             // IOrderCore primaryCore = new OrderCore()

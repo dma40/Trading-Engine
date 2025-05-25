@@ -58,6 +58,8 @@ namespace TradingServer.OrderbookCS
                             }
                         }
                     }
+
+                    _semaphore.Release();
                 }
 
                 else

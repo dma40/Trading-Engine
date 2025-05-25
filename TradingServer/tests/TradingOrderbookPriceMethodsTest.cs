@@ -22,15 +22,15 @@ namespace TradingServer.Tests
         }
 
         [Test]
-        public async Task TestPriceUpdatedCorrectly()
+        public void TestPriceUpdatedCorrectly()
         {
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 IOrderCore sellCore = new OrderCore(i + 20000, "Dylan", "TEST", OrderTypes.GoodTillCancel);
 
-                await _tradingEngine.addOrder(new Order(buyCore, i / 4, 1, false));
-                await _tradingEngine.addOrder(new Order(sellCore, i / 4, 1, true));
+                _tradingEngine.addOrder(new Order(buyCore, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(sellCore, i / 4, 1, true));
 
                 TimeSpan marketOpen = new TimeSpan(9, 30, 0);
                 TimeSpan marketEnd = new TimeSpan(16, 0, 0);
@@ -39,6 +39,7 @@ namespace TradingServer.Tests
 
                 if (now >= marketOpen && now <= marketEnd)
                 {
+                    //Console.WriteLine(_tradingEngine.lastTradedPrice);
                     Assert.That(_tradingEngine.lastTradedPrice == i / 4);
                 }
 

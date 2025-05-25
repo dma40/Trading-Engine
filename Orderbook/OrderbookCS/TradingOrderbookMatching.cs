@@ -38,6 +38,7 @@ namespace TradingServer.OrderbookCS
 
                 else
                 {
+                    //Console.WriteLine("Not a special order type. Starting match");
                     result = orderbook.match(order);
                     result.addTransactions(_hidden.match(order));
 
@@ -56,6 +57,9 @@ namespace TradingServer.OrderbookCS
                 }
 
                 _trades.addTransactions(result);
+
+                //Console.WriteLine("Length of result: " + result.recordedTrades.Count);
+                //Console.WriteLine("Number of trades: " + _trades.recordedTrades.Count);
                
                 return result;
             }

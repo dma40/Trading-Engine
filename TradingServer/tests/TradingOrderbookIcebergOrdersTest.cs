@@ -28,7 +28,7 @@ namespace TradingServer.Tests
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                await _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
 
             OrderCore icebergCore = new OrderCore(20000, "Dylan", "TEST", OrderTypes.Iceberg);
