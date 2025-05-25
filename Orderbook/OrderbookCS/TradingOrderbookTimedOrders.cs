@@ -18,7 +18,9 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime.TimeOfDay == marketEnd)
                 {
-                    lock (_stopLock)
+                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(200), token);
+                    
+                    if (acquired)
                     {
                         try
                         {
@@ -28,7 +30,7 @@ namespace TradingServer.OrderbookCS
                             _hidden.DeleteGoodForDayOrders();
                             _hidden.DeleteExpiredGoodTillCancel();
 
-                            ProcessOnMarketEndOrders(); 
+                            ProcessOnMarketEndOrders();
                         }
 
                         catch (Exception exception)
@@ -60,7 +62,9 @@ namespace TradingServer.OrderbookCS
                 
                 if (now.TimeOfDay == marketOpen)
                 {
-                    lock (_stopLock)
+                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+
+                    if (acquired)
                     {
                         foreach (var order in _onMarketOpen)
                         {

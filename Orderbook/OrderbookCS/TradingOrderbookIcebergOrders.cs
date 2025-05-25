@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class TradingEngine : IMatchingEngine, IDisposable
+    public partial class TradingEngine: IMatchingEngine, IDisposable
     {
         private readonly Dictionary<long, IcebergOrder> _iceberg = new Dictionary<long, IcebergOrder>();
 
@@ -13,7 +13,9 @@ namespace TradingServer.OrderbookCS
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
 
-                lock (_stopLock)
+                bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+
+                if (acquired)
                 {
                     if (currentTime >= marketOpen && currentTime <= marketEnd)
                     {
@@ -24,7 +26,7 @@ namespace TradingServer.OrderbookCS
                             if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
                             {
                                 iceberg.replenish();
-                                addOrder(iceberg);
+                                await addOrder(iceberg);
                             }
 
                             else if (iceberg.isEmpty)
@@ -69,7 +71,7 @@ namespace TradingServer.OrderbookCS
                     }
                 }
 
-                await Task.Delay(200, _ts.Token);
+                await Task.Delay(200, token);
             }
         }
     }

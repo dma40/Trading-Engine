@@ -17,19 +17,19 @@ orderbookMatchingTest.getEligibleOrderCountTest();
 TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
 
 priceMethodsTest.Setup();
-priceMethodsTest.TestPriceUpdatedCorrectly();
+await priceMethodsTest.TestPriceUpdatedCorrectly();
 
 TradingOrderbookMatchingTest matchingTest = new TradingOrderbookMatchingTest();
 
 matchingTest.Setup();
-matchingTest.PostOnlyMatchTest();
-matchingTest.ImmediateHandleTypeMatchedTest();
-matchingTest.HiddenAndVisibleOrdersMatchedCorrectly();
+await matchingTest.PostOnlyMatchTest();
+await matchingTest.ImmediateHandleTypeMatchedTest();
+await matchingTest.HiddenAndVisibleOrdersMatchedCorrectly();
 
 TradingOrderbookStopOrderTest stopOrderTest = new TradingOrderbookStopOrderTest();
 
 stopOrderTest.Setup();
-stopOrderTest.StopOrderAddedWhenLatestPriceChanges();
+await stopOrderTest.StopOrderAddedWhenLatestPriceChanges();
 
 /*
 TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();
@@ -40,8 +40,18 @@ await icebergOrdersTest.IcebergTest();
 Console.WriteLine("Starting trading server...\n");
 
 _ = Task.Run(() => processInputs());
-using var engine = TradingHostBuilder.BuildTradingServer();
-await engine.StartAsync().ConfigureAwait(false);
+using var server = TradingHostBuilder.BuildTradingServer();
+await server.StartAsync().ConfigureAwait(false);
+
+/* Alternatively,
+
+TradingServerServiceProvider.ServiceProvider = server.Services;
+{
+    using var scope = TradingServerServiceProvider.ServiceProvider.CreateScope();
+    await server.RunAsync().ConfigureAwait(false);
+}
+
+*/
 
 static void processInputs()
 {

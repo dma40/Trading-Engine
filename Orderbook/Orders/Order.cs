@@ -120,9 +120,14 @@ namespace TradingServer.Orders
             return Quantity - CurrentQuantity;
         }
 
-        public Order activate()
+        public virtual Order activate()
         {
-            return this;
+            throw new NotImplementedException();
+        }
+
+        public virtual void replenish()
+        {
+            throw new NotImplementedException();
         }
 
         ~Order()

@@ -11,6 +11,7 @@ using Grpc.Core;
 using TradingServer.Services;
 using Google.Protobuf.Reflection;
 using ZstdSharp.Unsafe;
+using System.Threading.Tasks;
 
 namespace TradingServer.Core
 {
@@ -52,7 +53,7 @@ namespace TradingServer.Core
             return Task.CompletedTask;
         }
 
-        public void checkIfOrderIsInvalid(OrderRequest request)
+        public async Task submitOrder(OrderRequest request, ServerCallContext context)
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
             TimeSpan onOpenDeadline = new TimeSpan(9, 28, 0);
@@ -60,7 +61,8 @@ namespace TradingServer.Core
             TimeSpan closed = new TimeSpan(16, 0, 0);
 
             IOrderCore orderCore = new OrderCore(request.Id, request.Username,
-                                                _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Securit ID cannot be null"),
+                                                _tradingConfig?.TradingServerSettings?.SecurityID
+                                                ?? throw new ArgumentNullException("Securit ID cannot be null"),
                                                 Order.StringToOrderType(request.Type));
 
             bool isInvalid = false;
@@ -73,14 +75,14 @@ namespace TradingServer.Core
             }
 
             if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnClose ||
-            Order.StringToOrderType(request.Type) == OrderTypes.LimitOnClose && now >= onCloseDeadline)
+                Order.StringToOrderType(request.Type) == OrderTypes.LimitOnClose && now >= onCloseDeadline)
             {
                 isInvalid = true;
                 reason = RejectionReason.SubmittedAfterDeadline;
             }
 
             else if (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnOpen ||
-            Order.StringToOrderType(request.Type) == OrderTypes.LimitOnOpen && now >= onOpenDeadline)
+                    Order.StringToOrderType(request.Type) == OrderTypes.LimitOnOpen && now >= onOpenDeadline)
             {
                 isInvalid = true;
                 reason = RejectionReason.SubmittedAfterDeadline;
@@ -127,6 +129,12 @@ namespace TradingServer.Core
             {
                 _logger.Error(nameof(TradingServer), RejectCreator.RejectReasonToString(reject.reason));
             }
+
+            else
+            {
+                OrderResponse response = await ProcessOrderAsync(request, context);
+                _logger.LogInformation(nameof(TradingServer), $"ID: {response.Id} Status: {response.Status} Message: {response.Message}");
+            }
         }
 
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
@@ -142,7 +150,7 @@ namespace TradingServer.Core
                 try
                 {
                     Order newOrder = modify.newOrder();
-                    _engine.addOrder(newOrder);
+                    await _engine.addOrder(newOrder);
                 }
 
                 catch (InvalidOperationException error)
@@ -165,7 +173,7 @@ namespace TradingServer.Core
                 try
                 {
                     CancelOrder cancelOrder = modify.cancelOrder();
-                    _engine.removeOrder(cancelOrder);
+                    await _engine.removeOrder(cancelOrder);
                 }
 
                 catch (InvalidOperationException exception)
@@ -187,7 +195,7 @@ namespace TradingServer.Core
 
                 try
                 {
-                    _engine.modifyOrder(modify);
+                    await _engine.modifyOrder(modify);
                 }
 
                 catch (InvalidOperationException exception)

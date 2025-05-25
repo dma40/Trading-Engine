@@ -6,6 +6,7 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Lock _ordersLock = new();
         private readonly Lock _stopLock = new();
+        private readonly SpinLock spin = new SpinLock();
 
         public readonly Orderbook orderbook;
         private readonly Orderbook _hidden;

@@ -41,7 +41,7 @@ namespace TradingServer.Orders
 
         public long StopPrice => Price;
 
-        public new Order activate()
+        public sealed override Order activate()
         {
             return new Order(this);
         }

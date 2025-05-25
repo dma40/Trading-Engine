@@ -28,13 +28,13 @@ namespace TradingServer.Tests
             for (int i = 0; i < 20000; i++)
             {
                 IOrderCore core = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
+                await _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
 
             OrderCore icebergCore = new OrderCore(20000, "Dylan", "TEST", OrderTypes.Iceberg);
             IcebergOrder icebergTest = new IcebergOrder(icebergCore, 1000000000, 2, true, 2);
 
-            _tradingEngine.addOrder(icebergTest);
+            await _tradingEngine.addOrder(icebergTest);
             await Task.Delay(100);
 
             Console.WriteLine(icebergTest.CurrentQuantity);

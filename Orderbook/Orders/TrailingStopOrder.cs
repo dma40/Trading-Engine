@@ -57,7 +57,7 @@ namespace TradingServer.Orders
 
         public long currentMaxPrice { get; set; }
 
-        public new Order activate()
+        public sealed override Order activate()
         {
             return new Order(this);
         }

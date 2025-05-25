@@ -17,9 +17,9 @@ internal static class TradingHostBuilder
         services.AddOptions();
         
         services.Configure<TradingServerConfiguration>(context.Configuration.
-                                                    GetSection(nameof(TradingServerConfiguration)));
+                            GetSection(nameof(TradingServerConfiguration)));
         services.Configure<LoggerConfiguration>(context.Configuration.
-                                                    GetSection(nameof(LoggerConfiguration)));
+                            GetSection(nameof(LoggerConfiguration)));
 
         var defaultConfig = new LoggerConfiguration
         {

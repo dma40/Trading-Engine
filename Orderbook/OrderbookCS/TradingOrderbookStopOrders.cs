@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
@@ -6,6 +7,7 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
         private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
         protected async Task ProcessStopOrders(CancellationToken token)
         {
@@ -17,8 +19,12 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime > marketOpen && currentTime < marketEnd)
                 {
-                    lock (_stopLock)
+                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+
+                    if (acquired)
                     {
+                        // make a list of CancelOrders, and then remove all of the orders; 
+                        // this method was implemented in Orderbook.
                         foreach (var order in _stop)
                         {
                             StopOrder stop = order.Value;
@@ -60,7 +66,7 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed);
+                    await Task.Delay(closed, token);
                 }
 
                 await Task.Delay(200, token);
@@ -77,7 +83,9 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime > marketOpen && currentTime < marketEnd)
                 {
-                    lock (_stopLock) 
+                    bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
+
+                    if (acquired)
                     {
                         foreach (var trail in _trailingStop)
                         {
@@ -94,10 +102,10 @@ namespace TradingServer.OrderbookCS
                                 }
 
                                 else if (greatestTradedPrice > trailstop.currentMaxPrice)
-                                    trail.Value.currentMaxPrice = greatestTradedPrice; 
+                                    trail.Value.currentMaxPrice = greatestTradedPrice;
                             }
 
-                            else 
+                            else
                             {
                                 if (lastTradedPrice >= trailstop.StopPrice)
                                 {
@@ -122,7 +130,7 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed);
+                    await Task.Delay(closed, token);
                 }
 
                 await Task.Delay(200, token);

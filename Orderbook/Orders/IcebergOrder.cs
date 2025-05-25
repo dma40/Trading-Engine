@@ -27,7 +27,7 @@ namespace TradingServer.Orders
 
         public bool isEmpty => fullQuantity == 0;
 
-        public void replenish()
+        public sealed override void replenish()
         {
             /* This is called only when the current quantity is 0 */
             float total = MathF.Min(Quantity, fullQuantity);

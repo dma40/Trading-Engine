@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
@@ -16,7 +17,9 @@ namespace TradingServer.OrderbookCS
 
                 if (timeOfDay >= marketOpen && timeOfDay <= marketEnd)
                 {
-                    lock (_stopLock)
+                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+
+                    if (acquired)
                     {
                         foreach (var pairedCancel in _pairedCancel)
                         {
@@ -82,7 +85,9 @@ namespace TradingServer.OrderbookCS
 
                 if (timeOfDay > marketOpen && timeOfDay < marketEnd)
                 {
-                    lock (_stopLock)
+                    bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
+
+                    if (acquired)
                     {
                         foreach (var pairedExecution in _pairedExecution)
                         {

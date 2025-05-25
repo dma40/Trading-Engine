@@ -1,17 +1,22 @@
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        public void addOrder(Order order)
+        public async Task addOrder(Order order)
         { 
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
                 return;
             }
 
-            lock (_ordersLock)
+            bool acquired = await _semaphore.WaitAsync(TimeSpan.FromSeconds(2), _ts.Token);
+
+            if (acquired)
             {
                 if (order.OrderType == OrderTypes.LimitOnClose || order.OrderType == OrderTypes.MarketOnClose)
                 {
@@ -54,7 +59,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void addOrder(StopOrder stop)
+        public async Task addOrder(StopOrder stop)
         {
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
@@ -63,7 +68,9 @@ namespace TradingServer.OrderbookCS
 
             if (stop.OrderType == OrderTypes.StopLimit || stop.OrderType == OrderTypes.StopMarket)
             {
-                lock (_ordersLock)
+                bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
+
+                if (acquired)
                 {
                     if (!_stop.TryGetValue(stop.OrderID, out StopOrder? stoporder))
                     {
@@ -78,7 +85,7 @@ namespace TradingServer.OrderbookCS
             } 
         }
 
-        public void addOrder(TrailingStopOrder trail)
+        public async Task addOrder(TrailingStopOrder trail)
         {
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
@@ -87,7 +94,9 @@ namespace TradingServer.OrderbookCS
 
             if (trail.OrderType == OrderTypes.TrailingStopLimit || trail.OrderType == OrderTypes.TrailingStopMarket)
             {
-                lock (_ordersLock)
+                bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
+
+                if (acquired)
                 {
                     if (!_trailingStop.TryGetValue(trail.OrderID, out TrailingStopOrder? trailstop))
                     {
@@ -102,9 +111,11 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void addOrder(PairedCancelOrder pairedCancel)
+        public async Task addOrder(PairedCancelOrder pairedCancel)
         {
-            lock (_ordersLock)
+            bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
+
+            if (acquired)
             {
                 if (!_pairedCancel.TryGetValue(pairedCancel.OrderID, out PairedCancelOrder? paired))
                 {
@@ -118,32 +129,39 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void addOrder(IcebergOrder order)
+        public async Task addOrder(IcebergOrder order)
         {
             if (order.OrderType == OrderTypes.Iceberg)
             {
-                if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
+                bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
+
+                if (acquired)
                 {
-                    match(order);
-                    _iceberg.Add(order.OrderID, order);
+                    if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
+                    {
+                        match(order);
+                        _iceberg.Add(order.OrderID, order);
+                    }
                 }
             }
         } 
 
-        public void modifyOrder(ModifyOrder modify)
+        public async Task modifyOrder(ModifyOrder modify)
         {
-            removeOrder(modify.cancelOrder());
-            addOrder(modify.newOrder());
+            await removeOrder(modify.cancelOrder());
+            await addOrder(modify.newOrder());
         }
 
-        public void removeOrder(CancelOrder cancel)
+        public async Task removeOrder(CancelOrder cancel)
         {
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
                 return;
             }
 
-            lock (_ordersLock)
+            bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
+
+            if (acquired)
             {
                 if (cancel.isHidden)
                 {
