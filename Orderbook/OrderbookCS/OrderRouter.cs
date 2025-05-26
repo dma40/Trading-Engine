@@ -1,8 +1,9 @@
+using System.Dynamic;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public class OrderRouter: IRouter
+    public class OrderRouter
     {
         public OrderRouter()
         {
@@ -10,10 +11,13 @@ namespace TradingServer.OrderbookCS
 
             routes.Add(key: OrderTypes.LimitOnOpen, value: new OnMarketOpenLimitRouter());
             routes.Add(key: OrderTypes.MarketOnOpen, value: new OnMarketOpenMarketRouter());
+
             routes.Add(key: OrderTypes.LimitOnClose, value: new OnMarketCloseLimitRouter());
             routes.Add(key: OrderTypes.MarketOnClose, value: new OnMarketCloseMarketRouter());
+
             routes.Add(key: OrderTypes.TrailingStopMarket, value: new TrailingStopLimitRouter());
             routes.Add(key: OrderTypes.TrailingStopLimit, value: new TrailingStopLimitRouter());
+
             routes.Add(key: OrderTypes.StopMarket, value: new StopMarketRouter());
             routes.Add(key: OrderTypes.StopLimit, value: new StopLimitRouter());
 
@@ -36,6 +40,21 @@ namespace TradingServer.OrderbookCS
                 strategy.Remove(cancel);
             }
         }
+
+        public IRouter StopLimit => routes[OrderTypes.StopLimit];
+        public IRouter StopMarket => routes[OrderTypes.StopMarket];
+
+        public IRouter TrailingStopLimit => routes[OrderTypes.TrailingStopLimit];
+        public IRouter TrailingStopMarket => routes[OrderTypes.TrailingStopMarket];
+
+        public IRouter MarketOnOpen => routes[OrderTypes.MarketOnOpen];
+        public IRouter MarketOnClose => routes[OrderTypes.MarketOnClose];
+
+        public IRouter LimitOnOpen => routes[OrderTypes.LimitOnOpen];
+        public IRouter LimitOnClose => routes[OrderTypes.LimitOnClose];
+
+        public IRouter Iceberg => routes[OrderTypes.Iceberg];
+
         private Dictionary<OrderTypes, IRouter> routes;
     }
 
@@ -54,7 +73,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; } 
     }
 
     public class OnMarketCloseLimitRouter : IRouter
@@ -72,10 +91,10 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }
 
-    public class OnMarketOpenMarketRouter : IRouter
+    public class OnMarketOpenMarketRouter: IRouter
     {
         public OnMarketOpenMarketRouter()
         {
@@ -90,7 +109,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }
 
     public class OnMarketOpenLimitRouter: IRouter
@@ -108,7 +127,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }
 
     public class IcebergRouter: IRouter
@@ -126,7 +145,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }   
 
     public class StopRouter: IRouter
@@ -144,7 +163,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }   
 
     public class TrailingStopLimitRouter: IRouter
@@ -162,7 +181,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }   
 
     public class TrailingStopMarketRouter: IRouter
@@ -180,7 +199,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }  
 
     public class StopLimitRouter: IRouter
@@ -198,10 +217,10 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
-    } 
+        public Dictionary<long, Order> queue { get; private set; }
+    }
 
-    public class StopMarketRouter: IRouter
+    public class StopMarketRouter : IRouter
     {
         public StopMarketRouter()
         {
@@ -216,12 +235,13 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public readonly Dictionary<long, Order> queue;
+        public Dictionary<long, Order> queue { get; private set; }
     }
 
-    interface IRouter
+    public interface IRouter
     {
         public void Route(Order order);
         public void Remove(CancelOrder cancel);
+        public Dictionary<long, Order> queue { get; }
     }
 }

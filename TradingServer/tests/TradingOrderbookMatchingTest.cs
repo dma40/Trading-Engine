@@ -17,7 +17,7 @@ namespace TradingServer.Tests
         [SetUp]
         public void Setup()
         {
-            _tradingEngine = new TradingEngine(new Security("TEST"));
+            _tradingEngine = new TradingEngine(new Security("TEST", "TEST_ID"));
         }
 
         [Test]

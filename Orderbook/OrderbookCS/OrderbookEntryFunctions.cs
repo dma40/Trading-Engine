@@ -58,7 +58,9 @@ namespace TradingServer.OrderbookCS
         private void removeOrders(List<OrderbookEntry> cancels)
         {
             foreach (OrderbookEntry cancel in cancels)
+            {
                 removeOrder(cancel.OrderID, cancel, _orders);
+            }
         }
 
         public void removeOrder(CancelOrder cancel)

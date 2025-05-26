@@ -6,7 +6,7 @@ namespace TradingServer.OrderbookCS
     {
         public PairedOrderRouter()
         {
-            routes = new Dictionary<OrderTypes, IPairedRouter>(); // process the market queue first!
+            routes = new Dictionary<OrderTypes, IPairedRouter>(); 
 
             routes.Add(key: OrderTypes.LimitOnOpen, value: new PairedExecutionRouter());
             routes.Add(key: OrderTypes.MarketOnOpen, value: new PairedCancelRouter());
@@ -16,15 +16,18 @@ namespace TradingServer.OrderbookCS
         {
             if (routes.TryGetValue(order.OrderType, out IPairedRouter? strategy))
             {
-                strategy.Route(order); // check if this works okay
+                strategy.Route(order);
             }
         }
+
+        public IPairedRouter PairedCancel => routes[OrderTypes.PairedCancel];
+        public IPairedRouter PairedExecution => routes[OrderTypes.PairedExecution];
 
         public void Remove(CancelOrder cancel)
         {
 
         }
-        private Dictionary<OrderTypes, IPairedRouter> routes;
+        public readonly Dictionary<OrderTypes, IPairedRouter> routes;
     }
 
     public class PairedCancelRouter: IPairedRouter
@@ -37,9 +40,12 @@ namespace TradingServer.OrderbookCS
         public void Route(AbstractPairedOrder paired) => queue.Add(paired.OrderID, paired);
         public void Remove(CancelOrder cancel)
         {
-
+            if (queue.TryGetValue(cancel.OrderID, out AbstractPairedOrder? paired))
+            {
+                queue.Remove(cancel.OrderID);
+            }
         }
-        public readonly Dictionary<long, AbstractPairedOrder> queue;
+        public Dictionary<long, AbstractPairedOrder> queue { get; private set; }
     }
 
     public class PairedExecutionRouter : IPairedRouter
@@ -52,14 +58,18 @@ namespace TradingServer.OrderbookCS
         public void Route(AbstractPairedOrder paired) => queue.Add(paired.OrderID, paired);
         public void Remove(CancelOrder cancel)
         {
-
+            if (queue.TryGetValue(cancel.OrderID, out AbstractPairedOrder? paired))
+            {
+                queue.Remove(cancel.OrderID);
+            }
         }
-        public readonly Dictionary<long, AbstractPairedOrder> queue;
+        public Dictionary<long, AbstractPairedOrder> queue { get; private set; }
     }
 
     public interface IPairedRouter
     {
         public void Route(AbstractPairedOrder paired);
         public void Remove(CancelOrder cancel);
+        public Dictionary<long, AbstractPairedOrder> queue { get; }
     }
 }

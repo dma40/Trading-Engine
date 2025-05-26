@@ -7,9 +7,6 @@ namespace TradingServer.OrderbookCS
         private static readonly TimeSpan marketOpen = new TimeSpan(9, 30, 0);
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
-        private readonly Dictionary<long, Order> _onMarketOpen = new Dictionary<long, Order>();
-        private readonly Dictionary<long, Order> _onMarketClose = new Dictionary<long, Order>();
-
         protected async Task ProcessAtMarketEnd(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
@@ -18,9 +15,6 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime.TimeOfDay == marketEnd)
                 {
-                    //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(200), token);
-
-                    //if (acquired)
                     lock (_ordersLock)
                     {
                         try
@@ -39,8 +33,6 @@ namespace TradingServer.OrderbookCS
                             Console.WriteLine(exception.Message);
                         }
                     }
-
-                    //_semaphore.Release();
                 }
 
                 else
@@ -65,24 +57,42 @@ namespace TradingServer.OrderbookCS
 
                 if (now.TimeOfDay == marketOpen)
                 {
-                    //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
+                    var route = _router.MarketOnOpen;
+                    var market_queue = route.queue;
 
-                    //if (acquired)
                     lock (_ordersLock)
                     {
-                        foreach (var order in _onMarketOpen)
+                        foreach (var order in market_queue)
                         {
                             var orderEntry = order.Value;
-                            var id = order.Value.OrderID;
 
-                            match(order.Value);
-                            _onMarketOpen.Remove(id);
+                            match(orderEntry);
+                        }
 
-                            orderEntry.Dispose();
+                        foreach (var order in market_queue)
+                        {
+                            var orderEntry = order.Value;
+
+                            route.Remove(orderEntry.cancelOrder());
+                        }
+
+                        var limitRoute = _router.LimitOnOpen;
+                        var limit_queue = limitRoute.queue;
+
+                        foreach (var order in limit_queue)
+                        {
+                            var orderEntry = order.Value;
+
+                            match(orderEntry);
+                        }
+
+                        foreach (var order in market_queue)
+                        {
+                            var orderEntry = order.Value;
+
+                            route.Remove(orderEntry.cancelOrder());
                         }
                     }
-
-                    _semaphore.Release();
                 }
 
                 else
@@ -100,13 +110,38 @@ namespace TradingServer.OrderbookCS
 
         protected void ProcessOnMarketEndOrders()
         {
-            foreach (var order in _onMarketClose)
-            {
-                var current = order.Value;
-                match(current);
+            var route = _router.MarketOnClose;
+            var market_queue = route.queue;
 
-                _onMarketClose.Remove(current.OrderID);
-                current.Dispose();
+            foreach (var order in market_queue)
+            {
+                var orderEntry = order.Value;
+
+                match(orderEntry);
+            }
+
+            foreach (var order in market_queue)
+            {
+                var orderEntry = order.Value;
+
+                route.Remove(orderEntry.cancelOrder());
+            }
+
+            var limitRoute = _router.LimitOnOpen;
+            var limit_queue = limitRoute.queue;
+
+            foreach (var order in limit_queue)
+            {
+                var orderEntry = order.Value;
+
+                match(orderEntry);
+            }
+
+            foreach (var order in limit_queue)
+            {
+                var orderEntry = order.Value;
+
+                route.Remove(orderEntry.cancelOrder());
             }
         }
     }

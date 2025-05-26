@@ -4,9 +4,9 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private static readonly List<int> ImmediateHandleTypes = [3, 5, 7, 9, 11, 12, 13, 14];
+        // private static readonly List<int> ImmediateHandleTypes = [3, 5, 7, 9, 11, 12, 13, 14];
         private readonly Trades _trades;
-
+        /*
         public Trades match(Order order) 
         {   
             int type = (int) order.OrderType;
@@ -39,7 +39,6 @@ namespace TradingServer.OrderbookCS
 
                 else
                 {
-                    //Console.WriteLine("Not a special order type. Starting match");
                     result = orderbook.match(order);
                     result.addTransactions(_hidden.match(order));
 
@@ -58,17 +57,22 @@ namespace TradingServer.OrderbookCS
                 }
 
                 _trades.addTransactions(result);
-
-                //Console.WriteLine("Length of result: " + result.recordedTrades.Count);
-                //Console.WriteLine("Number of trades: " + _trades.recordedTrades.Count);
                
                 return result;
             }
         }
+        */
+
+        public Trades match(Order order)
+        {
+            Trades result = _strategies.match(order);
+            _trades.addTransactions(result);
+            return result;
+        }
 
         public bool hasEligibleOrderCount(Order order)
         {
-           return orderbook.getEligibleOrderCount(order) + _hidden.getEligibleOrderCount(order) >= order.CurrentQuantity;
+            return orderbook.getEligibleOrderCount(order) + _hidden.getEligibleOrderCount(order) >= order.CurrentQuantity;
         }
     }
 }

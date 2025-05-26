@@ -13,7 +13,7 @@ namespace TradingServer.Tests
         [SetUp]
         public void Setup()
         {
-            _orderbook = new Orderbook(new Security("TEST"));
+            _orderbook = new Orderbook(new Security("TEST", "TEST_ID"));
         }
 
         [Test]

@@ -11,12 +11,16 @@ namespace TradingServer.OrderbookCS
         public readonly Orderbook orderbook;
         private readonly Orderbook _hidden;
 
+        private readonly MatchManager _strategies;
+
         public TradingEngine(Security security)
         {
             _trades = new Trades();
 
             orderbook = new Orderbook(security);
             _hidden = new Orderbook(security);
+
+            _strategies = new MatchManager(orderbook, _hidden);
 
             _ = Task.Run(() => ProcessStopOrders(_ts.Token));
             _ = Task.Run(() => ProcessTrailingStopOrders(_ts.Token));

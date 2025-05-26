@@ -17,10 +17,7 @@ namespace TradingServer.Core
             TimeSpan open = new TimeSpan(9, 30, 0);
             TimeSpan closed = new TimeSpan(16, 0, 0);
 
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username,
-                                                _tradingConfig?.TradingServerSettings?.SecurityID
-                                                ?? throw new ArgumentNullException("Securit ID cannot be null"),
-                                                Order.StringToOrderType(request.Type));
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _security.id, Order.StringToOrderType(request.Type));
 
             RejectionReason reason = _validator.Check(request);
 

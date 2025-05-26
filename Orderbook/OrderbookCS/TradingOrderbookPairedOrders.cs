@@ -5,9 +5,6 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private readonly Dictionary<long, PairedCancelOrder> _pairedCancel = new Dictionary<long, PairedCancelOrder>();
-        private readonly Dictionary<long, PairedExecutionOrder> _pairedExecution = new Dictionary<long, PairedExecutionOrder>();
-
         protected async Task ProcessPairedCancelOrders(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
@@ -17,14 +14,14 @@ namespace TradingServer.OrderbookCS
 
                 if (timeOfDay >= marketOpen && timeOfDay <= marketEnd)
                 {
-                    //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
-
-                    //if (acquired)
                     lock (_ordersLock)
                     {
-                        foreach (var pairedCancel in _pairedCancel)
+                        var route = _paired.PairedCancel;
+                        var paired_queue = route.queue;
+
+                        foreach (var pairedCancel in paired_queue)
                         {
-                            PairedCancelOrder pairedCancelOrder = pairedCancel.Value;
+                            AbstractPairedOrder pairedCancelOrder = pairedCancel.Value;
                             Order primary = pairedCancelOrder.primary.activate();
                             Order secondary = pairedCancelOrder.secondary.activate();
 
@@ -43,14 +40,14 @@ namespace TradingServer.OrderbookCS
                                     }
                                 }
 
-                                _pairedCancel.Remove(pairedCancelOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedCancelOrder)); // format this better
                             }
 
                             else if (orderbook.canMatch(primary))
                             {
                                 match(primary);
                                 secondary.Dispose();
-                                _pairedCancel.Remove(pairedCancelOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedCancelOrder));
 
                             }
 
@@ -58,11 +55,9 @@ namespace TradingServer.OrderbookCS
                             {
                                 match(secondary);
                                 primary.Dispose();
-                                _pairedCancel.Remove(pairedCancelOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedCancelOrder));
                             }
                         }
-
-                        //_semaphore.Release();
                     }
                 }
 
@@ -88,14 +83,14 @@ namespace TradingServer.OrderbookCS
 
                 if (timeOfDay > marketOpen && timeOfDay < marketEnd)
                 {
-                    //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
-
-                    //if (acquired)
                     lock (_ordersLock)
                     {
-                        foreach (var pairedExecution in _pairedExecution)
+                        var route = _paired.PairedExecution;
+                        var paired_queue = route.queue;
+
+                        foreach (var pairedExecution in paired_queue)
                         {
-                            PairedExecutionOrder pairedExecutionOrder = pairedExecution.Value;
+                            AbstractPairedOrder pairedExecutionOrder = pairedExecution.Value;
                             Order primary = pairedExecutionOrder.primary;
 
                             Order activatedPrimary = primary.activate();
@@ -105,7 +100,7 @@ namespace TradingServer.OrderbookCS
                             {
                                 Order activatedSecondary = pairedExecutionOrder.secondary.activate();
                                 match(activatedSecondary);
-                                _pairedExecution.Remove(pairedExecutionOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedExecutionOrder));
                             }
 
                             else
@@ -114,8 +109,6 @@ namespace TradingServer.OrderbookCS
                             }
                         }
                     }
-
-                    _semaphore.Release();
                 }
 
                 else

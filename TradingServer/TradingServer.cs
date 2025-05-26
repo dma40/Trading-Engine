@@ -27,7 +27,10 @@ namespace TradingServer.Core
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
             _tradingConfig = config.Value ?? throw new ArgumentNullException("config cannot be null");
 
-            _security = new Security(_tradingConfig?.TradingServerSettings?.SecurityName ?? throw new ArgumentNullException());
+            string name = _tradingConfig?.TradingServerSettings?.SecurityName ?? throw new ArgumentNullException();
+            string id = _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException();
+
+            _security = new Security(name, id);
             _engine = new TradingEngine(_security);
             _validator = new OrderValidator();
 
@@ -39,8 +42,8 @@ namespace TradingServer.Core
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation(nameof(TradingServer), "Starting Process");
-            _logger.LogInformation(nameof(TradingServer), $"Security name: {_tradingConfig.TradingServerSettings?.SecurityName}");
-            _logger.LogInformation(nameof(TradingServer), $"Security ID: {_tradingConfig.TradingServerSettings?.SecurityID}");
+            _logger.LogInformation(nameof(TradingServer), $"Security name: {_security.name}");
+            _logger.LogInformation(nameof(TradingServer), $"Security ID: {_security.id}");
 
             while (!stoppingToken.IsCancellationRequested)
             {

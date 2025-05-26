@@ -17,9 +17,6 @@ namespace TradingServer.OrderbookCS
                 return;
             }
 
-            //bool acquired = _semaphore.Wait(TimeSpan.FromSeconds(2), _ts.Token);
-
-            //if (acquired)
             lock (_ordersLock)
             {
                 if (isQueuable(order))
@@ -31,7 +28,6 @@ namespace TradingServer.OrderbookCS
                 {
                     if (!orderbook.containsOrder(order.OrderID) && !_hidden.containsOrder(order.OrderID))
                     {
-                        //Console.WriteLine("Matching this order");
                         match(order);
                     }
 
@@ -41,41 +37,31 @@ namespace TradingServer.OrderbookCS
                     }
                 }
             }
-
-            //_semaphore.Release();
         }
 
         public void addOrder(AbstractPairedOrder paired)
         {
-            //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
-
-            //if (acquired)
             lock (_ordersLock)
             {
                 _paired.Route(paired);
             }
-
-            //_semaphore.Release();
         }
 
         public void addOrder(IcebergOrder order)
         {
             if (order.OrderType == OrderTypes.Iceberg)
             {
-                //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(500), _ts.Token);
-
-                //if (acquired)
                 lock (_ordersLock)
                 {
-                    if (!_iceberg.TryGetValue(order.OrderID, out IcebergOrder? _order))
+                    var route = _router.Iceberg;
+                    var queue = route.queue;
+
+                    if (!queue.TryGetValue(order.OrderID, out Order? _order))
                     {
                         match(order);
                         _router.Route(order);
-                        //_iceberg.Add(order.OrderID, order);
                     }
                 }
-
-                //_semaphore.Release();
             }
         }
 

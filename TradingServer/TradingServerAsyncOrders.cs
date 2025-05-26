@@ -10,7 +10,7 @@ namespace TradingServer.Core
     {
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _tradingConfig?.TradingServerSettings?.SecurityID ?? throw new ArgumentNullException("Security ID cannot be null"), Order.StringToOrderType(request.Type));
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _security.id, Order.StringToOrderType(request.Type));
             ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
@@ -26,7 +26,7 @@ namespace TradingServer.Core
 
                 catch (Exception error)
                 {
-                    _logger.Error(nameof(TradingServer), error.Message + $" {DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), error.Message + $" {DateTime.UtcNow}");
                     exception = true;
                 }
 
@@ -49,7 +49,7 @@ namespace TradingServer.Core
 
                 catch (Exception exception)
                 {
-                    _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.Now}");
+                    _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.UtcNow}");
                     error = true;
                 }
 
@@ -71,7 +71,7 @@ namespace TradingServer.Core
 
                 catch (Exception exception)
                 {
-                    _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.Now}");
+                    _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.UtcNow}");
                     error = true;
                 }
 

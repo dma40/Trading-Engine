@@ -5,10 +5,6 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private readonly Dictionary<long, StopOrder> _stop = new Dictionary<long, StopOrder>();
-        private readonly Dictionary<long, TrailingStopOrder> _trailingStop = new Dictionary<long, TrailingStopOrder>();
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
-
         protected async Task ProcessStopOrders(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
@@ -19,42 +15,77 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime > marketOpen && currentTime < marketEnd)
                 {
-                    bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(100), token);
-
-                    //if (acquired)
                     lock (_ordersLock)
                     {
+                        var route = _router.StopMarket;
+                        var market_queue = route.queue;
                         // make a list of CancelOrders, and then remove all of the orders; 
                         // this method was implemented in Orderbook.
-                        foreach (var order in _stop)
+                        foreach (var order in market_queue)
                         {
-                            StopOrder stop = order.Value;
-                            Console.WriteLine("Price of this order: " + stop.StopPrice);
-                            Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
+                            var stop = order.Value;
+                            //Console.WriteLine("Price of this order: " + stop.StopPrice);
+                            //Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
 
                             if (stop.isBuySide)
                             {
-                                Console.WriteLine("This is a buy side order. Processing...");
+                                //Console.WriteLine("This is a buy side order. Processing...");
                                 if (lastTradedPrice <= stop.StopPrice)
                                 {
-                                    Console.WriteLine("Activating the buy side order");
+                                    //Console.WriteLine("Activating the buy side order");
                                     Order activated = order.Value.activate();
                                     match(activated);
 
-                                    _stop.Remove(stop.OrderID);
+                                    route.Remove(stop.cancelOrder()); // do this outside of the method
                                 }
                             }
 
                             else
                             {
-                                Console.WriteLine("This is a sell side order. Processing...");
+                                //Console.WriteLine("This is a sell side order. Processing...");
                                 if (lastTradedPrice >= stop.StopPrice)
                                 {
-                                    Console.WriteLine("Activating the sell side order");
+                                    //Console.WriteLine("Activating the sell side order");
                                     Order activated = stop.activate();
                                     match(activated);
 
-                                    _stop.Remove(stop.OrderID);
+                                    route.Remove(stop.cancelOrder()); // update this too
+                                }
+                            }
+                        }
+
+                        var limit_route = _router.StopLimit;
+                        var limit_queue = limit_route.queue;
+
+                        foreach (var order in limit_queue)
+                        {
+                            var stop = order.Value;
+                            //Console.WriteLine("Price of this order: " + stop.StopPrice);
+                            //Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
+
+                            if (stop.isBuySide)
+                            {
+                                //Console.WriteLine("This is a buy side order. Processing...");
+                                if (lastTradedPrice <= stop.StopPrice)
+                                {
+                                    //Console.WriteLine("Activating the buy side order");
+                                    Order activated = order.Value.activate();
+                                    match(activated);
+
+                                    route.Remove(stop.cancelOrder()); // do this outside of the method
+                                }
+                            }
+
+                            else
+                            {
+                                //Console.WriteLine("This is a sell side order. Processing...");
+                                if (lastTradedPrice >= stop.StopPrice)
+                                {
+                                    //Console.WriteLine("Activating the sell side order");
+                                    Order activated = stop.activate();
+                                    match(activated);
+
+                                    route.Remove(stop.cancelOrder());
                                 }
                             }
                         }
@@ -86,12 +117,12 @@ namespace TradingServer.OrderbookCS
 
                 if (currentTime > marketOpen && currentTime < marketEnd)
                 {
-                    //bool acquired = await _semaphore.WaitAsync(TimeSpan.FromMilliseconds(200), token);
-
-                    //if (acquired)
                     lock (_ordersLock)
                     {
-                        foreach (var trail in _trailingStop)
+                        var route = _router.TrailingStopMarket;
+                        var market_queue = route.queue;
+
+                        foreach (var trail in market_queue)
                         {
                             var trailstop = trail.Value;
 
@@ -102,11 +133,13 @@ namespace TradingServer.OrderbookCS
                                     Order activated = trailstop.activate();
                                     match(activated);
 
-                                    _trailingStop.Remove(trailstop.OrderID);
+                                    route.Remove(trailstop.cancelOrder()); // may add a few milli/nanoseconds; update this
                                 }
 
                                 else if (greatestTradedPrice > trailstop.currentMaxPrice)
+                                {
                                     trail.Value.currentMaxPrice = greatestTradedPrice;
+                                }
                             }
 
                             else
@@ -116,7 +149,47 @@ namespace TradingServer.OrderbookCS
                                     Order activated = trailstop.activate();
                                     match(activated);
 
-                                    _trailingStop.Remove(trailstop.OrderID);
+                                    route.Remove(trailstop.cancelOrder());
+                                }
+
+                                else if (greatestTradedPrice > trailstop.currentMaxPrice)
+                                {
+                                    trail.Value.currentMaxPrice = greatestTradedPrice;
+                                }
+                            }
+                        }
+
+                        var limit_route = _router.TrailingStopLimit;
+                        var limit_queue = limit_route.queue;
+
+                        foreach (var trail in limit_queue)
+                        {
+                            var trailstop = trail.Value;
+
+                            if (trailstop.isBuySide)
+                            {
+                                if (lastTradedPrice <= trailstop.StopPrice)
+                                {
+                                    Order activated = trailstop.activate();
+                                    match(activated);
+
+                                    route.Remove(trailstop.cancelOrder()); // may add a few milli/nanoseconds; update this
+                                }
+
+                                else if (greatestTradedPrice > trailstop.currentMaxPrice)
+                                {
+                                    trail.Value.currentMaxPrice = greatestTradedPrice;
+                                }
+                            }
+
+                            else
+                            {
+                                if (lastTradedPrice >= trailstop.StopPrice)
+                                {
+                                    Order activated = trailstop.activate();
+                                    match(activated);
+
+                                    route.Remove(trailstop.cancelOrder());
                                 }
 
                                 else if (greatestTradedPrice > trailstop.currentMaxPrice)
