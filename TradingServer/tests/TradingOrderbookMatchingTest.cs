@@ -37,6 +37,7 @@ namespace TradingServer.Tests
 
             _tradingEngine.addOrder(unfillableFOKOrder);
 
+            // Console.WriteLine(_tradingEngine.orderbook.getAskLimits().Count);
             Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 5000);
 
             IOrderCore fillableFOKCore = new OrderCore(20001, "Dylan", "TEST", OrderTypes.FillOrKill);

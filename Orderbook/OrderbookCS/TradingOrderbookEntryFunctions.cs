@@ -1,6 +1,3 @@
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
@@ -12,7 +9,7 @@ namespace TradingServer.OrderbookCS
 
         public void addOrder(Order order)
         {
-            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5) // update this method to use isValidTime
             {
                 return;
             }
@@ -26,7 +23,8 @@ namespace TradingServer.OrderbookCS
 
                 else
                 {
-                    if (!orderbook.containsOrder(order.OrderID) && !_hidden.containsOrder(order.OrderID))
+                    // Console.WriteLine("This order is not going to go into a queue. ");
+                    if (_strategies.containsOrder(order))
                     {
                         match(order);
                     }
@@ -78,26 +76,13 @@ namespace TradingServer.OrderbookCS
                 return;
             }
 
-            //bool acquired = _semaphore.Wait(TimeSpan.FromMilliseconds(500), _ts.Token);
-
-            //if (acquired)
             lock (_ordersLock)
             {
-                if (cancel.isHidden)
-                {
-                    _hidden.removeOrder(cancel);
-                }
-
-                else
-                {
-                    orderbook.removeOrder(cancel);
-                }
+                _strategies.removeOrder(cancel);
 
                 _router.Remove(cancel);
                 _paired.Remove(cancel);
             }
-
-            //_semaphore.Release();
         }
 
         protected bool isValidTime(IOrderCore order)

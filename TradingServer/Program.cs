@@ -19,6 +19,7 @@ TradingOrderbookMatchingTest matchingTest = new TradingOrderbookMatchingTest();
 
 matchingTest.Setup();
 
+matchingTest.FillOrKillTest();
 matchingTest.PostOnlyMatchTest();
 matchingTest.ImmediateHandleTypeMatchedTest();
 matchingTest.HiddenAndVisibleOrdersMatchedCorrectly(); 

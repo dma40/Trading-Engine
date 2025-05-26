@@ -5,22 +5,13 @@ namespace TradingServer.OrderbookCS
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
         private readonly Lock _ordersLock = new();
-        private readonly Lock _stopLock = new();
-        private readonly SpinLock spin = new SpinLock();
-
-        public readonly Orderbook orderbook;
-        private readonly Orderbook _hidden;
-
         private readonly MatchManager _strategies;
 
         public TradingEngine(Security security)
         {
             _trades = new Trades();
 
-            orderbook = new Orderbook(security);
-            _hidden = new Orderbook(security);
-
-            _strategies = new MatchManager(orderbook, _hidden);
+            _strategies = new MatchManager(security);
 
             _ = Task.Run(() => ProcessStopOrders(_ts.Token));
             _ = Task.Run(() => ProcessTrailingStopOrders(_ts.Token));
@@ -53,8 +44,8 @@ namespace TradingServer.OrderbookCS
            
             if (dispose)
             {
-                orderbook.Dispose();
-                _hidden.Dispose();
+                // orderbook.Dispose();
+                // _hidden.Dispose();
 
                 _ts.Cancel();
                 _ts.Dispose();

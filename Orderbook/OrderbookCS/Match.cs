@@ -7,8 +7,14 @@ namespace TradingServer.OrderbookCS
 {
     public class MatchManager
     {
-        public MatchManager(Orderbook visible, Orderbook hidden)
+        public MatchManager(Security security)
         {
+            Orderbook visible = new Orderbook(security);
+            Orderbook hidden = new Orderbook(security);
+
+            orderbook = visible;
+            _hidden = hidden;
+
             _strategies = new Dictionary<OrderTypes, IMatchingStrategy>();
 
             _strategies.Add(key: OrderTypes.Limit, value: new MatchAndAddRemainingStrategy(visible, hidden));
@@ -25,7 +31,7 @@ namespace TradingServer.OrderbookCS
             _strategies.Add(key: OrderTypes.MarketOnOpen, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
             _strategies.Add(key: OrderTypes.LimitOnOpen, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
             _strategies.Add(key: OrderTypes.MarketOnClose, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.LimitOnOpen, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
+            _strategies.Add(key: OrderTypes.LimitOnClose, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
 
             _strategies.Add(key: OrderTypes.FillOrKill, new FillOrKillStrategy(visible, hidden));
 
@@ -43,6 +49,36 @@ namespace TradingServer.OrderbookCS
 
             return result;
         }
+
+        public void ProcessAtMarketEnd()
+        {
+            orderbook.DeleteExpiredGoodTillCancel();
+            _hidden.DeleteExpiredGoodTillCancel();
+
+            orderbook.DeleteGoodForDayOrders();
+            _hidden.DeleteGoodForDayOrders();
+        }
+
+        public bool containsOrder(Order order)
+        {
+            return !_hidden.containsOrder(order.OrderID) && !orderbook.containsOrder(order.OrderID);
+        }
+
+        public void removeOrder(CancelOrder cancel)
+        {
+            if (cancel.isHidden)
+            {
+                _hidden.removeOrder(cancel);
+            }
+
+            else
+            {
+                orderbook.removeOrder(cancel);
+            }
+        }
+
+        public readonly Orderbook orderbook;
+        private readonly Orderbook _hidden;
 
         private readonly Dictionary<OrderTypes, IMatchingStrategy> _strategies;
     }
@@ -66,12 +102,12 @@ namespace TradingServer.OrderbookCS
             {
                 if (order.isHidden)
                 {
-                    visible.addOrder(order);
+                    hidden.addOrder(order);
                 }
 
                 else
                 {
-                    hidden.addOrder(order);
+                    visible.addOrder(order);
                 }
             }
 
@@ -103,7 +139,7 @@ namespace TradingServer.OrderbookCS
         }
 
         private readonly Orderbook hidden;
-        private readonly Orderbook visible;
+        public readonly Orderbook visible;
     }
 
     public class FillOrKillStrategy : IMatchingStrategy
@@ -128,7 +164,7 @@ namespace TradingServer.OrderbookCS
         }
 
         private readonly Orderbook hidden;
-        private readonly Orderbook visible;
+        public readonly Orderbook visible;
 
     }
 
@@ -151,7 +187,7 @@ namespace TradingServer.OrderbookCS
         }
 
         private readonly Orderbook hidden;
-        private readonly Orderbook visible;
+        public readonly Orderbook visible;
     }
 
     public interface IMatchingStrategy

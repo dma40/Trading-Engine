@@ -19,11 +19,15 @@ namespace TradingServer.OrderbookCS
                     {
                         try
                         {
+                            /*
                             orderbook.DeleteGoodForDayOrders();
                             orderbook.DeleteExpiredGoodTillCancel();
 
                             _hidden.DeleteGoodForDayOrders();
                             _hidden.DeleteExpiredGoodTillCancel();
+                            */
+
+                            _strategies.ProcessAtMarketEnd();
 
                             ProcessOnMarketEndOrders();
                         }
