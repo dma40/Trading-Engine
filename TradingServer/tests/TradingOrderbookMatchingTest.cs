@@ -37,7 +37,6 @@ namespace TradingServer.Tests
 
             _tradingEngine.addOrder(unfillableFOKOrder);
 
-            //Console.WriteLine(_tradingEngine.orderbook.getAskLimits().Count); run again during the day
             Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 5000);
 
             IOrderCore fillableFOKCore = new OrderCore(20001, "Dylan", "TEST", OrderTypes.FillOrKill);
@@ -45,10 +44,9 @@ namespace TradingServer.Tests
 
             _tradingEngine.addOrder(fillableFOKOrder);
 
-            //Console.WriteLine("Number of ask limits: " + _tradingEngine.orderbook.getAskLimits().Count);
             Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 4899);
 
-            for (int i = 404; i < 20000; i++) // edit this loop later
+            for (int i = 0; i < 20000; i++)
             {
                 _tradingEngine.removeOrder(testOrders[i].cancelOrder());
             }
@@ -69,14 +67,14 @@ namespace TradingServer.Tests
             }
 
             IOrderCore fakCore = new OrderCore(20000, "Dylan", "TEST", OrderTypes.FillAndKill);
-            Order fakOrder = new Order(fakCore, 100, 1000000, true);
+            Order fakOrder = new Order(fakCore, 100, 19604, true);
 
             _tradingEngine.addOrder(fakOrder);
 
             Assert.That(!_tradingEngine.containsOrder(fakOrder.OrderID));
-            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 4899);
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 100);
 
-            for (int i = 404; i < 20000; i++)
+            for (int i = 0; i < 404; i++)
             {
                 _tradingEngine.removeOrder(testOrders[i].cancelOrder());
             }
@@ -143,7 +141,7 @@ namespace TradingServer.Tests
             }
 
             IOrderCore visible = new OrderCore(40000, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-            Order visibleOrder = new Order(visible, 2, 24, true);
+            Order visibleOrder = new Order(visible, 4997, 24, true);
 
             _tradingEngine.addOrder(visibleOrder);
 
@@ -151,7 +149,7 @@ namespace TradingServer.Tests
             Assert.That(!_tradingEngine.containsOrder(visibleOrder.OrderID));
 
             IOrderCore hidden = new OrderCore(40001, "Dylan", "TEST", OrderTypes.GoodTillCancel, true);
-            Order hiddenOrder = new Order(hidden, 3, 12, true);
+            Order hiddenOrder = new Order(hidden, 4996, 12, true);
 
             _tradingEngine.addOrder(hiddenOrder);
 

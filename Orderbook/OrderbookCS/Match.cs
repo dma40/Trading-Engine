@@ -1,5 +1,3 @@
-using System.IO.Pipelines;
-using System.Runtime.InteropServices;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -181,15 +179,10 @@ namespace TradingServer.OrderbookCS
 
         public Trades match(Order order)
         {
-            Console.WriteLine("FOK strategy called.");
             Trades result = new Trades();
 
             if (hidden.getEligibleOrderCount(order) + visible.getEligibleOrderCount(order) >= order.Quantity)
             {
-                Console.WriteLine("Quantity in this order: " + order.Quantity);
-                Console.WriteLine(hidden.getEligibleOrderCount(order));
-                Console.WriteLine(visible.getEligibleOrderCount(order));
-
                 result.addTransactions(visible.match(order));
                 result.addTransactions(hidden.match(order));
             }

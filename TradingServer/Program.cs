@@ -14,8 +14,6 @@ orderbookMatchingTest.canFillTests();
 orderbookMatchingTest.MatchTest();
 orderbookMatchingTest.getEligibleOrderCountTest();
 
-
-
 TradingOrderbookMatchingTest matchingTest = new TradingOrderbookMatchingTest();
 
 matchingTest.Setup();

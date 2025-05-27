@@ -6,10 +6,12 @@ namespace TradingServer.OrderbookCS
     {
         public void addOrder(Order order)
         {
-            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5) // update this method to use isValidTime
+            /*
+            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5) // if (isValidTime(order))
             {
                 return;
             }
+            */
             
             lock (_ordersLock)
             {
@@ -68,10 +70,12 @@ namespace TradingServer.OrderbookCS
 
         public void removeOrder(CancelOrder cancel)
         {
+            /*
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
             {
                 return;
             }
+            */
 
             lock (_ordersLock)
             {

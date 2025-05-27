@@ -96,9 +96,8 @@ namespace TradingServer.Tests
             Order opposingSideMatchableOrder = new Order(opposingSideMatchable, 200, 5000, false);
 
             _orderbook.match(opposingSideMatchableOrder);
-            // Console.WriteLine(opposingSideMatchableOrder.CurrentQuantity);
+      
             Assert.That(opposingSideMatchableOrder.CurrentQuantity == 4196);
-            Console.WriteLine("Bid limits: " + _orderbook.getBidLimits().Count);
             Assert.That(_orderbook.getBidLimits().Count == 4799);
 
             IOrderCore currentQuantityMoreThanVolume = new OrderCore(20003, "Dylan", "TEST", OrderTypes.GoodTillCancel);
