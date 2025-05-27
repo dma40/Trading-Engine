@@ -39,7 +39,7 @@ namespace TradingServer.Orders
 
         public long limitPrice { get; private set; }
 
-        public long StopPrice => Price;
+        public new long StopPrice => Price;
 
         public sealed override Order activate()
         {

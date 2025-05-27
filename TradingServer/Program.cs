@@ -15,6 +15,7 @@ orderbookMatchingTest.MatchTest();
 orderbookMatchingTest.getEligibleOrderCountTest();
 
 
+
 TradingOrderbookMatchingTest matchingTest = new TradingOrderbookMatchingTest();
 
 matchingTest.Setup();
@@ -24,10 +25,17 @@ matchingTest.PostOnlyMatchTest();
 matchingTest.ImmediateHandleTypeMatchedTest();
 matchingTest.HiddenAndVisibleOrdersMatchedCorrectly(); 
 
+var watch = System.Diagnostics.Stopwatch.StartNew();
+
 TradingOrderbookPriceMethodsTest priceMethodsTest = new TradingOrderbookPriceMethodsTest();
 
 priceMethodsTest.Setup();
 priceMethodsTest.TestPriceUpdatedCorrectly();
+
+watch.Stop();
+
+
+// Console.WriteLine("Time to execute tests: " + watch.ElapsedMilliseconds);
 
 TradingOrderbookStopOrderTest stopOrderTest = new TradingOrderbookStopOrderTest();
 

@@ -5,7 +5,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public class MatchManager
+    public class MatchManager: IDisposable
     {
         public MatchManager(Security security)
         {
@@ -76,6 +76,35 @@ namespace TradingServer.OrderbookCS
                 orderbook.removeOrder(cancel);
             }
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        ~MatchManager()
+        {
+            Dispose(false);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool dispose)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            Interlocked.Exchange(ref _disposed, true);
+
+            if (dispose)
+            {
+                orderbook.Dispose();
+                _hidden.Dispose();
+            }
+        }
+
+        private bool _disposed = false;
 
         public readonly Orderbook orderbook;
         private readonly Orderbook _hidden;
@@ -152,10 +181,15 @@ namespace TradingServer.OrderbookCS
 
         public Trades match(Order order)
         {
+            Console.WriteLine("FOK strategy called.");
             Trades result = new Trades();
 
             if (hidden.getEligibleOrderCount(order) + visible.getEligibleOrderCount(order) >= order.Quantity)
             {
+                Console.WriteLine("Quantity in this order: " + order.Quantity);
+                Console.WriteLine(hidden.getEligibleOrderCount(order));
+                Console.WriteLine(visible.getEligibleOrderCount(order));
+
                 result.addTransactions(visible.match(order));
                 result.addTransactions(hidden.match(order));
             }

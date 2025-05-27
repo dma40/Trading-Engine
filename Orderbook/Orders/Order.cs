@@ -130,8 +130,8 @@ namespace TradingServer.Orders
             throw new NotImplementedException();
         }
 
-        public bool isEmpty => throw new NotImplementedException();
-        public long StopPrice => throw new NotImplementedException();
+        public virtual bool isEmpty => throw new NotImplementedException();
+        public virtual long StopPrice => throw new NotImplementedException();
         public long currentMaxPrice;
 
         ~Order()

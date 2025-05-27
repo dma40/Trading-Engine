@@ -34,7 +34,7 @@ namespace TradingServer.Orders
 
         public long trail { get; private set; }
         
-        public long StopPrice 
+        public new long StopPrice 
         {  
             get
             {
@@ -55,7 +55,7 @@ namespace TradingServer.Orders
             } 
         }
 
-        public long currentMaxPrice { get; set; }
+        public new long currentMaxPrice { get; set; }
 
         public sealed override Order activate()
         {

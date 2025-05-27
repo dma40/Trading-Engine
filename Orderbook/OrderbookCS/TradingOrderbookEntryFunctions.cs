@@ -4,16 +4,13 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine : IMatchingEngine, IDisposable
     {
-        private readonly OrderRouter _router = new OrderRouter();
-        private readonly PairedOrderRouter _paired = new PairedOrderRouter();
-
         public void addOrder(Order order)
         {
             if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5) // update this method to use isValidTime
             {
                 return;
             }
-
+            
             lock (_ordersLock)
             {
                 if (isQueuable(order))

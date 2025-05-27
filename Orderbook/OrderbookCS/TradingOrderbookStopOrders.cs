@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS

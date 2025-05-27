@@ -5,13 +5,18 @@ namespace TradingServer.OrderbookCS
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
         private readonly Lock _ordersLock = new();
+
         private readonly MatchManager _strategies;
+        private readonly OrderRouter _router;
+        private readonly PairedOrderRouter _paired;
 
         public TradingEngine(Security security)
         {
             _trades = new Trades();
 
             _strategies = new MatchManager(security);
+            _router = new OrderRouter();
+            _paired = new PairedOrderRouter();
 
             _ = Task.Run(() => ProcessStopOrders(_ts.Token));
             _ = Task.Run(() => ProcessTrailingStopOrders(_ts.Token));
