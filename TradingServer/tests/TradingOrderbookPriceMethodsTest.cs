@@ -25,14 +25,16 @@ namespace TradingServer.Tests
         public void TestPriceUpdatedCorrectly()
         {
             const int count = 1000;
-
+            /*
             for (int i = 0; i < count; i++)
             {
                 IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
             }
-
+            */
             Console.WriteLine($"Finished adding {count} orders. ");
+            var usage = GC.GetTotalMemory(forceFullCollection: false);
+            Console.WriteLine($"Total memory used: {usage}");
             
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -41,6 +43,9 @@ namespace TradingServer.Tests
             {
                 IOrderCore sellCore = new OrderCore(i + count, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 _tradingEngine.addOrder(new Order(sellCore, i / 4, 1000, true));
+
+                IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+                _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
 
                 //IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 //_tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
@@ -65,6 +70,8 @@ namespace TradingServer.Tests
             }
 
             watch.Stop();
+            var used = GC.GetTotalMemory(forceFullCollection: false);
+            Console.WriteLine($"Total memory used: {used}");
             Console.WriteLine($"Elapsed time: " + watch.ElapsedMilliseconds);
         }
     }

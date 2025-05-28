@@ -13,6 +13,11 @@ namespace TradingServer.Orders
 
         public OrderCore(long orderID, string username, string securityID, OrderTypes _orderType, bool _isHidden)
         {
+            if (_orderType == OrderTypes.PostOnly && _isHidden)
+            {
+                throw new InvalidDataException("Post only orders cannot be hidden");
+            }
+
             OrderID = orderID;
             Username = username;
             SecurityID = securityID;

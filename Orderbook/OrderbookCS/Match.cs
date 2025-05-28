@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using TradingServer.Instrument;
 using TradingServer.Orders;
 
@@ -15,25 +16,30 @@ namespace TradingServer.OrderbookCS
 
             _strategies = new Dictionary<OrderTypes, IMatchingStrategy>();
 
-            _strategies.Add(key: OrderTypes.Limit, value: new MatchAndAddRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.GoodForDay, value: new MatchAndAddRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.GoodTillCancel, value: new MatchAndAddRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.StopLimit, value: new MatchAndAddRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.TrailingStopLimit, value: new MatchAndAddRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.Iceberg, value: new MatchAndAddRemainingStrategy(visible, hidden));
+            var MatchAndAddRemaining = new MatchAndAddRemainingStrategy(visible, hidden);
+            var ImmediateMatchCancelRemaining = new ImmediateMatchCancelRemainingStrategy(visible, hidden);
+            var FillOrKill = new FillOrKillStrategy(visible, hidden);
+            var PostOnly = new PostOnlyStrategy(visible, hidden);
 
-            _strategies.Add(key: OrderTypes.Market, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.FillAndKill, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.StopMarket, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.TrailingStopMarket, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.MarketOnOpen, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.LimitOnOpen, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.MarketOnClose, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
-            _strategies.Add(key: OrderTypes.LimitOnClose, value: new ImmediateMatchCancelRemainingStrategy(visible, hidden));
+            _strategies.Add(key: OrderTypes.Limit, value: MatchAndAddRemaining);
+            _strategies.Add(key: OrderTypes.GoodForDay, value: MatchAndAddRemaining);
+            _strategies.Add(key: OrderTypes.GoodTillCancel, value: MatchAndAddRemaining);
+            _strategies.Add(key: OrderTypes.StopLimit, value: MatchAndAddRemaining);
+            _strategies.Add(key: OrderTypes.TrailingStopLimit, value: MatchAndAddRemaining);
+            _strategies.Add(key: OrderTypes.Iceberg, value: MatchAndAddRemaining);
 
-            _strategies.Add(key: OrderTypes.FillOrKill, new FillOrKillStrategy(visible, hidden));
+            _strategies.Add(key: OrderTypes.Market, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.FillAndKill, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.StopMarket, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.TrailingStopMarket, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.MarketOnOpen, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.LimitOnOpen, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.MarketOnClose, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.LimitOnClose, value: ImmediateMatchCancelRemaining);
 
-            _strategies.Add(key: OrderTypes.PostOnly, value: new PostOnlyStrategy(visible, hidden));
+            _strategies.Add(key: OrderTypes.FillOrKill, FillOrKill);
+
+            _strategies.Add(key: OrderTypes.PostOnly, value: PostOnly);
         }
 
         public Trades match(Order order)
