@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook : IOrderEntryOrderbook, IDisposable
+    public partial class Orderbook : IOrderEntryOrderbook
     {
         public uint getEligibleOrderCount(Order order)
         {

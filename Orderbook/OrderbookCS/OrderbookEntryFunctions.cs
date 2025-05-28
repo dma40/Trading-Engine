@@ -2,7 +2,7 @@ using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
 {
-    public partial class Orderbook: IOrderEntryOrderbook, IDisposable
+    public partial class Orderbook: IOrderEntryOrderbook
     {
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private readonly RestingRouter _router;
