@@ -2,13 +2,18 @@ namespace TradingServer.Core
 {
     public enum Actions
     {
+        // Level 1 Data
         ContainsOrder,
         GetCount,
-        GetSpread, // Level 1 data
+        GetSpread,
+
+        // Level 2 Data
         GetAskOrders,
-        GetBidOrders, // Level 2 data
+        GetBidOrders,
+
+        // Level 3 Data
         AddOrder,
         ModifyOrder,
-        RemoveOrder // Level 3 data
+        RemoveOrder
     }
 }

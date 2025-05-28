@@ -5,10 +5,9 @@ namespace TradingServer.Orders
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy)
         {
             if (orderCore.OrderType == OrderTypes.Market)
+            {
                 throw new InvalidDataException("Market orders cannot have a price");
-
-            if (orderCore.isHidden)
-                throw new InvalidDataException("Market orders cannot go to the hidden portion");
+            }
             
             _orderCore = orderCore;
             Price = price;
@@ -20,17 +19,28 @@ namespace TradingServer.Orders
         public Order(IOrderCore orderCore, uint quantity, bool isBuy)
         {
             if (orderCore.OrderType != OrderTypes.Market)
+            {
                 throw new InvalidDataException("Only market orders can have no price");
+            }
+
+            if (orderCore.isHidden)
+            {
+                throw new InvalidDataException("Market orders cannot go to the hidden portion");
+            }
             
             _orderCore = orderCore;
             Quantity = quantity;
             isBuySide = isBuy;
 
             if (isBuySide)
+            {
                 Price = int.MaxValue;
-            
-            else 
-                Price = int.MinValue;      
+            }
+
+            else
+            {
+                Price = -1;
+            }   
         }
 
         public Order(ModifyOrder modify): this(modify, 
@@ -63,19 +73,29 @@ namespace TradingServer.Orders
         public static OrderTypes StringToOrderType(string input)
         {
             if (input == "FillOrKill")
+            {
                 return OrderTypes.FillOrKill;
-            
+            }
+
             else if (input == "GoodTillCancel")
+            {
                 return OrderTypes.GoodTillCancel;
-            
-            else if (input == "IntermediateOrCancel")    
+            }
+
+            else if (input == "IntermediateOrCancel")
+            {
                 return OrderTypes.FillAndKill;
-        
-            else if (input == "PostOnly")    
+            }
+
+            else if (input == "PostOnly")
+            {
                 return OrderTypes.PostOnly;
-        
-            else         
-                return OrderTypes.GoodForDay;    
+            }
+
+            else
+            {
+                return OrderTypes.GoodForDay;
+            }
     
             throw new InvalidOperationException("You cannot have this as a input, this is not in the enum");
         }
@@ -87,8 +107,10 @@ namespace TradingServer.Orders
 
         public void DecreaseQuantity(uint decrease) 
         {
-            if (decrease > CurrentQuantity) 
+            if (decrease > CurrentQuantity)
+            {
                 throw new InvalidOperationException("You cannot take away more orders than are currently open!");
+            }
             
             CurrentQuantity -= decrease;
         }
@@ -98,10 +120,19 @@ namespace TradingServer.Orders
             return Quantity - CurrentQuantity;
         }
 
-        public Order activate()
+        public virtual Order activate()
         {
             return this;
         }
+
+        public virtual void replenish()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual bool isEmpty => throw new NotImplementedException();
+        public virtual long StopPrice => throw new NotImplementedException();
+        public long currentMaxPrice;
 
         ~Order()
         {
@@ -116,12 +147,15 @@ namespace TradingServer.Orders
 
         private void Dispose(bool dispose) 
         {
-            if (_disposed)  
+            if (_disposed)
+            {
                 return;
-            
-            _disposed = true;
+            }
 
-            if (dispose) 
+            //_disposed = true;
+            Interlocked.Exchange(ref _disposed, true);
+
+            if (dispose)
             {
                 _ts.Cancel();
                 _ts.Dispose();

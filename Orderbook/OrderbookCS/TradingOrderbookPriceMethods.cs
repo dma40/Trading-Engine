@@ -1,47 +1,32 @@
+using TradingServer.Orders;
+
 namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        private long _greatestTradedPrice = int.MinValue;
-        public long lastTradedPrice { get; private set; }
-
-        protected async Task UpdateGreatestTradedPrice()
+        public long greatestTradedPrice = -1;
+        public long lastTradedPrice
         {
-            while (true)
+            get
             {
-                DateTime now = DateTime.Now;
-                TimeSpan currentTime = now.TimeOfDay;
-                DateTime current = DateTime.Now;
-
-                if (_ts.IsCancellationRequested)
-                    return;
-                
-                if (currentTime <= marketEnd && currentTime >= marketOpen)
+                if (_trades.count == 0)
                 {
-                    if (_trades.count >= 0)
-                    {
-                        var lastTrade = _trades.recordedTrades[_trades.count - 1];
-                        lastTradedPrice = lastTrade.tradedPrice;
-                    
-                        if (lastTrade.tradedPrice > _greatestTradedPrice)
-                            _greatestTradedPrice = lastTradedPrice;  
-                    } 
+                    return -1;
                 }
 
                 else
                 {
-                    DateTime tomorrow = current.AddDays(1);
-                    DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
-                    TimeSpan closed = nextTradingDayStart - DateTime.Now;
+                    List<Trade> trades = _trades.recordedTrades;
+                    long price = trades[_trades.count - 1].tradedPrice;
 
-                    await Task.Delay(closed, _ts.Token);
+                    if (price > greatestTradedPrice)
+                    {
+                        greatestTradedPrice = price;
+                    }
+
+                    return price;
                 }
-
-                if (_ts.IsCancellationRequested)
-                    return;
-            
-                await Task.Delay(200, _ts.Token);
             }
-        }  
+        }
     }
 }

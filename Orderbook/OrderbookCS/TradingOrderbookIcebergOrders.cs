@@ -1,22 +1,27 @@
+using TradingServer.Orders;
+
 namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        protected async Task ProcessIcebergOrders() 
+        protected void ProcessIcebergOrders(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 DateTime now = DateTime.Now;
                 TimeSpan currentTime = now.TimeOfDay;
 
-                lock (_stopLock)
+                lock (_ordersLock)
                 {
                     if (currentTime >= marketOpen && currentTime <= marketEnd)
                     {
-                        foreach (var order in _iceberg)
+                        var route = _router.Iceberg;
+                        var queue = route.queue;
+
+                        foreach (var order in queue)
                         {
                             var iceberg = order.Value;
-                            
+
                             if (iceberg.CurrentQuantity == 0 && !iceberg.isEmpty)
                             {
                                 iceberg.replenish();
@@ -25,26 +30,31 @@ namespace TradingServer.OrderbookCS
 
                             else if (iceberg.isEmpty)
                             {
-                                _iceberg.Remove(iceberg.OrderID);
+                                queue.Remove(iceberg.OrderID);
                             }
                         }
                     }
 
-                    else 
+                    else
                     {
-                        foreach (var order in _iceberg)
+                        var route = _router.Iceberg;
+                        var queue = route.queue;
+
+                        foreach (var order in queue)
                         {
-                            var iceberg = order.Value;
+                            Order iceberg = order.Value;
 
                             if (iceberg.isEmpty)
                             {
-                                _iceberg.Remove(iceberg.OrderID);
+                                route.Remove(iceberg.cancelOrder());
                             }
                         }
                     }
+
+                    // add extra cases for debugging this method
                 }
 
-                await Task.Delay(200, _ts.Token);
+                // await Task.Delay(200, token);
             }
         }
     }

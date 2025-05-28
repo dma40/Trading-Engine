@@ -1,5 +1,3 @@
-using TradingServer.Orders;
-
 namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
@@ -7,31 +5,29 @@ namespace TradingServer.OrderbookCS
         private static readonly TimeSpan marketOpen = new TimeSpan(9, 30, 0);
         private static readonly TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
-        private readonly Dictionary<long, Order> _onMarketOpen = new Dictionary<long, Order>();
-        private readonly Dictionary<long, Order> _onMarketClose = new Dictionary<long, Order>();
-
-        protected async Task ProcessAtMarketEnd()
+        protected async Task ProcessAtMarketEnd(CancellationToken token)
         {
-            while (true)
-            {
-                if (_ts.IsCancellationRequested)
-                    return;
-                
+            while (!token.IsCancellationRequested)
+            {    
                 DateTime currentTime = DateTime.Now;
 
                 if (currentTime.TimeOfDay == marketEnd)
                 {
-                    lock (_stopLock)
+                    lock (_ordersLock)
                     {
                         try
                         {
+                            /*
                             orderbook.DeleteGoodForDayOrders();
                             orderbook.DeleteExpiredGoodTillCancel();
 
                             _hidden.DeleteGoodForDayOrders();
                             _hidden.DeleteExpiredGoodTillCancel();
+                            */
 
-                            ProcessOnMarketEndOrders(); 
+                            _strategies.ProcessAtMarketEnd();
+
+                            ProcessOnMarketEndOrders();
                         }
 
                         catch (Exception exception)
@@ -47,39 +43,56 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayEnd = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 16, 0, 0);
                     TimeSpan closed = nextTradingDayEnd - DateTime.Now;
 
-                    await Task.Delay(closed, _ts.Token);
+                    await Task.Delay(closed, token);
                 }
 
-                if (_ts.IsCancellationRequested)
-                    return; 
-
-                await Task.Delay(200, _ts.Token);
+                await Task.Delay(200, token);
             }
         }
 
-        protected async Task ProcessAtMarketOpen()
+        protected async Task ProcessAtMarketOpen(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                if (_ts.IsCancellationRequested)
-                    return;
-
                 DateTime currentTime = DateTime.Now;
                 DateTime now = DateTime.Now;
-                
+
                 if (now.TimeOfDay == marketOpen)
                 {
-                    lock (_stopLock)
+                    var route = _router.MarketOnOpen;
+                    var market_queue = route.queue;
+
+                    lock (_ordersLock)
                     {
-                        foreach (var order in _onMarketOpen)
+                        foreach (var order in market_queue)
                         {
                             var orderEntry = order.Value;
-                            var id = order.Value.OrderID;
 
-                            match(order.Value);
-                            _onMarketOpen.Remove(id);
+                            match(orderEntry);
+                        }
 
-                            orderEntry.Dispose();
+                        foreach (var order in market_queue)
+                        {
+                            var orderEntry = order.Value;
+
+                            route.Remove(orderEntry.cancelOrder());
+                        }
+
+                        var limitRoute = _router.LimitOnOpen;
+                        var limit_queue = limitRoute.queue;
+
+                        foreach (var order in limit_queue)
+                        {
+                            var orderEntry = order.Value;
+
+                            match(orderEntry);
+                        }
+
+                        foreach (var order in market_queue)
+                        {
+                            var orderEntry = order.Value;
+
+                            route.Remove(orderEntry.cancelOrder());
                         }
                     }
                 }
@@ -90,25 +103,47 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed, _ts.Token);
+                    await Task.Delay(closed, token);
                 }
-
-                if (_ts.IsCancellationRequested)
-                    return;
                 
-                await Task.Delay(200, _ts.Token);
+                //await Task.Delay(200, token);
             }
         }
 
         protected void ProcessOnMarketEndOrders()
         {
-            foreach (var order in _onMarketClose)
-            {
-                var current = order.Value;
-                match(current);
+            var route = _router.MarketOnClose;
+            var market_queue = route.queue;
 
-                _onMarketClose.Remove(current.OrderID);
-                current.Dispose();
+            foreach (var order in market_queue)
+            {
+                var orderEntry = order.Value;
+
+                match(orderEntry);
+            }
+
+            foreach (var order in market_queue)
+            {
+                var orderEntry = order.Value;
+
+                route.Remove(orderEntry.cancelOrder());
+            }
+
+            var limitRoute = _router.LimitOnOpen;
+            var limit_queue = limitRoute.queue;
+
+            foreach (var order in limit_queue)
+            {
+                var orderEntry = order.Value;
+
+                match(orderEntry);
+            }
+
+            foreach (var order in limit_queue)
+            {
+                var orderEntry = order.Value;
+
+                route.Remove(orderEntry.cancelOrder());
             }
         }
     }

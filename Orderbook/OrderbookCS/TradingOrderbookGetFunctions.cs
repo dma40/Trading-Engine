@@ -4,6 +4,7 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
+        public Orderbook orderbook => _strategies.orderbook;
         public int count => orderbook.count;
         public OrderbookSpread spread()
         {

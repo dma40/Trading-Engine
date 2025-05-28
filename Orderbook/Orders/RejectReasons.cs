@@ -1,6 +1,6 @@
 namespace TradingServer.Rejects 
 {
-    public enum RejectionReason 
+    public enum RejectionReason
     {
         Unknown,
         OrderNotFound,
@@ -9,6 +9,8 @@ namespace TradingServer.Rejects
         InvalidOrUnknownArgument,
         EmptyOrNullArgument,
         SubmittedAfterDeadline,
-        InsufficientPermissionError
+        InsufficientPermissionError,
+        
+        None
     }
 }
