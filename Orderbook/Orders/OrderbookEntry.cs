@@ -1,38 +1,40 @@
 namespace TradingServer.Orders 
 {
-    public class Limit 
+    public class Limit
     {
         public Limit(long price)
         {
             Price = price;
+            levelLock = new();
         }
 
         public long Price { get; private set; }
         public OrderbookEntry? head { get; set; }
         public OrderbookEntry? tail { get; set; }
+        private readonly Lock levelLock;
 
-        public uint getLevelOrderCount() 
+        public uint getLevelOrderCount()
         {
             uint count = 0;
             OrderbookEntry? headPointer = head;
 
             while (headPointer != null)
             {
-                if (headPointer.CurrentOrder.CurrentQuantity != 0) 
+                if (headPointer.CurrentOrder.CurrentQuantity != 0)
                 {
                     count++;
                 }
 
-                headPointer = headPointer.next; 
+                headPointer = headPointer.next;
             }
 
             return count;
         }
 
-        public uint getLevelOrderQuantity() 
+        public uint getLevelOrderQuantity()
         {
             uint count = 0;
-            
+
             OrderbookEntry? headPointer = head;
 
             while (headPointer != null)
@@ -47,7 +49,7 @@ namespace TradingServer.Orders
             return count;
         }
 
-        public List<OrderRecord> getOrderRecords() 
+        public List<OrderRecord> getOrderRecords()
         {
             List<OrderRecord> records = new List<OrderRecord>();
             OrderbookEntry? headPointer = head;
@@ -57,34 +59,34 @@ namespace TradingServer.Orders
             {
                 var current = headPointer.CurrentOrder;
                 records.Add(new OrderRecord(current.OrderID, current.CurrentQuantity, current.CurrentQuantity,
-                current.Price, current.Price, current.isBuySide, 
+                current.Price, current.Price, current.isBuySide,
                 current.Username, current.SecurityID, queuePosition, queuePosition));
 
                 queuePosition++;
                 headPointer = headPointer.next;
             }
-            
+
             return records;
         }
 
-        public bool isEmpty 
+        public bool isEmpty
         {
             get
             {
                 return head == null && tail == null;
             }
         }
-        
-        public Side side 
+
+        public Side side
         {
-            get 
+            get
             {
-                if (isEmpty) 
+                if (isEmpty)
                 {
                     return Side.Unknown;
                 }
 
-                else 
+                else
                 {
                     if (head != null)
                     {
@@ -95,9 +97,27 @@ namespace TradingServer.Orders
                 return Side.Unknown;
             }
         }
+
+        /*
+        public void Add(Order order)
+        {
+            lock (levelLock)
+            {
+
+            }
+        }
+
+        public void Remove(OrderbookEntry obe)
+        {
+            lock (levelLock)
+            {
+
+            }
+        }
+        */
     }
 
-    public class OrderbookEntry: IDisposable
+    public class OrderbookEntry
     {
         public OrderbookEntry(Order currentOrder, Limit parentLimit)
         {
@@ -110,17 +130,17 @@ namespace TradingServer.Orders
         {
             uint count = 0;
             OrderbookEntry? orderPtr = previous;
-            
+
             while (orderPtr != null)
             {
                 orderPtr = orderPtr.previous;
                 count += 1;
             }
-            
+
             return count;
         }
 
-        public DateTime CreationTime { get; private set; }      
+        public DateTime CreationTime { get; private set; }
         public Order CurrentOrder { get; private set; }
         public Limit ParentLimit { get; private set; }
         public OrderbookEntry? next { get; set; }
@@ -131,33 +151,7 @@ namespace TradingServer.Orders
 
         ~OrderbookEntry()
         {
-            Dispose(false);
+
         }
-
-        public void Dispose() 
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool dispose) 
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            //_disposed = true;
-            Interlocked.Exchange(ref _disposed, true);
-
-            if (dispose)
-            {
-                _ts.Cancel();
-                _ts.Dispose();
-            }
-        }
-
-        private bool _disposed = false;
-        CancellationTokenSource _ts = new CancellationTokenSource();
     }
 }

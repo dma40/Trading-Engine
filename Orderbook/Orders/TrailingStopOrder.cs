@@ -1,6 +1,6 @@
 namespace TradingServer.Orders
 {
-    public class TrailingStopOrder: Order, IOrderCore, IDisposable
+    public class TrailingStopOrder: Order, IOrderCore
     {
         static int ask = -1;
         static int bid = int.MaxValue;
@@ -64,32 +64,7 @@ namespace TradingServer.Orders
 
         ~TrailingStopOrder()
         {
-            Dispose(false);
-        }
-
-        public new void Dispose() 
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool dispose) 
-        {
-            if (_disposed)
-            {
-                return;
-            }
             
-            _disposed = true;
-
-            if (dispose) 
-            {
-                _ts.Cancel();
-                _ts.Dispose();
-            }
         }
-
-        private bool _disposed = false;
-        private readonly CancellationTokenSource _ts = new CancellationTokenSource();
     }
 }

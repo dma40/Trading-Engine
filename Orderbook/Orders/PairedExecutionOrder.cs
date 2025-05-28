@@ -1,8 +1,8 @@
 namespace TradingServer.Orders
 {
-    public class PairedExecutionOrder: AbstractPairedOrder, IOrderCore
+    public class PairedExecutionOrder : AbstractPairedOrder, IOrderCore
     {
-        public PairedExecutionOrder(IOrderCore orderCore, Order _primary, Order _secondary): base(orderCore, _primary, _secondary)
+        public PairedExecutionOrder(IOrderCore orderCore, Order _primary, Order _secondary) : base(orderCore, _primary, _secondary)
         {
             if (orderCore.OrderType != OrderTypes.PairedExecution)
             {
@@ -13,6 +13,11 @@ namespace TradingServer.Orders
             {
                 throw new InvalidDataException();
             }
+        }
+
+        ~PairedExecutionOrder()
+        {
+            
         }
     }
 }

@@ -1,6 +1,6 @@
 namespace TradingServer.Orders 
 {
-    public class Order: IOrderCore, IDisposable
+    public class Order : IOrderCore
     {
         public Order(IOrderCore orderCore, long price, uint quantity, bool isBuy)
         {
@@ -8,7 +8,7 @@ namespace TradingServer.Orders
             {
                 throw new InvalidDataException("Market orders cannot have a price");
             }
-            
+
             _orderCore = orderCore;
             Price = price;
             Quantity = quantity;
@@ -27,7 +27,7 @@ namespace TradingServer.Orders
             {
                 throw new InvalidDataException("Market orders cannot go to the hidden portion");
             }
-            
+
             _orderCore = orderCore;
             Quantity = quantity;
             isBuySide = isBuy;
@@ -40,17 +40,20 @@ namespace TradingServer.Orders
             else
             {
                 Price = -1;
-            }   
+            }
         }
 
-        public Order(ModifyOrder modify): this(modify, 
-            modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide) {}
+        public Order(ModifyOrder modify) : this(modify,
+            modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide)
+        { }
 
-        public Order(StopOrder stop): this(stop, stop.limitPrice, stop.Quantity, 
-            stop.isBuySide) {}
+        public Order(StopOrder stop) : this(stop, stop.limitPrice, stop.Quantity,
+            stop.isBuySide)
+        { }
 
-        public Order(TrailingStopOrder trail): this(trail, trail.StopPrice, trail.Quantity, 
-            trail.isBuySide) {}
+        public Order(TrailingStopOrder trail) : this(trail, trail.StopPrice, trail.Quantity,
+            trail.isBuySide)
+        { }
 
         public CancelOrder cancelOrder()
         {
@@ -58,8 +61,8 @@ namespace TradingServer.Orders
         }
 
         private readonly IOrderCore _orderCore;
-        
-        public long OrderID => _orderCore.OrderID; 
+
+        public long OrderID => _orderCore.OrderID;
         public string SecurityID => _orderCore.SecurityID;
         public string Username => _orderCore.Username;
         public bool isHidden => _orderCore.isHidden;
@@ -96,22 +99,22 @@ namespace TradingServer.Orders
             {
                 return OrderTypes.GoodForDay;
             }
-    
+
             throw new InvalidOperationException("You cannot have this as a input, this is not in the enum");
         }
 
-        public void IncreaseQuantity(uint additional) 
+        public void IncreaseQuantity(uint additional)
         {
             CurrentQuantity += additional;
         }
 
-        public void DecreaseQuantity(uint decrease) 
+        public void DecreaseQuantity(uint decrease)
         {
             if (decrease > CurrentQuantity)
             {
                 throw new InvalidOperationException("You cannot take away more orders than are currently open!");
             }
-            
+
             CurrentQuantity -= decrease;
         }
 
@@ -136,33 +139,7 @@ namespace TradingServer.Orders
 
         ~Order()
         {
-            Dispose(false);
+            
         }
-
-        public void Dispose() 
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool dispose) 
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            //_disposed = true;
-            Interlocked.Exchange(ref _disposed, true);
-
-            if (dispose)
-            {
-                _ts.Cancel();
-                _ts.Dispose();
-            }
-        }
-
-        private bool _disposed = false;
-        CancellationTokenSource _ts = new CancellationTokenSource();
     }
 }

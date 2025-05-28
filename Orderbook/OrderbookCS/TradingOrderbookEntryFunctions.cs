@@ -11,6 +11,7 @@ namespace TradingServer.OrderbookCS
                 if (isQueuable(order))
                 {
                     _router.Route(order);
+                    return;
                 }
 
                 else
@@ -69,23 +70,6 @@ namespace TradingServer.OrderbookCS
                 _router.Remove(cancel);
                 _paired.Remove(cancel);
             }
-        }
-
-        protected bool isValidTime(IOrderCore order)
-        {
-            if (order.OrderType == OrderTypes.PostOnly
-                || order.OrderType == OrderTypes.Market
-                || order.OrderType == OrderTypes.FillOrKill
-                || order.OrderType == OrderTypes.FillAndKill
-                || order.OrderType == OrderTypes.StopLimit
-                || order.OrderType == OrderTypes.StopMarket
-                || order.OrderType == OrderTypes.TrailingStopLimit
-                || order.OrderType == OrderTypes.TrailingStopMarket)
-            {
-                return DateTime.Now.Hour <= 16 && DateTime.Now.Hour >= 9.5;
-            }
-
-            return true;
         }
 
         protected bool isQueuable(Order order)

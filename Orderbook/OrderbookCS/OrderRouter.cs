@@ -1,4 +1,3 @@
-using System.Dynamic;
 using TradingServer.Orders;
 
 namespace TradingServer.OrderbookCS
@@ -28,7 +27,7 @@ namespace TradingServer.OrderbookCS
         {
             if (routes.TryGetValue(order.OrderType, out IRouter? strategy))
             {
-                strategy.Route(order); 
+                strategy.Route(order);
             }
         }
 

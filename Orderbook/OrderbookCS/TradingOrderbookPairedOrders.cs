@@ -39,13 +39,12 @@ namespace TradingServer.OrderbookCS
                                     }
                                 }
 
-                                route.Remove(new CancelOrder(pairedCancelOrder)); // format this better
+                                route.Remove(new CancelOrder(pairedCancelOrder)); 
                             }
 
                             else if (orderbook.canMatch(primary))
                             {
                                 match(primary);
-                                secondary.Dispose();
                                 route.Remove(new CancelOrder(pairedCancelOrder));
 
                             }
@@ -53,7 +52,6 @@ namespace TradingServer.OrderbookCS
                             else if (orderbook.canMatch(secondary))
                             {
                                 match(secondary);
-                                primary.Dispose();
                                 route.Remove(new CancelOrder(pairedCancelOrder));
                             }
                         }

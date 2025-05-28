@@ -126,7 +126,6 @@ namespace TradingServer.OrderbookCS
             }
             
             orders.Remove(id);
-            orderentry.Dispose();
         }
 
         public void modifyOrder(ModifyOrder modify)
