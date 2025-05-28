@@ -58,6 +58,8 @@ namespace TradingServer.OrderbookCS
             Trades result = new Trades();
             List<OrderbookEntry> cancels = new List<OrderbookEntry>();
 
+           // bool broken = false;
+
             if (order.isBuySide)
             {
                 foreach (var ask in _askLimits)
@@ -86,14 +88,16 @@ namespace TradingServer.OrderbookCS
 
                     else if (order.CurrentQuantity == 0)
                     {
+                        // Console.WriteLine("Broke loop because order is now empty");
                         break;
                     }
 
                     else if (ask.Price < order.Price)
                     {
+                        // Console.WriteLine("Broke loop because further price levels are not matchable");
                         break;
                     }
-                    
+
                 }
             }
 
@@ -112,7 +116,7 @@ namespace TradingServer.OrderbookCS
 
                             if (entry.CurrentQuantity > 0)
                             {
-                                break;  
+                                break;
                             }
 
                             else

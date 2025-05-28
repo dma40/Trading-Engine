@@ -12,7 +12,6 @@ namespace TradingServer.OrderbookCS
         {
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             {
-                //Console.WriteLine("Did not find a orderbook entry with this id" + order.OrderID);
                 addOrder(order, order.isBuySide ? _bidLimits : _askLimits, _orders);
             }
         }
