@@ -7,7 +7,7 @@ namespace TradingServer.OrderbookCS
     {
         public OrderRouter()
         {
-            routes = new Dictionary<OrderTypes, IRouter>(); // process the market queue first!
+            routes = new Dictionary<OrderTypes, IRouter>();
 
             routes.Add(key: OrderTypes.LimitOnOpen, value: new OnMarketOpenLimitRouter());
             routes.Add(key: OrderTypes.MarketOnOpen, value: new OnMarketOpenMarketRouter());
@@ -22,14 +22,13 @@ namespace TradingServer.OrderbookCS
             routes.Add(key: OrderTypes.StopLimit, value: new StopLimitRouter());
 
             routes.Add(key: OrderTypes.Iceberg, value: new IcebergRouter());
-            /* Add remove method as well, simplify remove method*/
         }
 
         public void Route(Order order)
         {
             if (routes.TryGetValue(order.OrderType, out IRouter? strategy))
             {
-                strategy.Route(order); // check if this works okay
+                strategy.Route(order); 
             }
         }
 

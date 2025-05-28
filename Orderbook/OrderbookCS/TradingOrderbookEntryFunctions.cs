@@ -6,13 +6,6 @@ namespace TradingServer.OrderbookCS
     {
         public void addOrder(Order order)
         {
-            /*
-            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5) // if (isValidTime(order))
-            {
-                return;
-            }
-            */
-            
             lock (_ordersLock)
             {
                 if (isQueuable(order))
@@ -22,7 +15,6 @@ namespace TradingServer.OrderbookCS
 
                 else
                 {
-                    // Console.WriteLine("This order is not going to go into a queue. ");
                     if (_strategies.containsOrder(order))
                     {
                         match(order);
@@ -70,13 +62,6 @@ namespace TradingServer.OrderbookCS
 
         public void removeOrder(CancelOrder cancel)
         {
-            /*
-            if (DateTime.Now.Hour >= 16 || DateTime.Now.Hour <= 9.5)
-            {
-                return;
-            }
-            */
-
             lock (_ordersLock)
             {
                 _strategies.removeOrder(cancel);

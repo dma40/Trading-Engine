@@ -49,8 +49,7 @@ namespace TradingServer.OrderbookCS
            
             if (dispose)
             {
-                // orderbook.Dispose();
-                // _hidden.Dispose();
+                _strategies.Dispose();
 
                 _ts.Cancel();
                 _ts.Dispose();
