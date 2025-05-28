@@ -17,9 +17,9 @@ internal static class TradingHostBuilder
         services.AddOptions();
         
         services.Configure<TradingServerConfiguration>(context.Configuration.
-                                                    GetSection(nameof(TradingServerConfiguration)));
+                            GetSection(nameof(TradingServerConfiguration)));
         services.Configure<LoggerConfiguration>(context.Configuration.
-                                                    GetSection(nameof(LoggerConfiguration)));
+                            GetSection(nameof(LoggerConfiguration)));
 
         var defaultConfig = new LoggerConfiguration
         {
@@ -61,9 +61,10 @@ internal static class TradingHostBuilder
             throw new ArgumentException("This is not a supported logger type");
         }
         
-        services.AddGrpcClient<TradingClient>(); 
+        services.AddGrpcClient<TradingClient>();
+        
+        services.AddSingleton<TradingClient>();
         services.AddSingleton<ITradingServer, TradingServer>();
-
         services.AddHostedService<TradingServer>();
 
         services.AddGrpc();

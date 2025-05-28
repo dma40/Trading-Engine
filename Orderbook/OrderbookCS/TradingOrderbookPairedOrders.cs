@@ -4,23 +4,23 @@ namespace TradingServer.OrderbookCS
 {
     public partial class TradingEngine: IMatchingEngine, IDisposable
     {
-        protected async Task ProcessPairedCancelOrders()
+        protected async Task ProcessPairedCancelOrders(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                if (_ts.IsCancellationRequested)
-                    return;
-
                 TimeSpan timeOfDay = DateTime.Now.TimeOfDay;
                 DateTime current = DateTime.Now;
 
                 if (timeOfDay >= marketOpen && timeOfDay <= marketEnd)
                 {
-                    lock (_stopLock)
+                    lock (_ordersLock)
                     {
-                        foreach (var pairedCancel in _pairedCancel)
+                        var route = _paired.PairedCancel;
+                        var paired_queue = route.queue;
+
+                        foreach (var pairedCancel in paired_queue)
                         {
-                            PairedCancelOrder pairedCancelOrder = pairedCancel.Value;
+                            AbstractPairedOrder pairedCancelOrder = pairedCancel.Value;
                             Order primary = pairedCancelOrder.primary.activate();
                             Order secondary = pairedCancelOrder.secondary.activate();
 
@@ -39,14 +39,14 @@ namespace TradingServer.OrderbookCS
                                     }
                                 }
 
-                                _pairedCancel.Remove(pairedCancelOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedCancelOrder)); // format this better
                             }
 
                             else if (orderbook.canMatch(primary))
                             {
                                 match(primary);
                                 secondary.Dispose();
-                                _pairedCancel.Remove(pairedCancelOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedCancelOrder));
 
                             }
 
@@ -54,7 +54,7 @@ namespace TradingServer.OrderbookCS
                             {
                                 match(secondary);
                                 primary.Dispose();
-                                _pairedCancel.Remove(pairedCancelOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedCancelOrder));
                             }
                         }
                     }
@@ -66,33 +66,30 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed, _ts.Token);
+                    await Task.Delay(closed, token);
                 }
 
-                if (_ts.IsCancellationRequested)
-                    return;
-
-                await Task.Delay(200, _ts.Token);
+                // await Task.Delay(200, token);
             }
         }
 
-        protected async Task ProcessPairedExecutionOrders()
+        protected async Task ProcessPairedExecutionOrders(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                if (_ts.IsCancellationRequested)
-                    return;
-
                 TimeSpan timeOfDay = DateTime.Now.TimeOfDay;
                 DateTime current = DateTime.Now;
 
                 if (timeOfDay > marketOpen && timeOfDay < marketEnd)
                 {
-                    lock (_stopLock)
+                    lock (_ordersLock)
                     {
-                        foreach (var pairedExecution in _pairedExecution)
+                        var route = _paired.PairedExecution;
+                        var paired_queue = route.queue;
+
+                        foreach (var pairedExecution in paired_queue)
                         {
-                            PairedExecutionOrder pairedExecutionOrder = pairedExecution.Value;
+                            AbstractPairedOrder pairedExecutionOrder = pairedExecution.Value;
                             Order primary = pairedExecutionOrder.primary;
 
                             Order activatedPrimary = primary.activate();
@@ -102,7 +99,7 @@ namespace TradingServer.OrderbookCS
                             {
                                 Order activatedSecondary = pairedExecutionOrder.secondary.activate();
                                 match(activatedSecondary);
-                                _pairedExecution.Remove(pairedExecutionOrder.OrderID);
+                                route.Remove(new CancelOrder(pairedExecutionOrder));
                             }
 
                             else
@@ -119,13 +116,10 @@ namespace TradingServer.OrderbookCS
                     DateTime nextTradingDayStart = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 9, 30, 0);
                     TimeSpan closed = nextTradingDayStart - DateTime.Now;
 
-                    await Task.Delay(closed, _ts.Token);
+                    await Task.Delay(closed, token);
                 }
 
-                if (_ts.IsCancellationRequested)
-                    return;
-
-                await Task.Delay(200, _ts.Token);
+                // await Task.Delay(200, token);
             }
         }
     }

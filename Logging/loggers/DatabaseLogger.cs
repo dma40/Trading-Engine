@@ -2,7 +2,7 @@ using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Options;
 using TradingServer.Logging.LoggingConfiguration;
 
-using MySql.Data.MySqlClient;
+using Npgsql;
 
 namespace TradingServer.Logging
 {
@@ -21,15 +21,29 @@ namespace TradingServer.Logging
 
             DateTime now = DateTime.Now;
 
-            string? user = Environment.GetEnvironmentVariable("MYSQL_USER");
-            string? password = Environment.GetEnvironmentVariable("MYSQL_PASS");
+            string? user = Environment.GetEnvironmentVariable("SQL_USER");
+            string? password = Environment.GetEnvironmentVariable("SQL_PASS");
 
             string? filename = _logConfig?.TextLoggerConfiguration?.Filename ?? throw new ArgumentException("Filename cannot be null");
 
-            string dbname = $"{filename}_{now.Year}_{now.Month}_{now.Day}"; // maybe include the time too
-            string dbquery = $"CREATE DATABASE IF NOT EXISTS {dbname};";
-            string link = $"Server=localhost;Port=3306;Uid={user};Pwd={password}";
-            string dblink = $"Server=localhost;Port=3306;Database={dbname};Uid={user};Pwd={password}";
+            string dbname = $"{filename}_{now:yyyy-MM-dd}";
+            string dbquery = @$"DO $$  
+                                BEGIN
+
+                                    IF NOT EXISTS (
+                                        SELECT FROM pg_database WHERE name = '{dbname}'
+                                    ) 
+
+                                    THEN
+                                        PERFORM dblink_exec('dbname={dbname}', 'CREATE DATABASE {dbname}')
+                                    
+                                    END IF;
+
+                                END
+                                $$";
+
+            string link = $"Server=localhost;Port=5432;Uid={user};Pwd={password}";
+            string dblink = $"Server=localhost;Port=5432;Database={dbname};Uid={user};Pwd={password}";
             
             string createTableRequest = @"
             CREATE TABLE IF NOT EXISTS LogInformation (
@@ -41,19 +55,15 @@ namespace TradingServer.Logging
                 name VARCHAR(100) NOT NULL
             );";
 
-
-            using (var conn = new MySqlConnection(link))
+            using (var conn = new NpgsqlConnection(link))
             {
                 conn.Open();
-
-                using (var command = new MySqlCommand(dbquery, conn))
+                using (var command = new NpgsqlCommand(dbquery, conn))
                 {
                     command.ExecuteNonQuery();
 
-                    var connection = new MySqlConnection(dblink);
-                    connection.Open();
-
-                    using (var request = new MySqlCommand(createTableRequest, connection))
+                    var connection = new NpgsqlConnection(dblink);
+                    using (var request = new NpgsqlCommand(createTableRequest, connection))
                     {
                         request.ExecuteNonQuery();
                     }
@@ -65,7 +75,7 @@ namespace TradingServer.Logging
 
         private static async Task LogAsync(string db, BufferBlock<LogInformation> logs, CancellationToken token)
         {
-            MySqlConnection connection = new MySqlConnection(db);
+            NpgsqlConnection connection = new NpgsqlConnection(db);
 
             try
             {
@@ -73,7 +83,7 @@ namespace TradingServer.Logging
                 {
                     var item = await logs.ReceiveAsync(token).ConfigureAwait(false);
                     string request = FormatLogItem(item);
-                    using (var command = new MySqlCommand(request, connection))
+                    using (var command = new NpgsqlCommand(request, connection))
                     {
                         await command.ExecuteNonQueryAsync();
                     }

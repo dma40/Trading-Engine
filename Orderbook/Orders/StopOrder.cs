@@ -22,7 +22,7 @@ namespace TradingServer.Orders
 
             else
             {
-                limitPrice = int.MinValue;
+                limitPrice = -1;
             }
         }
 
@@ -39,9 +39,9 @@ namespace TradingServer.Orders
 
         public long limitPrice { get; private set; }
 
-        public long StopPrice => Price;
+        public new long StopPrice => Price;
 
-        public new Order activate()
+        public sealed override Order activate()
         {
             return new Order(this);
         }
@@ -74,6 +74,6 @@ namespace TradingServer.Orders
         }
 
         private bool _disposed = false;
-        CancellationTokenSource _ts = new CancellationTokenSource();
+        private readonly CancellationTokenSource _ts = new CancellationTokenSource();
     }
 }

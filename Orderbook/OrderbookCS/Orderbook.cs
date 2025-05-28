@@ -7,8 +7,7 @@ namespace TradingServer.OrderbookCS
         private readonly Security _security;
 
         CancellationTokenSource _ts = new CancellationTokenSource();
-        public bool _disposed => _dispose == 1;
-        private int _dispose = 0;
+        private bool _disposed = false;
 
         public Orderbook(Security instrument)
         {
@@ -28,10 +27,12 @@ namespace TradingServer.OrderbookCS
 
         protected virtual void Dispose(bool dispose) 
         {
-            if (_disposed) 
+            if (_disposed)
+            {
                 return;
+            }
             
-            Interlocked.Exchange(ref _dispose, 1);
+            Interlocked.Exchange(ref _disposed, true);
 
             if (dispose) 
             {

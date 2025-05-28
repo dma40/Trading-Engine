@@ -10,21 +10,15 @@ namespace TradingServer.OrderbookCS
     
         public void addOrder(Order order)
         {
-            if (!isValidTime(order))
-            {
-                return;
-            }
-            
-            var baseLimit = new Limit(order.Price);
-
             if (!_orders.TryGetValue(order.OrderID, out OrderbookEntry? orderbookentry))
             {
-                addOrder(order, baseLimit, order.isBuySide ? _bidLimits : _askLimits, _orders);
+                addOrder(order, order.isBuySide ? _bidLimits : _askLimits, _orders);
             }
         }
         
-        private void addOrder(Order order, Limit baseLimit, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
+        private void addOrder(Order order, SortedSet<Limit> levels, Dictionary<long, OrderbookEntry> orders)
         {
+            Limit baseLimit = new Limit(order.Price);
             OrderbookEntry orderbookEntry = new OrderbookEntry(order, baseLimit);
 
             if (levels.TryGetValue(baseLimit, out Limit? limit))
@@ -64,16 +58,13 @@ namespace TradingServer.OrderbookCS
         private void removeOrders(List<OrderbookEntry> cancels)
         {
             foreach (OrderbookEntry cancel in cancels)
+            {
                 removeOrder(cancel.OrderID, cancel, _orders);
+            }
         }
 
         public void removeOrder(CancelOrder cancel)
         {
-            if (!isValidTime(cancel))
-            {
-                return;
-            }
-
             if (_orders.TryGetValue(cancel.OrderID, out OrderbookEntry? orderbookentry))
             {
                 removeOrder(cancel.OrderID, orderbookentry, _orders);
@@ -92,18 +83,24 @@ namespace TradingServer.OrderbookCS
             {
                 orderentry.ParentLimit.head = null;
                 orderentry.ParentLimit.tail = null;
-                
-                if (orderentry.CurrentOrder.isBuySide)
-                    _bidLimits.Remove(orderentry.ParentLimit);
 
-                else 
-                    _askLimits.Remove(orderentry.ParentLimit);    
+                if (orderentry.CurrentOrder.isBuySide)
+                {
+                    _bidLimits.Remove(orderentry.ParentLimit);
+                }
+
+                else
+                {
+                    _askLimits.Remove(orderentry.ParentLimit);
+                }  
             }
 
             else if (orderentry.ParentLimit.head == orderentry)
             {
                 if (orderentry.next != null)
+                {
                     orderentry.next.previous = null;
+                }
 
                 orderentry.ParentLimit.head = orderentry.next;
             }
@@ -111,7 +108,9 @@ namespace TradingServer.OrderbookCS
             else if (orderentry.ParentLimit.tail == orderentry)
             {
                 if (orderentry.previous != null)
+                {
                     orderentry.previous.next = null;
+                }
 
                 orderentry.ParentLimit.tail = orderentry.previous;
             }
@@ -132,25 +131,24 @@ namespace TradingServer.OrderbookCS
 
         public void modifyOrder(ModifyOrder modify)
         {
-            if (!isValidTime(modify))
-            {
-                return;
-            }
-
             if (_orders.TryGetValue(modify.OrderID, out OrderbookEntry? orderentry))
             {
                 removeOrder(modify.OrderID, orderentry, _orders);
-                addOrder(modify.newOrder(), orderentry.ParentLimit, modify.isBuySide ? _bidLimits : _askLimits, _orders);
+                addOrder(modify.newOrder(), modify.isBuySide ? _bidLimits : _askLimits, _orders);
             }
         }
 
         public static bool isValidTime(IOrderCore order)
         {
             if (order.OrderType == OrderTypes.GoodForDay)
+            {
                 return DateTime.Now.Hour < 16 && DateTime.Now.Hour > 9.5;
-            
+            }
+
             else
+            {
                 return true;
+            }
         }
     }
 }

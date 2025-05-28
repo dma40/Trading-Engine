@@ -87,7 +87,9 @@ namespace TradingServer.Orders
                 else 
                 {
                     if (head != null)
+                    {
                         return head.CurrentOrder.isBuySide ? Side.Bid : Side.Ask;
+                    }
                 }
 
                 return Side.Unknown;
@@ -140,12 +142,15 @@ namespace TradingServer.Orders
 
         protected virtual void Dispose(bool dispose) 
         {
-            if (_disposed)  
+            if (_disposed)
+            {
                 return;
+            }
 
-            _disposed = true;
+            //_disposed = true;
+            Interlocked.Exchange(ref _disposed, true);
 
-            if (dispose) 
+            if (dispose)
             {
                 _ts.Cancel();
                 _ts.Dispose();
