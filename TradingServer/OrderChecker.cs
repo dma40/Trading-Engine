@@ -59,11 +59,21 @@ namespace TradingServer.Core
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
 
-            return ((Order.StringToOrderType(request.Type) == OrderTypes.MarketOnClose) ||
+
+            return (Order.StringToOrderType(request.Type) == OrderTypes.MarketOnClose ||
                 Order.StringToOrderType(request.Type) == OrderTypes.LimitOnClose) && (now >= onCloseDeadline)
                 || Order.StringToOrderType(request.Type) == OrderTypes.MarketOnOpen ||
                 Order.StringToOrderType(request.Type) == OrderTypes.LimitOnOpen && (now >= onOpenDeadline)
-                || (now >= closed);
+                || (now >= closed) ||
+                ((request.Type == "PostOnly"
+                || request.Type == "Market"
+                || request.Type == "FillOrKill"
+                || request.Type == "FillAndKill"
+                || request.Type == "StopLimit"
+                || request.Type == "StopMarket"
+                || request.Type == "TrailingStopLimit"
+                || request.Type == "TrailingStopMarket")
+                && DateTime.Now.Hour <= 16 && DateTime.Now.Hour >= 9.5);
         }
 
         private readonly TimeSpan onOpenDeadline = new TimeSpan(9, 28, 0);
