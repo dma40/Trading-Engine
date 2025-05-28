@@ -5,8 +5,7 @@ namespace TradingServer.OrderbookCS
     public partial class Orderbook: IOrderEntryOrderbook, IDisposable
     {
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
-        private readonly Dictionary<long, OrderbookEntry> _goodTillCancel = new Dictionary<long, OrderbookEntry>(); 
-        private readonly Dictionary<long, OrderbookEntry> _goodForDay = new Dictionary<long, OrderbookEntry>();
+        private readonly RestingRouter _router;
     
         public void addOrder(Order order)
         {
@@ -42,15 +41,7 @@ namespace TradingServer.OrderbookCS
                 baseLimit.tail = orderbookEntry;
             }
 
-            if (order.OrderType == OrderTypes.GoodTillCancel)
-            {
-                _goodTillCancel.Add(order.OrderID, orderbookEntry);
-            }
-
-            if (order.OrderType == OrderTypes.GoodForDay)
-            {
-                _goodForDay.Add(order.OrderID, orderbookEntry);
-            }
+            _router.Route(orderbookEntry);
 
             orders.Add(order.OrderID, orderbookEntry);
         }
@@ -115,15 +106,7 @@ namespace TradingServer.OrderbookCS
                 orderentry.ParentLimit.tail = orderentry.previous;
             }
 
-            if (orderentry.OrderType == OrderTypes.GoodTillCancel)
-            {
-                _goodTillCancel.Remove(orderentry.OrderID);
-            }
-                
-            if (orderentry.OrderType == OrderTypes.GoodForDay)
-            {
-                _goodForDay.Remove(orderentry.OrderID);
-            }
+            _router.Remove(orderentry);
             
             orders.Remove(id);
         }
@@ -134,19 +117,6 @@ namespace TradingServer.OrderbookCS
             {
                 removeOrder(modify.OrderID, orderentry, _orders);
                 addOrder(modify.newOrder(), modify.isBuySide ? _bidLimits : _askLimits, _orders);
-            }
-        }
-
-        public static bool isValidTime(IOrderCore order)
-        {
-            if (order.OrderType == OrderTypes.GoodForDay)
-            {
-                return DateTime.Now.Hour < 16 && DateTime.Now.Hour > 9.5;
-            }
-
-            else
-            {
-                return true;
             }
         }
     }

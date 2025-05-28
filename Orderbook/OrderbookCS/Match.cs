@@ -103,8 +103,7 @@ namespace TradingServer.OrderbookCS
 
             if (dispose)
             {
-                orderbook.Dispose();
-                _hidden.Dispose();
+                // Dispose of unmanaged resources, if the need arises.
             }
         }
 

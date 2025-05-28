@@ -6,21 +6,29 @@ namespace TradingServer.OrderbookCS
     {
         internal void DeleteGoodForDayOrders()
         {
-            removeOrders(_goodForDay.Values.ToList());
+            IRestingRouter goodForDay = _router.goodForDay;
+            Dictionary<long, OrderbookEntry> gfdQueue = goodForDay.queue;
+            List<OrderbookEntry> cancels = gfdQueue.Values.ToList();
+
+            removeOrders(cancels);
         }
 
         internal void DeleteExpiredGoodTillCancel()
         {
-            List<OrderbookEntry> goodTillCancelOrders = new List<OrderbookEntry>();
+            IRestingRouter goodTillCancel = _router.goodTillCancel;
+            Dictionary<long, OrderbookEntry> gtcQueue = goodTillCancel.queue;
+            List<OrderbookEntry> gtcOrders = gtcQueue.Values.ToList();
 
-            foreach (var order in _goodTillCancel)
+            List<OrderbookEntry> cancels = new List<OrderbookEntry>();
+
+            foreach (var order in gtcOrders)
             {
-                if ((DateTime.UtcNow - order.Value.CreationTime).TotalDays >= 90)
+                if ((DateTime.UtcNow - order.CreationTime).TotalDays >= 90)
                 {
-                    goodTillCancelOrders.Add(order.Value);
+                    cancels.Add(order);
                 }
 
-                removeOrders(goodTillCancelOrders);
+                removeOrders(cancels);
             }
         }
     }

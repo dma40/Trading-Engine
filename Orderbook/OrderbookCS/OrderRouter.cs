@@ -56,7 +56,7 @@ namespace TradingServer.OrderbookCS
         private Dictionary<OrderTypes, IRouter> routes;
     }
 
-    public class OnMarketCloseMarketRouter: IRouter
+    public class OnMarketCloseMarketRouter : IRouter
     {
         public OnMarketCloseMarketRouter()
         {
@@ -71,7 +71,7 @@ namespace TradingServer.OrderbookCS
                 queue.Remove(cancel.OrderID);
             }
         }
-        public Dictionary<long, Order> queue { get; private set; } 
+        public Dictionary<long, Order> queue { get; private set; }
     }
 
     public class OnMarketCloseLimitRouter : IRouter
