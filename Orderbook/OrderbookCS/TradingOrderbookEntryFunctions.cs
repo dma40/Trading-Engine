@@ -29,7 +29,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void addOrder(AbstractPairedOrder paired)
+        public void addOrder(PairedOrder paired)
         {
             lock (_ordersLock)
             {

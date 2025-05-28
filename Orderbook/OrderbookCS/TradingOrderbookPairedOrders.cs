@@ -20,7 +20,7 @@ namespace TradingServer.OrderbookCS
 
                         foreach (var pairedCancel in paired_queue)
                         {
-                            AbstractPairedOrder pairedCancelOrder = pairedCancel.Value;
+                            PairedOrder pairedCancelOrder = pairedCancel.Value;
                             Order primary = pairedCancelOrder.primary.activate();
                             Order secondary = pairedCancelOrder.secondary.activate();
 
@@ -87,7 +87,7 @@ namespace TradingServer.OrderbookCS
 
                         foreach (var pairedExecution in paired_queue)
                         {
-                            AbstractPairedOrder pairedExecutionOrder = pairedExecution.Value;
+                            PairedOrder pairedExecutionOrder = pairedExecution.Value;
                             Order primary = pairedExecutionOrder.primary;
 
                             Order activatedPrimary = primary.activate();
