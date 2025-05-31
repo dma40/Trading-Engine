@@ -58,7 +58,7 @@ namespace TradingServer.OrderbookCS
             Trades result = new Trades();
             List<OrderbookEntry> cancels = new List<OrderbookEntry>();
 
-           // bool broken = false;
+            // bool broken = false;
 
             if (order.isBuySide)
             {
@@ -66,27 +66,30 @@ namespace TradingServer.OrderbookCS
                 {
                     if (ask.Price >= order.Price)
                     {
-                        OrderbookEntry? head = ask.head;
-
-                        while (head != null)
+                        lock (_lockManager[ask])
                         {
-                            var entry = head.CurrentOrder;
-                            result.addTransaction(executeTrade(order, head));
+                            OrderbookEntry? head = ask.head;
 
-                            if (entry.CurrentQuantity > 0)
+                            while (head != null)
                             {
-                                break;
-                            }
+                                var entry = head.CurrentOrder;
+                                result.addTransaction(executeTrade(order, head));
 
-                            else
-                            {
-                                cancels.Add(head);
-                                head = head.next;
+                                if (entry.CurrentQuantity > 0)
+                                {
+                                    break;
+                                }
+
+                                else
+                                {
+                                    cancels.Add(head);
+                                    head = head.next;
+                                }
                             }
                         }
                     }
 
-                    else if (order.CurrentQuantity == 0)
+                    if (order.CurrentQuantity == 0)
                     {
                         // Console.WriteLine("Broke loop because order is now empty");
                         break;
@@ -97,7 +100,6 @@ namespace TradingServer.OrderbookCS
                         // Console.WriteLine("Broke loop because further price levels are not matchable");
                         break;
                     }
-
                 }
             }
 
@@ -107,34 +109,38 @@ namespace TradingServer.OrderbookCS
                 {
                     if (bid.Price <= order.Price)
                     {
-                        OrderbookEntry? head = bid.head;
-
-                        while (head != null)
+                        lock (_lockManager[bid])
                         {
-                            var entry = head.CurrentOrder;
-                            result.addTransaction(executeTrade(order, head));
+                            OrderbookEntry? head = bid.head;
 
-                            if (entry.CurrentQuantity > 0)
+                            while (head != null)
                             {
-                                break;
-                            }
+                                var entry = head.CurrentOrder;
+                                result.addTransaction(executeTrade(order, head));
 
-                            else
-                            {
-                                cancels.Add(head);
-                                head = head.next;
+                                if (entry.CurrentQuantity > 0)
+                                {
+                                    break;
+                                }
+
+                                else
+                                {
+                                    cancels.Add(head);
+                                    head = head.next;
+                                }
                             }
                         }
-                    }
 
-                    else if (order.CurrentQuantity == 0)
-                    {
-                        break;
-                    }
+                        if (order.CurrentQuantity == 0)
+                        {
+                            break;
+                        }
 
-                    else if (bid.Price > order.Price)
-                    {
-                        break;
+                        else if (bid.Price > order.Price)
+                        {
+                            break;
+                        }
+                        
                     }
                 }
             }

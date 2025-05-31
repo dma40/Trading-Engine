@@ -6,6 +6,7 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private readonly RestingRouter _router;
+        private readonly Dictionary<Limit, Lock> _lockManager;
     
         public void addOrder(Order order)
         {
@@ -24,18 +25,22 @@ namespace TradingServer.OrderbookCS
             {
                 if (limit.tail != null)
                 {
-                    orderbookEntry = new OrderbookEntry(order, limit);
+                    lock (_lockManager[limit])
+                    {
+                        orderbookEntry = new OrderbookEntry(order, limit);
 
-                    OrderbookEntry tailPointer = limit.tail;
-                    tailPointer.next = orderbookEntry;
-                    orderbookEntry.previous = tailPointer;
-                    limit.tail = orderbookEntry;
+                        OrderbookEntry tailPointer = limit.tail;
+                        tailPointer.next = orderbookEntry;
+                        orderbookEntry.previous = tailPointer;
+                        limit.tail = orderbookEntry;
+                    }
                 }                  
             }
 
             else 
             {
                 levels.Add(baseLimit);
+                _lockManager.Add(baseLimit, new Lock());
 
                 baseLimit.head = orderbookEntry;
                 baseLimit.tail = orderbookEntry;
@@ -66,14 +71,22 @@ namespace TradingServer.OrderbookCS
         {
             if (orderentry.previous != null && orderentry.next != null)
             {
-                orderentry.next.previous = orderentry.previous;
-                orderentry.previous.next = orderentry.next;
+                lock (_lockManager[orderentry.ParentLimit])
+                {
+                    orderentry.next.previous = orderentry.previous;
+                    orderentry.previous.next = orderentry.next;
+                }
+
+                return;
             }
-            
+
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
             {
-                orderentry.ParentLimit.head = null;
-                orderentry.ParentLimit.tail = null;
+                lock (_lockManager[orderentry.ParentLimit])
+                {
+                    orderentry.ParentLimit.head = null;
+                    orderentry.ParentLimit.tail = null;
+                }
 
                 if (orderentry.CurrentOrder.isBuySide)
                 {
@@ -83,27 +96,35 @@ namespace TradingServer.OrderbookCS
                 else
                 {
                     _askLimits.Remove(orderentry.ParentLimit);
-                }  
+                }
+
+                _lockManager.Remove(orderentry.ParentLimit);
             }
 
             else if (orderentry.ParentLimit.head == orderentry)
             {
-                if (orderentry.next != null)
+                lock (_lockManager[orderentry.ParentLimit])
                 {
-                    orderentry.next.previous = null;
-                }
+                    if (orderentry.next != null)
+                    {
+                        orderentry.next.previous = null;
+                    }
 
-                orderentry.ParentLimit.head = orderentry.next;
+                    orderentry.ParentLimit.head = orderentry.next;
+                }
             }
-            
+
             else if (orderentry.ParentLimit.tail == orderentry)
             {
-                if (orderentry.previous != null)
+                lock (_lockManager[orderentry.ParentLimit])
                 {
-                    orderentry.previous.next = null;
-                }
+                    if (orderentry.previous != null)
+                    {
+                        orderentry.previous.next = null;
+                    }
 
-                orderentry.ParentLimit.tail = orderentry.previous;
+                    orderentry.ParentLimit.tail = orderentry.previous;
+                }
             }
 
             _router.Remove(orderentry);

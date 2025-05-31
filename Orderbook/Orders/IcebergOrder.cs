@@ -25,7 +25,7 @@ namespace TradingServer.Orders
 
         private uint fullQuantity;
 
-        public bool isEmpty => fullQuantity == 0;
+        public new bool isEmpty => fullQuantity == 0;
 
         public sealed override void replenish()
         {

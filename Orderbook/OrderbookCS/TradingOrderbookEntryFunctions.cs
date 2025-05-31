@@ -6,12 +6,10 @@ namespace TradingServer.OrderbookCS
     {
         public void addOrder(Order order)
         {
-            lock (_ordersLock)
             {
                 if (isQueuable(order))
                 {
                     _router.Route(order);
-                    return;
                 }
 
                 else
@@ -41,16 +39,13 @@ namespace TradingServer.OrderbookCS
         {
             if (order.OrderType == OrderTypes.Iceberg)
             {
-                lock (_ordersLock)
-                {
-                    var route = _router.Iceberg;
-                    var queue = route.queue;
+                var route = _router.Iceberg;
+                var queue = route.queue;
 
-                    if (!queue.TryGetValue(order.OrderID, out Order? _order))
-                    {
-                        match(order);
-                        _router.Route(order);
-                    }
+                if (!queue.TryGetValue(order.OrderID, out Order? _order))
+                {
+                    match(order);
+                    _router.Route(order);
                 }
             }
         }
@@ -62,14 +57,12 @@ namespace TradingServer.OrderbookCS
         }
 
         public void removeOrder(CancelOrder cancel)
-        {
-            lock (_ordersLock)
-            {
-                _strategies.removeOrder(cancel);
+        { 
+            _strategies.removeOrder(cancel);
 
-                _router.Remove(cancel);
-                _paired.Remove(cancel);
-            }
+            _router.Remove(cancel);
+            _paired.Remove(cancel);
+            
         }
 
         protected bool isQueuable(Order order)

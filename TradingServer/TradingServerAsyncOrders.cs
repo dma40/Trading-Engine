@@ -16,7 +16,7 @@ namespace TradingServer.Core
 
             if (request.Operation == "Add")
             {
-                bool exception = false;
+                bool error = false;
 
                 try
                 {
@@ -24,13 +24,13 @@ namespace TradingServer.Core
                     _engine.addOrder(newOrder);
                 }
 
-                catch (Exception error)
+                catch (Exception exception)
                 {
-                    _logger.Error(nameof(TradingServer), error.Message + $" {DateTime.UtcNow}");
-                    exception = true;
+                    _logger.Error(nameof(TradingServer), exception);
+                    error = true;
                 }
 
-                if (!exception)
+                if (!error)
                 {
                     _logger.LogInformation(nameof(TradingServer), $"Order {request.Id} added to {request.Side}" +
                     $" side by {request.Username} at {DateTime.UtcNow}");
@@ -49,7 +49,7 @@ namespace TradingServer.Core
 
                 catch (Exception exception)
                 {
-                    _logger.LogInformation(nameof(TradingServer), exception.Message + $" {DateTime.UtcNow}");
+                    _logger.LogInformation(nameof(TradingServer), exception);
                     error = true;
                 }
 
@@ -71,7 +71,7 @@ namespace TradingServer.Core
 
                 catch (Exception exception)
                 {
-                    _logger.Error(nameof(TradingServer), exception.Message + $"{DateTime.UtcNow}");
+                    _logger.Error(nameof(TradingServer), exception);
                     error = true;
                 }
 

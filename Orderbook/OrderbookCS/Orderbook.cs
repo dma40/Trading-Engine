@@ -12,6 +12,7 @@ namespace TradingServer.OrderbookCS
             _security = instrument;
 
             _router = new RestingRouter();
+            _lockManager = new Dictionary<Limit, Lock>();
         }
 
         ~Orderbook()

@@ -8,26 +8,52 @@ namespace TradingServer.OrderbookCS
         {
             routes = new Dictionary<OrderTypes, IRouter>();
 
-            routes.Add(key: OrderTypes.LimitOnOpen, value: new OnMarketOpenLimitRouter());
-            routes.Add(key: OrderTypes.MarketOnOpen, value: new OnMarketOpenMarketRouter());
+            IRouter LimitOnCloseRouter = new OnMarketCloseLimitRouter();
+            IRouter MarketOnCloseRouter = new OnMarketCloseMarketRouter();
 
-            routes.Add(key: OrderTypes.LimitOnClose, value: new OnMarketCloseLimitRouter());
-            routes.Add(key: OrderTypes.MarketOnClose, value: new OnMarketCloseMarketRouter());
+            IRouter LimitOnOpenRouter = new OnMarketOpenLimitRouter();
+            IRouter MarketOnOpenRouter = new OnMarketOpenMarketRouter();
 
-            routes.Add(key: OrderTypes.TrailingStopMarket, value: new TrailingStopLimitRouter());
-            routes.Add(key: OrderTypes.TrailingStopLimit, value: new TrailingStopLimitRouter());
+            IRouter TrailingStopLimitRouter = new TrailingStopLimitRouter();
+            IRouter TrailingStopMarketRouter = new TrailingStopMarketRouter();
 
-            routes.Add(key: OrderTypes.StopMarket, value: new StopMarketRouter());
-            routes.Add(key: OrderTypes.StopLimit, value: new StopLimitRouter());
+            IRouter StopLimitRouter = new StopLimitRouter();
+            IRouter StopMarketRouter = new StopMarketRouter();
 
-            routes.Add(key: OrderTypes.Iceberg, value: new IcebergRouter());
+            IRouter IcebergRouter = new IcebergRouter();
+
+            routes.Add(key: OrderTypes.LimitOnOpen, value: LimitOnOpenRouter);
+            routes.Add(key: OrderTypes.MarketOnOpen, value: MarketOnOpenRouter);
+            routes.Add(key: OrderTypes.LimitOnClose, value: LimitOnCloseRouter);
+            routes.Add(key: OrderTypes.MarketOnClose, value: MarketOnCloseRouter);
+            routes.Add(key: OrderTypes.TrailingStopMarket, value: TrailingStopMarketRouter);
+            routes.Add(key: OrderTypes.TrailingStopLimit, value: TrailingStopLimitRouter);
+            routes.Add(key: OrderTypes.StopMarket, value: StopMarketRouter);
+            routes.Add(key: OrderTypes.StopLimit, value: StopLimitRouter);
+            routes.Add(key: OrderTypes.Iceberg, value: IcebergRouter);
+
+            _lockManager = new Dictionary<IRouter, Lock>
+            {
+                { LimitOnOpenRouter, new Lock() },
+                { LimitOnCloseRouter, new Lock() },
+                { MarketOnOpenRouter, new Lock() },
+                { MarketOnCloseRouter, new Lock() },
+                { TrailingStopMarketRouter, new Lock() },
+                { TrailingStopLimitRouter, new Lock() },
+                { StopLimitRouter, new Lock() },
+                { StopMarketRouter, new Lock() },
+                { IcebergRouter, new Lock() }
+            };
         }
 
         public void Route(Order order)
         {
             if (routes.TryGetValue(order.OrderType, out IRouter? strategy))
             {
-                strategy.Route(order);
+                lock (_lockManager[strategy])
+                {
+                    strategy.Route(order);
+                }
             }
         }
 
@@ -35,7 +61,10 @@ namespace TradingServer.OrderbookCS
         {
             if (routes.TryGetValue(cancel.OrderType, out IRouter? strategy))
             {
-                strategy.Remove(cancel);
+                lock (_lockManager[strategy])
+                {
+                    strategy.Remove(cancel);
+                }
             }
         }
 
@@ -54,6 +83,7 @@ namespace TradingServer.OrderbookCS
         public IRouter Iceberg => routes[OrderTypes.Iceberg];
 
         private Dictionary<OrderTypes, IRouter> routes;
+        private Dictionary<IRouter, Lock> _lockManager;
     }
 
     public class OnMarketCloseMarketRouter : IRouter
