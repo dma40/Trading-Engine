@@ -66,8 +66,6 @@ namespace TradingServer.OrderbookCS
 
                     await Task.Delay(closed, token);
                 }
-
-                // await Task.Delay(200, token);
             }
         }
 
@@ -116,8 +114,6 @@ namespace TradingServer.OrderbookCS
 
                     await Task.Delay(closed, token);
                 }
-
-                // await Task.Delay(200, token);
             }
         }
     }

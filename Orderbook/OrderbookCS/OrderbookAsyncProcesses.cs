@@ -6,7 +6,7 @@ namespace TradingServer.OrderbookCS
     {
         internal void DeleteGoodForDayOrders()
         {
-            IRestingRouter goodForDay = _router.goodForDay;
+            OrderRoute<OrderbookEntry> goodForDay = _router.goodForDay;
             Dictionary<long, OrderbookEntry> gfdQueue = goodForDay.queue;
             List<OrderbookEntry> cancels = gfdQueue.Values.ToList();
 
@@ -15,7 +15,7 @@ namespace TradingServer.OrderbookCS
 
         internal void DeleteExpiredGoodTillCancel()
         {
-            IRestingRouter goodTillCancel = _router.goodTillCancel;
+            OrderRoute<OrderbookEntry> goodTillCancel = _router.goodTillCancel;
             Dictionary<long, OrderbookEntry> gtcQueue = goodTillCancel.queue;
             List<OrderbookEntry> gtcOrders = gtcQueue.Values.ToList();
 

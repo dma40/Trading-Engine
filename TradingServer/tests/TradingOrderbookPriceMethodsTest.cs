@@ -24,7 +24,7 @@ namespace TradingServer.Tests
         [Test]
         public void TestPriceUpdatedCorrectly()
         {
-            const int count = 1000;
+            const int count = 1000000;
             /*
             for (int i = 0; i < count; i++)
             {
@@ -51,10 +51,10 @@ namespace TradingServer.Tests
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            for (int i = 0; i < count / 4; i++)
+            for (int i = 0; i < count; i++)
             {
                 IOrderCore sellCore = new OrderCore(i + count, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                _tradingEngine.addOrder(new Order(sellCore, i / 4, 4000, true));
+                _tradingEngine.addOrder(new Order(sellCore, i / 4, 1000, true));
 
                 //IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                // _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));

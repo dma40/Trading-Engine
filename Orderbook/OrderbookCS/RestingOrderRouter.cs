@@ -6,15 +6,15 @@ namespace TradingServer.Orders
     {
         public RestingRouter()
         {
-            _routes = new Dictionary<OrderTypes, IRestingRouter>();
+            _routes = new Dictionary<OrderTypes, OrderRoute<OrderbookEntry>>();
 
-            _routes.Add(key: OrderTypes.GoodForDay, value: new GoodForDayRouter());
-            _routes.Add(key: OrderTypes.GoodTillCancel, value: new GoodTillCancelRouter());
+            _routes.Add(key: OrderTypes.GoodForDay, value: new OrderRoute<OrderbookEntry>());
+            _routes.Add(key: OrderTypes.GoodTillCancel, value: new OrderRoute<OrderbookEntry>());
         }
 
         public void Route(OrderbookEntry orderbookEntry)
         {
-            if (_routes.TryGetValue(orderbookEntry.OrderType, out IRestingRouter? resting))
+            if (_routes.TryGetValue(orderbookEntry.OrderType, out OrderRoute<OrderbookEntry>? resting))
             {
                 resting.Route(orderbookEntry);
             }
@@ -22,68 +22,57 @@ namespace TradingServer.Orders
 
         public void Remove(OrderbookEntry orderbookEntry)
         {
-            if (_routes.TryGetValue(orderbookEntry.OrderType, out IRestingRouter? resting))
+            if (_routes.TryGetValue(orderbookEntry.OrderType, out OrderRoute<OrderbookEntry>? resting))
             {
                 resting.Remove(orderbookEntry);
             }
         }
 
-        public IRestingRouter goodForDay => _routes[OrderTypes.GoodForDay];
-        public IRestingRouter goodTillCancel => _routes[OrderTypes.GoodTillCancel];
+        public OrderRoute<OrderbookEntry> goodForDay => _routes[OrderTypes.GoodForDay];
+        public OrderRoute<OrderbookEntry> goodTillCancel => _routes[OrderTypes.GoodTillCancel];
 
-        private readonly Dictionary<OrderTypes, IRestingRouter> _routes;
+        private readonly Dictionary<OrderTypes, OrderRoute<OrderbookEntry>> _routes;
     }
 
-    public class GoodTillCancelRouter : IRestingRouter
+    public class OrderRoute<T> where T: IOrderCore
     {
-        public GoodTillCancelRouter()
-        {
-            queue = new Dictionary<long, OrderbookEntry>();
+        public OrderRoute() {
+            queue = new Dictionary<long, T>();
         }
 
-        public void Route(OrderbookEntry orderbookEntry)
+        public void Route(T orderbookEntry)
         {
-            if (!queue.TryGetValue(orderbookEntry.OrderID, out OrderbookEntry? obe))
+            if (!queue.TryGetValue(orderbookEntry.OrderID, out T? obe))
             {
                 queue.Add(orderbookEntry.OrderID, orderbookEntry);
             }
         }
 
-        public void Remove(OrderbookEntry orderbookEntry)
+        public void Remove(T orderbookEntry)
         {
-            if (queue.TryGetValue(orderbookEntry.OrderID, out OrderbookEntry? obe))
+            if (queue.TryGetValue(orderbookEntry.OrderID, out T? obe))
             {
-                queue.Remove(obe.OrderID);
+                queue.Remove(orderbookEntry.OrderID);
             }
         }
 
-        public Dictionary<long, OrderbookEntry> queue { get; private set; }
-    }    
-
-    public class GoodForDayRouter : IRestingRouter
-    {
-        public GoodForDayRouter()
+        public void Remove(CancelOrder cancel)
         {
-            queue = new Dictionary<long, OrderbookEntry>();
-        }
-
-        public void Route(OrderbookEntry orderbookEntry)
-        {
-            if (!queue.TryGetValue(orderbookEntry.OrderID, out OrderbookEntry? obe))
+            if (queue.TryGetValue(cancel.OrderID, out T? obe))
             {
-                queue.Add(orderbookEntry.OrderID, orderbookEntry);
+                queue.Remove(cancel.OrderID);
             }
         }
 
-        public void Remove(OrderbookEntry orderbookEntry)
+        public void Remove(long id)
         {
-            if (queue.TryGetValue(orderbookEntry.OrderID, out OrderbookEntry? obe))
+            if (queue.TryGetValue(id, out T? t))
             {
-                queue.Remove(obe.OrderID);
+                queue.Remove(id);
             }
         }
 
-        public Dictionary<long, OrderbookEntry> queue { get; private set; }
+        public Dictionary<long, T> queue { get; private set; }
     }
 
     public interface IRestingRouter

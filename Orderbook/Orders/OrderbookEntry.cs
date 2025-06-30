@@ -117,7 +117,7 @@ namespace TradingServer.Orders
         */
     }
 
-    public class OrderbookEntry
+    public class OrderbookEntry: IOrderCore
     {
         public OrderbookEntry(Order currentOrder, Limit parentLimit)
         {
@@ -147,6 +147,9 @@ namespace TradingServer.Orders
         public OrderbookEntry? previous { get; set; }
 
         public long OrderID => CurrentOrder.OrderID;
+        public string Username => CurrentOrder.Username;
+        public string SecurityID => CurrentOrder.SecurityID;
+        public bool isHidden => CurrentOrder.isHidden;
         public OrderTypes OrderType => CurrentOrder.OrderType;
 
         ~OrderbookEntry()

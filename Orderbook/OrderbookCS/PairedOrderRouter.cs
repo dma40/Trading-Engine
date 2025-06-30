@@ -6,28 +6,28 @@ namespace TradingServer.OrderbookCS
     {
         public PairedOrderRouter()
         {
-            routes = new Dictionary<OrderTypes, IPairedRouter>(); 
+            routes = new Dictionary<OrderTypes, OrderRoute<PairedOrder>>(); 
 
-            routes.Add(key: OrderTypes.LimitOnOpen, value: new PairedExecutionRouter());
-            routes.Add(key: OrderTypes.MarketOnOpen, value: new PairedCancelRouter());
+            routes.Add(key: OrderTypes.LimitOnOpen, value: new OrderRoute<PairedOrder>());
+            routes.Add(key: OrderTypes.MarketOnOpen, value: new OrderRoute<PairedOrder>());
         }
 
         public void Route(PairedOrder order)
         {
-            if (routes.TryGetValue(order.OrderType, out IPairedRouter? strategy))
+            if (routes.TryGetValue(order.OrderType, out OrderRoute<PairedOrder>? strategy))
             {
                 strategy.Route(order);
             }
         }
 
-        public IPairedRouter PairedCancel => routes[OrderTypes.PairedCancel];
-        public IPairedRouter PairedExecution => routes[OrderTypes.PairedExecution];
+        public OrderRoute<PairedOrder> PairedCancel => routes[OrderTypes.PairedCancel];
+        public OrderRoute<PairedOrder> PairedExecution => routes[OrderTypes.PairedExecution];
 
         public void Remove(CancelOrder cancel)
         {
 
         }
-        public readonly Dictionary<OrderTypes, IPairedRouter> routes;
+        public readonly Dictionary<OrderTypes, OrderRoute<PairedOrder>> routes;
     }
 
     public class PairedCancelRouter: IPairedRouter

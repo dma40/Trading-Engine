@@ -6,7 +6,6 @@ namespace TradingServer.OrderbookCS
     {
         private readonly Dictionary<long, OrderbookEntry> _orders = new Dictionary<long, OrderbookEntry>();
         private readonly RestingRouter _router;
-        private readonly Dictionary<Limit, Lock> _lockManager;
     
         public void addOrder(Order order)
         {
@@ -25,7 +24,6 @@ namespace TradingServer.OrderbookCS
             {
                 if (limit.tail != null)
                 {
-                    lock (_lockManager[limit])
                     {
                         orderbookEntry = new OrderbookEntry(order, limit);
 
@@ -40,7 +38,6 @@ namespace TradingServer.OrderbookCS
             else 
             {
                 levels.Add(baseLimit);
-                _lockManager.Add(baseLimit, new Lock());
 
                 baseLimit.head = orderbookEntry;
                 baseLimit.tail = orderbookEntry;
@@ -71,18 +68,16 @@ namespace TradingServer.OrderbookCS
         {
             if (orderentry.previous != null && orderentry.next != null)
             {
-                lock (_lockManager[orderentry.ParentLimit])
+                //lock (_lockManager[orderentry.ParentLimit])
                 {
                     orderentry.next.previous = orderentry.previous;
                     orderentry.previous.next = orderentry.next;
                 }
-
-                return;
             }
 
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
             {
-                lock (_lockManager[orderentry.ParentLimit])
+                //lock (_lockManager[orderentry.ParentLimit])
                 {
                     orderentry.ParentLimit.head = null;
                     orderentry.ParentLimit.tail = null;
@@ -97,13 +92,10 @@ namespace TradingServer.OrderbookCS
                 {
                     _askLimits.Remove(orderentry.ParentLimit);
                 }
-
-                _lockManager.Remove(orderentry.ParentLimit);
             }
 
             else if (orderentry.ParentLimit.head == orderentry)
             {
-                lock (_lockManager[orderentry.ParentLimit])
                 {
                     if (orderentry.next != null)
                     {
@@ -116,7 +108,6 @@ namespace TradingServer.OrderbookCS
 
             else if (orderentry.ParentLimit.tail == orderentry)
             {
-                lock (_lockManager[orderentry.ParentLimit])
                 {
                     if (orderentry.previous != null)
                     {

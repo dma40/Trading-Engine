@@ -53,8 +53,6 @@ namespace TradingServer.OrderbookCS
 
                     // add extra cases for debugging this method
                 }
-
-                // await Task.Delay(200, token);
             }
         }
     }

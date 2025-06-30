@@ -66,7 +66,7 @@ namespace TradingServer.OrderbookCS
                 {
                     if (ask.Price >= order.Price)
                     {
-                        lock (_lockManager[ask])
+                        //lock (_lockManager[ask])
                         {
                             OrderbookEntry? head = ask.head;
 
@@ -91,13 +91,11 @@ namespace TradingServer.OrderbookCS
 
                     if (order.CurrentQuantity == 0)
                     {
-                        // Console.WriteLine("Broke loop because order is now empty");
                         break;
                     }
 
                     else if (ask.Price < order.Price)
                     {
-                        // Console.WriteLine("Broke loop because further price levels are not matchable");
                         break;
                     }
                 }
@@ -109,7 +107,7 @@ namespace TradingServer.OrderbookCS
                 {
                     if (bid.Price <= order.Price)
                     {
-                        lock (_lockManager[bid])
+                        //lock (_lockManager[bid])
                         {
                             OrderbookEntry? head = bid.head;
 
@@ -130,17 +128,16 @@ namespace TradingServer.OrderbookCS
                                 }
                             }
                         }
+                    }
+                    
+                    if (order.CurrentQuantity == 0)
+                    {
+                        break;
+                    }
 
-                        if (order.CurrentQuantity == 0)
-                        {
-                            break;
-                        }
-
-                        else if (bid.Price > order.Price)
-                        {
-                            break;
-                        }
-                        
+                    else if (bid.Price > order.Price)
+                    {
+                        break;
                     }
                 }
             }
