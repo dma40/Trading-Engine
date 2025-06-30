@@ -1,4 +1,6 @@
-namespace TradingServer.Orders
+using TradingServer.Orders;
+
+namespace TradingServer.OrderbookCS
 {
     public class OrderRouter
     {
@@ -68,12 +70,5 @@ namespace TradingServer.Orders
 
         private Dictionary<OrderTypes, OrderRoute<Order>> routes;
         private Dictionary<OrderRoute<Order>, Lock> _lockManager;
-    }
-
-    public interface IRouter
-    {
-        public void Route(Order order);
-        public void Remove(CancelOrder cancel);
-        public Dictionary<long, Order> queue { get; }
     }
 }
