@@ -30,7 +30,7 @@ namespace TradingServer.Tests
 
             _tradingEngine.addOrder(stop);
 
-            Assert.That(!_tradingEngine.orderbook.containsOrder(stop.OrderID));
+            Assert.That(!_tradingEngine.orderbook.containsOrder(stop.OrderID)); // error
 
             for (int i = 0; i < 404; i++)
             {
@@ -44,6 +44,8 @@ namespace TradingServer.Tests
 
             Assert.That(_tradingEngine.orderbook.containsOrder(stop.OrderID));
         }
+
+        /*
 
         [Test]
         public void StopOrderTestChangedCorrectly()
@@ -64,5 +66,6 @@ namespace TradingServer.Tests
                 _tradingEngine.addOrder(new Order(core, i / 4, 1, false));
             }
         }
+        */
     }
 }

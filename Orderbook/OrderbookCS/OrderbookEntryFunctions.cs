@@ -68,7 +68,7 @@ namespace TradingServer.OrderbookCS
         {
             if (orderentry.previous != null && orderentry.next != null)
             {
-                //lock (_lockManager[orderentry.ParentLimit])
+                
                 {
                     orderentry.next.previous = orderentry.previous;
                     orderentry.previous.next = orderentry.next;
@@ -77,7 +77,6 @@ namespace TradingServer.OrderbookCS
 
             else if (orderentry.ParentLimit.head == orderentry && orderentry.ParentLimit.tail == orderentry)
             {
-                //lock (_lockManager[orderentry.ParentLimit])
                 {
                     orderentry.ParentLimit.head = null;
                     orderentry.ParentLimit.tail = null;

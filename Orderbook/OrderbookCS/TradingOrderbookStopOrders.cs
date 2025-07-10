@@ -23,15 +23,15 @@ namespace TradingServer.OrderbookCS
                         foreach (var order in market_queue)
                         {
                             var stop = order.Value;
-                            //Console.WriteLine("Price of this order: " + stop.StopPrice);
-                            //Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
+                            Console.WriteLine("Price of this order: " + stop.StopPrice);
+                            Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
 
                             if (stop.isBuySide)
                             {
                                 //Console.WriteLine("This is a buy side order. Processing...");
                                 if (lastTradedPrice <= stop.StopPrice)
                                 {
-                                    //Console.WriteLine("Activating the buy side order");
+                                    Console.WriteLine("Activating the buy side order");
                                     Order activated = order.Value.activate();
                                     match(activated);
 
@@ -41,10 +41,10 @@ namespace TradingServer.OrderbookCS
 
                             else
                             {
-                                //Console.WriteLine("This is a sell side order. Processing...");
+                                Console.WriteLine("This is a sell side order. Processing...");
                                 if (lastTradedPrice >= stop.StopPrice)
                                 {
-                                    //Console.WriteLine("Activating the sell side order");
+                                    Console.WriteLine("Activating the sell side order");
                                     Order activated = stop.activate();
                                     match(activated);
 
@@ -59,28 +59,28 @@ namespace TradingServer.OrderbookCS
                         foreach (var order in limit_queue)
                         {
                             var stop = order.Value;
-                            //Console.WriteLine("Price of this order: " + stop.StopPrice);
-                            //Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
+                            Console.WriteLine("Price of this order: " + stop.StopPrice);
+                            Console.WriteLine("Current greatest traded price: " + lastTradedPrice);
 
                             if (stop.isBuySide)
                             {
-                                //Console.WriteLine("This is a buy side order. Processing...");
+                                Console.WriteLine("This is a buy side order. Processing...");
                                 if (lastTradedPrice <= stop.StopPrice)
                                 {
-                                    //Console.WriteLine("Activating the buy side order");
+                                    Console.WriteLine("Activating the buy side order");
                                     Order activated = order.Value.activate();
                                     match(activated);
 
-                                    route.Remove(stop.cancelOrder()); // do this outside of the method
+                                    route.Remove(stop.cancelOrder()); 
                                 }
                             }
 
                             else
                             {
-                                //Console.WriteLine("This is a sell side order. Processing...");
+                                Console.WriteLine("This is a sell side order. Processing...");
                                 if (lastTradedPrice >= stop.StopPrice)
                                 {
-                                    //Console.WriteLine("Activating the sell side order");
+                                    Console.WriteLine("Activating the sell side order");
                                     Order activated = stop.activate();
                                     match(activated);
 
@@ -89,8 +89,6 @@ namespace TradingServer.OrderbookCS
                             }
                         }
                     }
-
-                   // _semaphore.Release();
                 }
 
                 else

@@ -37,10 +37,10 @@ watch.Stop();
 
 TradingOrderbookStopOrderTest stopOrderTest = new TradingOrderbookStopOrderTest();
 
-/*
+
 stopOrderTest.Setup();
-await stopOrderTest.StopOrderAddedWhenLatestPriceChanges();
-*/
+stopOrderTest.StopOrderAddedWhenLatestPriceChanges();
+
 
 /*
 TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();
