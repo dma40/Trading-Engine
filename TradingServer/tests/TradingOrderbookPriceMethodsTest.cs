@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
 using NUnit.Framework;
 using TradingServer.Orders;
 using TradingServer.OrderbookCS;
@@ -25,15 +24,7 @@ namespace TradingServer.Tests
         public void TestPriceUpdatedCorrectly()
         {
             const int count = 1000000;
-            /*
            
-            for (int i = 0; i < count; i++)
-            {
-                IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
-            }
-            */
-
             Console.WriteLine($"Finished adding {count} orders. ");
             var usage = GC.GetTotalMemory(forceFullCollection: false);
             Console.WriteLine($"Total memory used: {usage}");
