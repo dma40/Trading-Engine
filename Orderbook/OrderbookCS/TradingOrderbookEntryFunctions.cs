@@ -6,6 +6,7 @@ namespace TradingServer.OrderbookCS
     {
         public void addOrder(Order order)
         {
+            lock (_ordersLock)
             {
                 if (isQueuable(order))
                 {
@@ -27,42 +28,22 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public void addOrder(PairedOrder paired)
+        public void modifyOrder(ModifyOrder modify)
         {
             lock (_ordersLock)
             {
-                _paired.Route(paired);
+                removeOrder(modify.cancelOrder());
+                addOrder(modify.newOrder());
             }
-        }
-
-        public void addOrder(IcebergOrder order)
-        {
-            if (order.OrderType == OrderTypes.Iceberg)
-            {
-                var route = _router.Iceberg;
-                var queue = route.queue;
-
-                if (!queue.TryGetValue(order.OrderID, out Order? _order))
-                {
-                    match(order);
-                    _router.Route(order);
-                }
-            }
-        }
-
-        public void modifyOrder(ModifyOrder modify)
-        {
-            removeOrder(modify.cancelOrder());
-            addOrder(modify.newOrder());
         }
 
         public void removeOrder(CancelOrder cancel)
-        { 
-            _strategies.removeOrder(cancel);
-
-            _router.Remove(cancel);
-            _paired.Remove(cancel);
-            
+        {
+            lock (_ordersLock)
+            {
+                _strategies.removeOrder(cancel);
+                _router.Remove(cancel);
+            }
         }
 
         protected bool isQueuable(Order order)

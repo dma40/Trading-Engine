@@ -47,14 +47,6 @@ namespace TradingServer.Orders
             modify.ModifyPrice, modify.ModifyQuantity, modify.isBuySide)
         { }
 
-        public Order(StopOrder stop) : this(stop, stop.limitPrice, stop.Quantity,
-            stop.isBuySide)
-        { }
-
-        public Order(TrailingStopOrder trail) : this(trail, trail.StopPrice, trail.Quantity,
-            trail.isBuySide)
-        { }
-
         public CancelOrder cancelOrder()
         {
             return new CancelOrder(_orderCore);

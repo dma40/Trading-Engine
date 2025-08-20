@@ -9,7 +9,6 @@ namespace TradingServer.OrderbookCS
 
         private readonly MatchManager _strategies;
         private readonly OrderRouter _router;
-        private readonly PairedOrderRouter _paired;
 
         public TradingEngine(Security security)
         {
@@ -17,13 +16,9 @@ namespace TradingServer.OrderbookCS
 
             _strategies = new MatchManager(security);
             _router = new OrderRouter();
-            _paired = new PairedOrderRouter();
 
-            _ = Task.Run(() => ProcessStopOrders(_ts.Token));
-            _ = Task.Run(() => ProcessTrailingStopOrders(_ts.Token));
             _ = Task.Run(() => ProcessAtMarketOpen(_ts.Token));
             _ = Task.Run(() => ProcessAtMarketEnd(_ts.Token));
-            _ = Task.Run(() => ProcessIcebergOrders(_ts.Token));
         }
 
         ~TradingEngine()

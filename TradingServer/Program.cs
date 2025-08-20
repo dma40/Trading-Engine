@@ -32,22 +32,6 @@ priceMethodsTest.TestPriceUpdatedCorrectly();
 
 watch.Stop();
 
-
-// Console.WriteLine("Time to execute tests: " + watch.ElapsedMilliseconds);
-
-TradingOrderbookStopOrderTest stopOrderTest = new TradingOrderbookStopOrderTest();
-
-
-stopOrderTest.Setup();
-stopOrderTest.StopOrderAddedWhenLatestPriceChanges();
-
-
-/*
-TradingOrderbookIcebergOrdersTest icebergOrdersTest = new TradingOrderbookIcebergOrdersTest();
-icebergOrdersTest.Setup();
-await icebergOrdersTest.IcebergTest();
-*/
-
 Console.WriteLine("Starting trading server...\n");
 
 _ = Task.Run(() => processInputs());
@@ -55,6 +39,8 @@ using var server = TradingHostBuilder.BuildTradingServer();
 await server.StartAsync().ConfigureAwait(false);
 
 /*
+This is used for manually creating the environment
+
 TradingServerServiceProvider.ServiceProvider = server.Services;
 {
     using var scope = TradingServerServiceProvider.ServiceProvider.CreateScope();

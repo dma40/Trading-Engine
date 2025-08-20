@@ -26,24 +26,13 @@ namespace TradingServer.Tests
         {
             const int count = 1000000;
             /*
+           
             for (int i = 0; i < count; i++)
             {
                 IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
             }
             */
-
-            /*
-            Console.WriteLine($"Finished adding {count} orders. ");
-            var usage = GC.GetTotalMemory(forceFullCollection: false);
-            Console.WriteLine($"Total memory used: {usage}");
-            */
-
-            for (int i = 0; i < count; i++)
-            {
-                IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
-            }
 
             Console.WriteLine($"Finished adding {count} orders. ");
             var usage = GC.GetTotalMemory(forceFullCollection: false);
@@ -56,13 +45,9 @@ namespace TradingServer.Tests
                 IOrderCore sellCore = new OrderCore(i + count, "Dylan", "TEST", OrderTypes.GoodTillCancel);
                 _tradingEngine.addOrder(new Order(sellCore, i / 4, 1000, true));
 
-                //IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-               // _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
-
-                //IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
-                //_tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
-                // Console.WriteLine(_tradingEngine.lastTradedPrice);
-                /*
+                IOrderCore buyCore = new OrderCore(i, "Dylan", "TEST", OrderTypes.GoodTillCancel);
+               _tradingEngine.addOrder(new Order(buyCore, i / 4, 1000, false));
+                
                 TimeSpan marketOpen = new TimeSpan(9, 30, 0);
                 TimeSpan marketEnd = new TimeSpan(16, 0, 0);
 
@@ -70,7 +55,6 @@ namespace TradingServer.Tests
 
                 if (now >= marketOpen && now <= marketEnd)
                 {
-                    Console.WriteLine(_tradingEngine.lastTradedPrice);
                     Assert.That(_tradingEngine.lastTradedPrice == i / 4);
                 }
 
@@ -78,7 +62,7 @@ namespace TradingServer.Tests
                 {
                     Assert.That(_tradingEngine.lastTradedPrice == -1);
                 }
-                */
+                
             }
 
             watch.Stop();

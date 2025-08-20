@@ -16,7 +16,6 @@ namespace TradingServer.OrderbookCS
             routes.Add(key: OrderTypes.TrailingStopLimit, value: new OrderRoute<Order>());
             routes.Add(key: OrderTypes.StopMarket, value: new OrderRoute<Order>());
             routes.Add(key: OrderTypes.StopLimit, value: new OrderRoute<Order>());
-            routes.Add(key: OrderTypes.Iceberg, value: new OrderRoute<Order>());
 
             _lockManager = new Dictionary<OrderRoute<Order>, Lock>
             {
@@ -28,7 +27,6 @@ namespace TradingServer.OrderbookCS
                 { routes[OrderTypes.TrailingStopLimit], new Lock() },
                 { routes[OrderTypes.StopMarket], new Lock() },
                 { routes[OrderTypes.StopLimit], new Lock() },
-                { routes[OrderTypes.Iceberg], new Lock() }
             };
         }
 
@@ -54,19 +52,11 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        public OrderRoute<Order> StopLimit => routes[OrderTypes.StopLimit];
-        public OrderRoute<Order> StopMarket => routes[OrderTypes.StopMarket];
-
-        public OrderRoute<Order> TrailingStopLimit => routes[OrderTypes.TrailingStopLimit];
-        public OrderRoute<Order> TrailingStopMarket => routes[OrderTypes.TrailingStopMarket];
-
         public OrderRoute<Order> MarketOnOpen => routes[OrderTypes.MarketOnOpen];
         public OrderRoute<Order> MarketOnClose => routes[OrderTypes.MarketOnClose];
 
         public OrderRoute<Order> LimitOnOpen => routes[OrderTypes.LimitOnOpen];
         public OrderRoute<Order> LimitOnClose => routes[OrderTypes.LimitOnClose];
-
-        public OrderRoute<Order> Iceberg => routes[OrderTypes.Iceberg];
 
         private Dictionary<OrderTypes, OrderRoute<Order>> routes;
         private Dictionary<OrderRoute<Order>, Lock> _lockManager;
