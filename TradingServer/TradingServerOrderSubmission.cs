@@ -14,9 +14,7 @@ namespace TradingServer.Core
             TimeSpan now = DateTime.Now.TimeOfDay;
             TimeSpan onOpenDeadline = new TimeSpan(9, 28, 0);
             TimeSpan onCloseDeadline = new TimeSpan(15, 50, 0);
-            TimeSpan open = new TimeSpan(9, 30, 0);
-            TimeSpan closed = new TimeSpan(16, 0, 0);
-
+          
             IOrderCore orderCore = new OrderCore(request.Id, request.Username, _security.id, Order.StringToOrderType(request.Type));
 
             RejectionReason reason = _validator.Check(request);

@@ -5,7 +5,6 @@ namespace TradingServer.Core.Configuration
     internal sealed class TradingServerConfiguration 
     {
         public TradingServerSettings? TradingServerSettings { get; set; }
-        public PermissionLevel PermissionLevel { get; set; }
     }
 
     internal sealed class TradingServerSettings 

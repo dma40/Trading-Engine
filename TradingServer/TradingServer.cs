@@ -8,6 +8,7 @@ using TradingServer.Instrument;
 using Trading;
 using Grpc.Core;
 using TradingServer.Services;
+using Mysqlx.Cursor;
 
 namespace TradingServer.Core
 {
@@ -20,8 +21,6 @@ namespace TradingServer.Core
 
         private readonly TradingEngine _engine;
 
-        public PermissionLevel permissionLevel;
-
         public TradingServer(ITextLogger logger, IOptions<TradingServerConfiguration> config)
         {
             _logger = logger ?? throw new ArgumentNullException("logger cannot be null");
@@ -33,8 +32,6 @@ namespace TradingServer.Core
             _security = new Security(name, id);
             _engine = new TradingEngine(_security);
             _validator = new OrderValidator();
-
-            permissionLevel = config.Value.PermissionLevel;
         }
 
         public Task Run(CancellationToken token) => ExecuteAsync(token);
@@ -58,10 +55,7 @@ namespace TradingServer.Core
 
         public async Task processIncomingRequest(OrderRequest request, ServerCallContext context)
         {
-            // provide support for the level 1, 2 operations here 
             await submitOrder(request, context);
         }
-
-        
     }
 }

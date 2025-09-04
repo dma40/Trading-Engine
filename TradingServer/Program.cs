@@ -48,7 +48,6 @@ TradingServerServiceProvider.ServiceProvider = server.Services;
 }
 */
 
-
 static void processInputs()
 {
     // A starting point for any API for this trading platform.

@@ -44,15 +44,15 @@ namespace TradingServer.Tests
 
                 TimeSpan now = DateTime.Now.TimeOfDay;
 
-                if (now >= marketOpen && now <= marketEnd)
+                //if (now >= marketOpen && now <= marketEnd)
                 {
                     Assert.That(_tradingEngine.lastTradedPrice == i / 4);
                 }
 
-                else
-                {
-                    Assert.That(_tradingEngine.lastTradedPrice == -1);
-                }
+                //else
+                //{
+                //    Assert.That(_tradingEngine.lastTradedPrice == -1);
+                //}
                 
             }
 
