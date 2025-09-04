@@ -10,8 +10,10 @@ namespace TradingServer.Core
     {
         public async Task<OrderResponse> ProcessOrderAsync(OrderRequest request, ServerCallContext context)
         {
-            IOrderCore orderCore = new OrderCore(request.Id, request.Username, _security.id, Order.StringToOrderType(request.Type));
-            ModifyOrder modify = new ModifyOrder(orderCore, request.Price, request.Quantity, request.Side == "Bid");
+            IOrderCore orderCore = new OrderCore(request.Id, request.Username,
+                                    _security.id, Order.StringToOrderType(request.Type));
+            ModifyOrder modify = new ModifyOrder(orderCore, request.Price,
+                                                request.Quantity, request.Side == "Bid");
             DateTime now = DateTime.Now;
 
             if (request.Operation == "Add")
