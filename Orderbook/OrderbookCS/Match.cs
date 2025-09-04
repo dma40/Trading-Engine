@@ -21,25 +21,19 @@ namespace TradingServer.OrderbookCS
             var FillOrKill = new FillOrKillStrategy(visible, hidden);
             var PostOnly = new PostOnlyStrategy(visible, hidden);
 
+
             _strategies.Add(key: OrderTypes.Limit, value: MatchAndAddRemaining);
             _strategies.Add(key: OrderTypes.GoodForDay, value: MatchAndAddRemaining);
             _strategies.Add(key: OrderTypes.GoodTillCancel, value: MatchAndAddRemaining);
-            _strategies.Add(key: OrderTypes.StopLimit, value: MatchAndAddRemaining);
-            _strategies.Add(key: OrderTypes.TrailingStopLimit, value: MatchAndAddRemaining);
-            _strategies.Add(key: OrderTypes.Iceberg, value: MatchAndAddRemaining);
-
             _strategies.Add(key: OrderTypes.Market, value: ImmediateMatchCancelRemaining);
             _strategies.Add(key: OrderTypes.FillAndKill, value: ImmediateMatchCancelRemaining);
-            _strategies.Add(key: OrderTypes.StopMarket, value: ImmediateMatchCancelRemaining);
-            _strategies.Add(key: OrderTypes.TrailingStopMarket, value: ImmediateMatchCancelRemaining);
-            _strategies.Add(key: OrderTypes.MarketOnOpen, value: ImmediateMatchCancelRemaining);
-            _strategies.Add(key: OrderTypes.LimitOnOpen, value: ImmediateMatchCancelRemaining);
-            _strategies.Add(key: OrderTypes.MarketOnClose, value: ImmediateMatchCancelRemaining);
-            _strategies.Add(key: OrderTypes.LimitOnClose, value: ImmediateMatchCancelRemaining);
-
             _strategies.Add(key: OrderTypes.FillOrKill, FillOrKill);
-
             _strategies.Add(key: OrderTypes.PostOnly, value: PostOnly);
+
+            _strategies.Add(key: OrderTypes.MarketOnClose, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.MarketOnOpen, value: ImmediateMatchCancelRemaining);
+            _strategies.Add(key: OrderTypes.LimitOnOpen, value: MatchAndAddRemaining);
+            _strategies.Add(key: OrderTypes.LimitOnClose, value: MatchAndAddRemaining);
         }
 
         public Trades match(Order order)
@@ -103,7 +97,10 @@ namespace TradingServer.OrderbookCS
 
             if (dispose)
             {
-                // Dispose of unmanaged resources
+                /*
+                Dispose of unmanaged resources. 
+                Here, we don't have any now, but this could be useful.
+                */
             }
         }
 

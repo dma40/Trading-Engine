@@ -9,20 +9,11 @@ namespace TradingServer.Orders
         GoodTillCancel, 
         Market, 
         PostOnly,
-
-        StopMarket,
-        StopLimit,
-        TrailingStopMarket,
-        TrailingStopLimit,
+        
 
         MarketOnClose,
         LimitOnClose,
         MarketOnOpen,
         LimitOnOpen,
-
-        PairedCancel,
-        PairedExecution,
-
-        Iceberg
     }
 }

@@ -58,15 +58,13 @@ namespace TradingServer.OrderbookCS
             Trades result = new Trades();
             List<OrderbookEntry> cancels = new List<OrderbookEntry>();
 
-            // bool broken = false;
-
             if (order.isBuySide)
             {
                 foreach (var ask in _askLimits)
                 {
                     if (ask.Price >= order.Price)
                     {
-                        //lock (_lockManager[ask])
+    
                         {
                             OrderbookEntry? head = ask.head;
 
@@ -107,7 +105,6 @@ namespace TradingServer.OrderbookCS
                 {
                     if (bid.Price <= order.Price)
                     {
-                        //lock (_lockManager[bid])
                         {
                             OrderbookEntry? head = bid.head;
 
@@ -156,8 +153,14 @@ namespace TradingServer.OrderbookCS
                 resting.DecreaseQuantity(quantity);
                 incoming.DecreaseQuantity(quantity);
 
-                OrderRecord _incoming = new OrderRecord(incoming.OrderID, incoming.CurrentQuantity, incoming.Quantity, incoming.Price, resting.Price, incoming.isBuySide, incoming.Username, incoming.SecurityID, 0, 0);
-                OrderRecord _resting = new OrderRecord(resting.OrderID, 0, quantity, resting.Price, resting.Price, resting.isBuySide, incoming.Username, incoming.SecurityID, _rest.queuePosition(), 0);
+                OrderRecord _incoming = new OrderRecord(incoming.OrderID, incoming.CurrentQuantity,
+                                                        incoming.Quantity, incoming.Price,
+                                                        resting.Price, incoming.isBuySide,
+                                                        incoming.Username, incoming.SecurityID, 0, 0);
+                OrderRecord _resting = new OrderRecord(resting.OrderID, 0, quantity,
+                                                        resting.Price, resting.Price, resting.isBuySide,
+                                                        incoming.Username, incoming.SecurityID,
+                                                        _rest.queuePosition(), 0);
 
                 return new Trade(_incoming, _resting);
             }

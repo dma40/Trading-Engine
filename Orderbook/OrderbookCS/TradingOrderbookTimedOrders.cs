@@ -17,16 +17,7 @@ namespace TradingServer.OrderbookCS
                     {
                         try
                         {
-                            /*
-                            orderbook.DeleteGoodForDayOrders();
-                            orderbook.DeleteExpiredGoodTillCancel();
-
-                            _hidden.DeleteGoodForDayOrders();
-                            _hidden.DeleteExpiredGoodTillCancel();
-                            */
-
                             _strategies.ProcessAtMarketEnd();
-
                             ProcessOnMarketEndOrders();
                         }
 
@@ -67,14 +58,12 @@ namespace TradingServer.OrderbookCS
                         foreach (var order in market_queue)
                         {
                             var orderEntry = order.Value;
-
                             match(orderEntry);
                         }
 
                         foreach (var order in market_queue)
                         {
                             var orderEntry = order.Value;
-
                             route.Remove(orderEntry.cancelOrder());
                         }
 
@@ -84,14 +73,12 @@ namespace TradingServer.OrderbookCS
                         foreach (var order in limit_queue)
                         {
                             var orderEntry = order.Value;
-
                             match(orderEntry);
                         }
 
                         foreach (var order in market_queue)
                         {
                             var orderEntry = order.Value;
-
                             route.Remove(orderEntry.cancelOrder());
                         }
                     }
@@ -116,14 +103,12 @@ namespace TradingServer.OrderbookCS
             foreach (var order in market_queue)
             {
                 var orderEntry = order.Value;
-
                 match(orderEntry);
             }
 
             foreach (var order in market_queue)
             {
                 var orderEntry = order.Value;
-
                 route.Remove(orderEntry.cancelOrder());
             }
 
@@ -133,7 +118,6 @@ namespace TradingServer.OrderbookCS
             foreach (var order in limit_queue)
             {
                 var orderEntry = order.Value;
-
                 match(orderEntry);
             }
 
