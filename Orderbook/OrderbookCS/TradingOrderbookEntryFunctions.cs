@@ -46,7 +46,7 @@ namespace TradingServer.OrderbookCS
             }
         }
 
-        protected bool isQueuable(Order order)
+        private bool isQueuable(Order order)
         {
             return order.OrderType == OrderTypes.MarketOnClose || order.OrderType == OrderTypes.MarketOnOpen
                     || order.OrderType == OrderTypes.LimitOnOpen || order.OrderType == OrderTypes.LimitOnClose;

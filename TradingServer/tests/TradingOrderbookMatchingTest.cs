@@ -51,7 +51,7 @@ namespace TradingServer.Tests
                 _tradingEngine.removeOrder(testOrders[i].cancelOrder());
             }
 
-            //Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 0);
+            Assert.That(_tradingEngine.orderbook.getAskLimits().Count == 0);
         }
 
         [Test]

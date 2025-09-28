@@ -58,7 +58,7 @@ internal static class TradingHostBuilder
 
         else
         {
-            throw new ArgumentException("This is not a supported logger type");
+            throw new ArgumentException("Invalid logger type");
         }
         
         services.AddGrpcClient<TradingClient>();

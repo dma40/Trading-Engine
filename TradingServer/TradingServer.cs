@@ -19,7 +19,7 @@ namespace TradingServer.Core
         private readonly TradingServerConfiguration _tradingConfig;
         private readonly OrderValidator _validator;
 
-        private readonly TradingEngine _engine;
+        private readonly IMatchingEngine _engine;
 
         public TradingServer(ITextLogger logger, IOptions<TradingServerConfiguration> config)
         {
@@ -31,7 +31,7 @@ namespace TradingServer.Core
 
             _security = new Security(name, id);
             _engine = new TradingEngine(_security);
-            _validator = new OrderValidator();
+            _validator = OrderValidator.Instance;
         }
 
         public Task Run(CancellationToken token) => ExecuteAsync(token);

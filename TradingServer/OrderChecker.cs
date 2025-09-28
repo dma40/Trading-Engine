@@ -5,9 +5,11 @@ using TradingServer.Rejects;
 
 namespace TradingServer.Core
 {
-    class OrderValidator
+    sealed class OrderValidator
     {
-        public OrderValidator()
+        private static readonly OrderValidator _validator = new OrderValidator();
+
+        private OrderValidator()
         {
             _validators = new Dictionary<RejectionReason, IValidator>();
 
@@ -15,6 +17,14 @@ namespace TradingServer.Core
             _validators.Add(key: RejectionReason.EmptyOrNullArgument, value: new EmptyOrNullArgumentValidator());
             _validators.Add(key: RejectionReason.InvalidOrUnknownArgument, value: new InvalidArgumentValidator());
             _validators.Add(key: RejectionReason.OperationNotFound, value: new OperationValidator());
+        }
+
+        public static OrderValidator Instance
+        {
+            get
+            {
+                return _validator;
+            }
         }
 
         public RejectionReason Check(OrderRequest request)

@@ -15,7 +15,7 @@ namespace TradingServer.Logging
 
             if (_logConfig.LoggerType != LoggerType.ThreadPoll)
             {
-                throw new InvalidDataException();
+                throw new InvalidDataException("A ThreadPollLogger cannot be instantiated with a differnet type");
             }
 
             if (_logConfig.TextLoggerConfiguration == null)
